@@ -1,0 +1,413 @@
+# Registro de Arquitectura — Limonchero 3D
+# Fuente autoritativa de posturas arquitectónicas cross-ADR.
+# Actualizar aquí cuando se apruebe un ADR nuevo.
+# Nunca modificar entradas existentes — agregar nueva entrada con status: superseded_by si cambia.
+
+---
+
+state_ownership:
+  - state: game_state
+    owner: GameManager
+    source_adr: ADR-0001
+    interface: GameManager (autoload singleton)
+    notes: >
+      Todo el estado canónico del juego (pistas, flags, telemetría, english_level, session_id)
+      vive exclusivamente en GameManager. Ningún otro módulo duplica este estado.
+
+  - state: anti_stall_state
+    owner: GameManager
+    source_adr: ADR-0011
+    interface: "_stall_timer: Timer (child node), _stall_level: int"
+    notes: >
+      Timer one-shot en GameManager. _stall_level: 0=armado, 1=L1 disparado, 2=L2, 3=L3.
+      Resetea a 0 en cada clue_added. Sin disparos después de L3. Conteos en anti_stall_triggers dict (ADR-0007).
+
+  - state: player_transform
+    owner: "CharacterBody3D en player.tscn"
+    source_adr: ADR-0012
+    interface: "player.tscn instanciado en el_agave_y_la_luna.tscn — acceso via get_node o grupo"
+    notes: >
+      Posición y orientación del jugador pertenecen exclusivamente a la escena player.tscn.
+      Ningún autoload lee ni escribe transform del jugador directamente.
+      Camera3D accesible como $Camera3D desde scripts hijos o de la escena del nivel.
+
+  - state: interaction_focus
+    owner: "InteractionSystem (interaction_system.gd en player.tscn)"
+    source_adr: ADR-0013
+    interface: "_focused: Node3D — nodo actual bajo RayCast3D, null si ninguno"
+    notes: >
+      Estado efímero — no persiste entre frames. Ningún autoload lee ni escribe el foco.
+      HUD y InspectOverlay escuchan señal focus_changed para actualizar UI.
+
+  - state: npc_histories
+    owner: "NPCDialogueManager (autoload — Foundation layer)"
+    source_adr: ADR-0014
+    interface: "_histories: Dictionary — {npc_id: Array[{role, content}]}"
+    notes: >
+      Historial de conversación por NPC. Persiste toda la sesión. MAX_HISTORY_TURNS = 10.
+      Trunca los 2 mensajes más antiguos al superar el límite. Solo legible externamente via get_history(npc_id).
+
+  - state: inventory_view
+    owner: "InventoryHUD (CanvasLayer en el_agave_y_la_luna.tscn)"
+    source_adr: ADR-0015
+    interface: "visible: bool — toggle con acción open_inventory (Tab / Select)"
+    notes: >
+      Solo lectura de GameManager.clues. No escribe estado de pistas.
+      Actualiza reactivamente via clue_added y clue_state_changed.
+      MAX_SLOTS = 8. Congela movimiento del jugador mientras visible.
+
+  - state: gajito_popup_state
+    owner: "GajitoModule (autoload — Feature layer)"
+    source_adr: ADR-0016
+    interface: "_pending_correction: bool; _popup.visible: bool"
+    notes: >
+      Pop-up CanvasLayer esquina inf. izq. Auto-dismiss 5 s via Timer one-shot.
+      Prioridad: corrección > hint anti-stall. No bloquea movimiento.
+
+interfaces:
+  - name: clue_added
+    type: signal
+    signature: "clue_added(clue_id: String)"
+    owner: GameManager
+    source_adr: ADR-0001
+    consumers: [Anti-Estancamiento, HUD/UI, Evidencias/Inventario]
+
+  - name: clue_state_changed
+    type: signal
+    signature: "clue_state_changed(clue_id: String, state: String)"
+    owner: GameManager
+    source_adr: ADR-0001
+    consumers: [Acusación/Final, HUD/UI]
+
+  - name: gate_opened
+    type: signal
+    signature: "gate_opened()"
+    owner: GameManager
+    source_adr: ADR-0001
+    consumers: [Acusación/Final]
+
+  - name: add_clue
+    type: method
+    signature: "add_clue(clue_id: String) -> void"
+    owner: GameManager
+    source_adr: ADR-0001
+    notes: Único punto de escritura de pistas al estado canónico
+
+  - name: is_confession_gate_open
+    type: method
+    signature: "is_confession_gate_open() -> bool"
+    owner: GameManager
+    source_adr: ADR-0001
+    notes: Evalúa F1+F2+F3 BUENAS + Barry nombrado
+
+  - name: export_session_json
+    type: method
+    signature: "export_session_json() -> void"
+    owner: GameManager
+    source_adr: ADR-0001
+    notes: Escribe user://sesion_{session_id}_{timestamp}.json. Conectado a tree_exiting y case_resolved.
+
+  - name: anti_stall_triggered
+    type: signal
+    signature: "anti_stall_triggered(level: String)"
+    owner: GameManager
+    source_adr: ADR-0011
+    notes: >
+      Emitida en _on_stall_timer_timeout(). level = "L1"|"L2"|"L3".
+      GajitoModule conecta para mostrar hint en español. Máximo 3 emisiones por sesión.
+
+  - name: enable_input
+    type: method
+    signature: "enable_input(enabled: bool) -> void"
+    owner: "CharacterBody3D (player_controller.gd)"
+    source_adr: ADR-0012
+    notes: >
+      Desactiva todos los controles del jugador (movimiento + look).
+      También libera/captura el cursor según enabled.
+      Llamar con false al abrir menú/pausa; con true al cerrarlo.
+
+  - name: set_mouse_sensitivity
+    type: method
+    signature: "set_mouse_sensitivity(value: float) -> void"
+    owner: "CharacterBody3D (player_controller.gd)"
+    source_adr: ADR-0012
+    notes: >
+      Único punto de ajuste de sensibilidad. Llamado desde menú de opciones.
+      Valor por defecto: MOUSE_SENSITIVITY = 0.002 rad/pixel.
+
+  - name: focus_changed
+    type: signal
+    signature: "focus_changed(interactable)"
+    owner: "InteractionSystem (interaction_system.gd)"
+    source_adr: ADR-0013
+    notes: >
+      Emitida cada vez que el objeto bajo RayCast3D cambia (incluye null al perder foco).
+      HUD conecta para mostrar/ocultar etiqueta de acción.
+      Argumento sin tipo explícito (duck-typed) — el receptor debe verificar que el nodo tiene interaction_label.
+
+  - name: interact_contract
+    type: duck_typing_interface
+    signature: "var interaction_label: String; func interact() -> void"
+    owner: "Nodos interactuables en el nivel (ClueInteractable, NPCInteractable, EnvironmentInteractable)"
+    source_adr: ADR-0013
+    notes: >
+      No hay herencia obligatoria. Todo nodo que exponga interaction_label y interact() es válido.
+      InteractionSystem detecta la presencia de interact() via has_method("interact").
+
+  - name: npc_response_ready
+    type: signal
+    signature: "npc_response_ready(npc_id: String, text: String)"
+    owner: NPCDialogueManager
+    source_adr: ADR-0014
+    notes: >
+      Emitida por NPCDialogueManager al recibir respuesta del backend O al expirar timeout (8s).
+      Consumidores: ADR-0010 (tablón diegético), ADR-0009 (detener balbuceo), ADR-0017 (HUD subtítulo NPC).
+
+  - name: testimony_available
+    type: signal
+    signature: "testimony_available(clue_id: String)"
+    owner: NPCDialogueManager
+    source_adr: ADR-0014
+    notes: >
+      Emitida cuando la respuesta NPC contiene testimonio relevante (flag backend o keyword match).
+      UI muestra "¿Agregar como evidencia? [E]". Confirmación → GameManager.add_clue(clue_id).
+      Claves: Moni → "F3" (traje amarillo), Gerry → "R5" (puerta trasera).
+
+  - name: inventory_opened
+    type: signal
+    signature: "inventory_opened()"
+    owner: "InventoryHUD (CanvasLayer)"
+    source_adr: ADR-0015
+    notes: Emitida al abrir con Tab. HUD System puede escuchar para ocultar elementos incompatibles.
+
+  - name: inventory_closed
+    type: signal
+    signature: "inventory_closed()"
+    owner: "InventoryHUD (CanvasLayer)"
+    source_adr: ADR-0015
+    notes: Emitida al cerrar con Tab. HUD System restaura elementos ocultos.
+
+forbidden_patterns:
+  - pattern: escritura_directa_estado_gamemanager
+    description: >
+      Escribir directamente en GameManager.clues, GameManager.npc_interrogation_counts,
+      GameManager.accusation_attempts u otras variables de estado sin usar los métodos públicos.
+    source_adr: ADR-0001
+    instead_use: GameManager.add_clue(), GameManager.register_interrogation(), etc.
+
+  - pattern: llamada_directa_godot_a_ollama
+    description: >
+      Godot no debe llamar directamente a Ollama (localhost:11434).
+      Todas las llamadas LLM van a través del backend FastAPI (localhost:8000).
+    source_adr: ADR-0002
+    instead_use: LLM Client → POST localhost:8000/npc/{id} o /grammar
+
+api_decisions:
+  - name: llm_provider
+    value: "ollama/llama3.2 local (http://localhost:11434)"
+    source_adr: ADR-0002
+    notes: >
+      Proveedor LLM único para todo el proyecto. Sin API externa, sin costo.
+      Cambiar modelo requiere solo modificar OLLAMA_MODEL en backend/config.py.
+
+  - name: backend_url
+    value: "http://localhost:8000"
+    source_adr: ADR-0003
+    notes: Puerto fijo 8000. Definido como constante BACKEND_URL en llm_client.gd y backend/config.py.
+
+  - name: backend_launch
+    value: "OS.create_process('python', [ruta_main_py]) desde main_menu"
+    source_adr: ADR-0003
+    notes: >
+      El juego lanza el backend automáticamente. Health check con 3 reintentos antes de habilitar
+      el botón "Iniciar partida". stop_backend() conectado a tree_exiting.
+
+interfaces:
+  - name: backend_ready
+    type: signal
+    signature: "backend_ready()"
+    owner: BackendLauncher
+    source_adr: ADR-0003
+    consumers: [main_menu — habilita botón Iniciar partida, GameManager.initialize_session()]
+
+  - name: backend_unavailable
+    type: signal
+    signature: "backend_unavailable(reason: String)"
+    owner: BackendLauncher
+    source_adr: ADR-0003
+    consumers: [main_menu — muestra panel de error con instrucciones]
+
+forbidden_patterns:
+  - pattern: iniciar_partida_sin_health_check
+    description: >
+      No cargar el_agave_y_la_luna.tscn ni llamar GameManager.initialize_session()
+      antes de recibir la señal backend_ready. Hacerlo resulta en errores de LLM/STT
+      sin mensaje de error accionable para el usuario.
+    source_adr: ADR-0003
+    instead_use: Esperar señal backend_ready antes de habilitar SceneLoader
+
+  - pattern: audio_a_disco_antes_de_enviar
+    description: >
+      No escribir el audio capturado a user://temp.wav u otro archivo temporal
+      antes de enviarlo al backend. El WAV se construye en memoria y se envía
+      directamente vía HTTPRequest.
+    source_adr: ADR-0004
+    instead_use: VoiceManager._build_wav(buffer) → emit audio_captured(wav_bytes) → HTTPRequest
+
+  - name: recording_started
+    type: signal
+    signature: "recording_started()"
+    owner: VoiceManager
+    source_adr: ADR-0004
+    consumers: [HUD/UI — muestra indicador PTT]
+
+  - name: recording_stopped
+    type: signal
+    signature: "recording_stopped()"
+    owner: VoiceManager
+    source_adr: ADR-0004
+    consumers: [HUD/UI — oculta indicador PTT]
+
+  - name: audio_captured
+    type: signal
+    signature: "audio_captured(wav_bytes: PackedByteArray)"
+    owner: VoiceManager
+    source_adr: ADR-0004
+    consumers: [LLMClient — POST /stt]
+
+  - name: ptt_audio_capture
+    value: "AudioEffectCapture en bus 'Mic' con AudioStreamMicrophone, buffer 10s, forzar stop a 8s"
+    source_adr: ADR-0004
+    notes: Sample rate 16000 Hz. Conversión manual PackedVector2Array → WAV PCM 16-bit mono.
+
+  - name: patron_comunicacion
+    value: "señales tipadas Godot nativas — sin EventBus global, sin get_node() entre capas"
+    source_adr: ADR-0005
+    notes: >
+      Capa superior puede llamar métodos de capa inferior directamente.
+      Capa inferior notifica a capas superiores solo via señales.
+      Foundation nunca llama módulos de Feature/Core/Presentation.
+
+  - pattern: llamadas_directas_entre_capas_ascendentes
+    description: >
+      Ningún módulo de Foundation (GameManager, LLMClient, SceneLoader) puede llamar
+      get_node() ni métodos directos de módulos Feature, Core o Presentation.
+      La comunicación ascendente es SIEMPRE via señales.
+    source_adr: ADR-0005
+    instead_use: emit_signal() en el módulo de capa inferior; connect() en el módulo de capa superior
+
+  - pattern: senales_sin_tipo
+    description: >
+      No declarar señales sin tipos explícitos. Usar siempre "signal foo(bar: String)"
+      en lugar de "signal foo". Las señales sin tipo dificultan el autocompletado y
+      la detección de errores en Godot 4.6.
+    source_adr: ADR-0005
+    instead_use: "signal nombre(parametro: Tipo)"
+
+  - pattern: add_clue_sin_confirmacion
+    description: >
+      Un ClueInteractable no debe llamar GameManager.add_clue() directamente en interact()
+      sin que el jugador confirme primero en el overlay de inspección (salvo auto_add=true explícito).
+      Hacerlo añade la pista al inventario sin que el jugador haya leído su descripción.
+    source_adr: ADR-0013
+    instead_use: >
+      interact() emite inspect_requested(clue_id, description).
+      InspectOverlay.confirmed emite la señal → InteractionSystem llama GameManager.add_clue().
+      Excepción: @export var auto_add: bool = true en ClueInteractable para objetos triviales.
+
+  - name: english_level
+    type: method
+    signature: "set_english_level(level: String) -> void"
+    owner: GameManager
+    source_adr: ADR-0006
+    notes: >
+      Valores válidos: "beginner", "intermediate", "advanced". Único punto de escritura
+      del nivel de inglés. Llamado desde main_menu antes de initialize_session().
+
+  - name: english_level_field
+    type: property
+    signature: "english_level: String"
+    owner: GameManager
+    source_adr: ADR-0006
+    notes: Leído por LLMClient en cada request_npc_response(); incluido en JSON de telemetría.
+
+  - name: export_session_json
+    type: method
+    signature: "export_session_json() -> void"
+    owner: GameManager
+    source_adr: ADR-0007
+    notes: >
+      Escribe user://sesion_{session_id}_{timestamp}.json. Protegido con flag _session_exported.
+      Conectado a tree_exiting y a señal case_resolved.
+
+api_decisions:
+  - name: english_level_conditioning
+    value: "sufijo inyectado en backend — ENGLISH_LEVEL_SUFFIXES en backend/config.py"
+    source_adr: ADR-0006
+    notes: >
+      Godot envía english_level como String en POST /npc/{id}. Backend construye
+      full_prompt = system_prompt + "\n\n" + sufijo. Sufijo editable sin tocar Godot.
+
+  - name: telemetria_formato
+    value: "JSON local en user:// — un archivo por sesión — sin envío de red"
+    source_adr: ADR-0007
+    notes: >
+      Campos: session_id, timestamps, duration_seconds, english_level, case_resolved,
+      accusation_attempts, clues, npc_interrogation_counts, gajito_corrections, anti_stall_triggers.
+      session_id visible en pantalla final para cruzar con Google Forms.
+
+  - name: confession_gate_logic
+    value: "F1+F2+F3 en estado 'good' + npc_id == 'barry_peel' → is_confession_gate_open()"
+    source_adr: ADR-0008
+    notes: >
+      Acusación es irreversible. Fallo inmediato si NPC equivocado o puerta cerrada.
+      Señales: case_failed(reason: String), case_resolved(). CULPRIT_ID = "barry_peel" hardcodeado.
+
+  - name: npc_babble
+    value: "clips .ogg por NPC + AudioStreamRandomizer — res://assets/audio/babble/{npc_id}/"
+    source_adr: ADR-0009
+    notes: >
+      3-5 clips por NPC grabados por Sofía. Reproducción en loop mientras LLMClient espera respuesta.
+      Detener en npc_response_ready. Placeholder genérico si clips no están listos.
+
+  - name: npc_dialogue_display
+    value: "SubViewport (512×256) + RichTextLabel → ViewportTexture → Sprite3D unlit en mundo 3D"
+    source_adr: ADR-0010
+    notes: >
+      Sprite3D posicionado cerca del NPC. Visible solo cuando hay respuesta activa.
+      RichTextLabel con tema noir (fuente monoespaciada, texto crema, fondo oscuro).
+
+  - name: anti_stall_timer
+    value: "Timer one-shot en GameManager — STALL_THRESHOLDS = [240.0, 60.0, 120.0] segundos"
+    source_adr: ADR-0011
+    notes: >
+      L1 a 240 s sin clue_added, L2 a 60 s adicionales, L3 a 120 s adicionales.
+      Reset en clue_added: _stall_level=0, timer reinicia desde STALL_THRESHOLDS[0].
+      Sin disparos tras L3. GajitoModule conecta anti_stall_triggered para mostrar hint.
+
+  - name: player_controller
+    value: "CharacterBody3D + Camera3D hijo — WALK_SPEED=4.0 m/s, SPRINT_SPEED=7.0 m/s"
+    source_adr: ADR-0012
+    notes: >
+      Scene: res://scenes/player/player.tscn. Script: res://scripts/core/player_controller.gd.
+      Gravedad = 9.8 m/s². Sin salto. Mouse capturado durante gameplay (MOUSE_MODE_CAPTURED).
+      Mando: Input.get_vector() para movimiento, acción "sprint" mapeada a L3.
+
+  - name: npc_dialogue
+    value: "NPCDialogueManager autoload — MAX_HISTORY_TURNS=10, LLM_TIMEOUT_SEC=8.0, árbol acusación scripted"
+    source_adr: ADR-0014
+    notes: >
+      Script: res://scripts/feature/npc_dialogue_manager.gd.
+      Historial: {npc_id: Array[{role, content}]} truncado a 10 turnos.
+      Árbol de acusación (Spud): scripted, no LLM. Valida via GameManager.is_confession_gate_open().
+      Testimonio: flag backend testimony_clue_id (prioritario) o TESTIMONY_TRIGGERS keyword-match (fallback).
+
+  - name: inventory_hud
+    value: "CanvasLayer GridContainer 4×2 — MAX_SLOTS=8, icono+borde por tipo, STATE_COLORS por estado"
+    source_adr: ADR-0015
+    notes: >
+      Scene: res://scenes/ui/inventory_hud.tscn. Script: res://scripts/ui/inventory_hud.gd.
+      Tipo físico: borde dorado + icono lupa. Tipo testimonio: borde azul + icono diálogo.
+      STATE_COLORS: good=verde oscuro, not_good=rojo oscuro, unchecked=gris.
+      STATE_LABELS (español): BUENA / NO_BUENA / SIN_REVISAR.
+      TESTIMONY_PREFIXES = ["R"]. Toggle con acción open_inventory (Tab / Select).

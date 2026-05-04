@@ -1,0 +1,25 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Godot 3 leftovers (safe if absent)
+.import/
+
+# Builds/exports (if generated inside game/)
+/exports/
+/build/
+/dist/
+
+# Logs
+*.log
+
+# Blender temp/backups (if you keep .blend in-project)
+*.blend1
+*.blend2
+*.blend@
+
+# Blender source files (keep exported .glb/.gltf/.obj in git instead)
+*.blend
+
+# Common source bundles (prefer extracting what you actually ship)
+assets/models/**/*.zip

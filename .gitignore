@@ -1,0 +1,40 @@
+# Godot 4 generated/import cache
+.godot/
+
+# Godot 3 leftovers (safe if absent)
+.import/
+
+# Editor/OS noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.obsidian/
+
+# Logs
+*.log
+
+# Builds/exports
+exports/
+build/
+dist/
+
+# Android export artifacts (if used)
+android/
+
+# Blender temp/backups
+*.blend1
+*.blend2
+*.blend@
+
+# Blender source files (keep exported .glb/.gltf/.obj in git instead)
+*.blend
+
+# Source art that isn't used at runtime (keep your game-ready assets versioned)
+source_assets/
+
+# Common source bundles (prefer extracting what you actually ship)
+game/assets/models/**/*.zip
+
+# Nested git repo (keep separately or add as submodule later)
+tools/Claude-Code-Game-Studios/

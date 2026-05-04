@@ -1,0 +1,288 @@
+# TR Registry — Limonchero 3D
+# Stable IDs for all technical requirements extracted from GDDs.
+# IDs are immutable once assigned. Never renumber or delete.
+# To retire a requirement: set status: deprecated.
+#
+# last_updated: 2026-05-01 (v2)
+# version: 1.1
+# source_review: docs/architecture/architecture-review-2026-05-01-v2.md
+# notes: v2 — no new TR-IDs; coverage jumped 11→25/27 with ADR-0011..0016. No deprecations.
+
+requirements:
+
+  # ── PLAYER ──────────────────────────────────────────────────────────────────
+  - id: TR-jugador-001
+    system: Player
+    requirement: >
+      FPS movement — CharacterBody3D + Camera3D, WASD / mouse + gamepad support.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Core / Input
+    layer: Core
+    status: active
+
+  - id: TR-jugador-002
+    system: Player
+    requirement: Sprint (Shift keyboard / L3 gamepad).
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Core
+    layer: Core
+    status: active
+
+  # ── INTERACTION ─────────────────────────────────────────────────────────────
+  - id: TR-interact-001
+    system: Interaction
+    requirement: >
+      Proximity detection → E key, contextual menu (Interrogar / Examinar).
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Core / Input
+    layer: Core
+    status: active
+
+  - id: TR-interact-002
+    system: Interaction
+    requirement: >
+      Inspection overlay — centred object view, Esc to close.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Core / UI
+    layer: Core
+    status: active
+
+  - id: TR-interact-003
+    system: Interaction
+    requirement: >
+      Clue pickup → inventory, prompt "¿Agregar como evidencia?" during NPC dialogue.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Core
+    layer: Core
+    status: active
+
+  # ── EVIDENCE / INVENTORY ────────────────────────────────────────────────────
+  - id: TR-pista-001
+    system: Evidence/Inventory
+    requirement: >
+      8 slots, distinguishes physical clues vs testimonies.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Feature
+    layer: Feature
+    status: active
+
+  - id: TR-pista-002
+    system: Evidence/Inventory
+    requirement: >
+      Tablón diegético (3D wall) + Tab-key readable HUD view.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Feature / UI
+    layer: Feature
+    status: active
+
+  - id: TR-pista-003
+    system: Evidence/Inventory
+    requirement: >
+      Per-clue state: BUENA / NO_BUENA / SIN_REVISAR (canonical runtime values TBD — Conflict #1).
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Feature
+    layer: Feature
+    status: active
+    note: "Canonical: state String 'good'|'not_good'|'unchecked', stored nested in clues[id].state. Resolved 2026-05-01."
+
+  # ── NPC ─────────────────────────────────────────────────────────────────────
+  - id: TR-npc-001
+    system: NPC
+    requirement: >
+      5 NPCs with unique system prompts and per-session conversation history.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Feature / AI
+    layer: Feature
+    status: active
+
+  - id: TR-npc-002
+    system: NPC
+    requirement: >
+      Per-NPC balbuceo — short audio clip synced with text display speed.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Presentation
+    layer: Presentation
+    status: active
+
+  # ── VOICE / STT ─────────────────────────────────────────────────────────────
+  - id: TR-voz-001
+    system: Voice/STT
+    requirement: >
+      PTT — hold V (keyboard) / LB (gamepad) → AudioEffectCapture → WAV → FastAPI.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Core
+    layer: Core
+    status: active
+
+  - id: TR-voz-002
+    system: Voice/STT
+    requirement: >
+      STT latency ≤ 4s end-to-end, English with Latin accent, >85% word accuracy.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Core
+    layer: Core
+    status: active
+
+  # ── LLM CLIENT ──────────────────────────────────────────────────────────────
+  - id: TR-llm-001
+    system: LLM Client
+    requirement: >
+      HTTP POST localhost → FastAPI → LLM model.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Foundation
+    layer: Foundation
+    status: active
+
+  - id: TR-llm-002
+    system: LLM Client
+    requirement: 8-second timeout per NPC response.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Foundation
+    layer: Foundation
+    status: active
+
+  - id: TR-llm-003
+    system: LLM Client
+    requirement: >
+      Dev = Ollama (llama3/mistral), Demo = GPT-4o-mini / Gemini Flash.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Foundation
+    layer: Foundation
+    status: active
+    note: "Resolved 2026-05-01: Ollama-only (ADR-0002 wins). GDD + CLAUDE.md updated. No demo path."
+
+  # ── GAJITO ──────────────────────────────────────────────────────────────────
+  - id: TR-gajito-001
+    system: Gajito
+    requirement: >
+      Grammar evaluator: player text → LLM → Spanish correction in pop-up overlay.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Feature / AI
+    layer: Feature
+    status: active
+
+  - id: TR-gajito-002
+    system: Gajito
+    requirement: >
+      Grammar evaluation runs in parallel to NPC LLM response (non-blocking).
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Feature
+    layer: Feature
+    status: active
+
+  # ── ACCUSATION ──────────────────────────────────────────────────────────────
+  - id: TR-acus-001
+    system: Accusation
+    requirement: >
+      Dialogue tree with Commissioner Spud, up to 3 evidence items presented.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Feature
+    layer: Feature
+    status: active
+
+  - id: TR-acus-002
+    system: Accusation
+    requirement: >
+      Confession gate: F1+F2+F3 simultaneously GOOD + Barry Peel named as accused.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Feature
+    layer: Feature
+    status: active
+
+  # ── GAME STATE ──────────────────────────────────────────────────────────────
+  - id: TR-estado-001
+    system: Game State
+    requirement: >
+      GameManager autoload: canonical clue state, progress flags, session telemetry.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Foundation
+    layer: Foundation
+    status: active
+
+  - id: TR-estado-002
+    system: Game State
+    requirement: >
+      Anti-stall L1/L2/L3: hints triggered at 4/5/7 minutes without new evidence.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Feature
+    layer: Feature
+    status: active
+
+  # ── HUD / UI ────────────────────────────────────────────────────────────────
+  - id: TR-ui-001
+    system: HUD/UI
+    requirement: >
+      2-channel subtitles (player + NPC), PTT active indicator, Gajito pop-up overlay.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Presentation
+    layer: Presentation
+    status: active
+
+  - id: TR-ui-002
+    system: HUD/UI
+    requirement: >
+      FOV slider 70–110°, subtitle font size adjustable.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Presentation
+    layer: Presentation
+    status: active
+
+  # ── BACKEND ─────────────────────────────────────────────────────────────────
+  - id: TR-backend-001
+    system: Backend
+    requirement: >
+      FastAPI: /stt /npc/{id} /grammar endpoints; offline detection at startup with actionable error.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Foundation
+    layer: Foundation
+    status: active
+
+  # ── ENGLISH LEVEL ────────────────────────────────────────────────────────────
+  - id: TR-nivel-001
+    system: Level Selector
+    requirement: >
+      Main menu selector: Beginner / Intermediate / Advanced, stored in GameManager.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Feature / UI
+    layer: Feature
+    status: active
+
+  - id: TR-nivel-002
+    system: NPC Dialogue
+    requirement: >
+      NPC system prompt conditioned by selected English level on each LLM request.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Feature / AI
+    layer: Feature
+    status: active
+
+  # ── TELEMETRY ────────────────────────────────────────────────────────────────
+  - id: TR-telemetria-001
+    system: Session Log
+    requirement: >
+      GameManager records timestamped events during session (clues, NPC counts, accusations, grammar errors).
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Foundation
+    layer: Foundation
+    status: active
+    note: "Resolved 2026-05-01: canonical fields in ADR-0007 — grammar_errors_count, npcs_interrogated, anti_stall_triggers dict, accusation_attempts Array."
+
+  - id: TR-telemetria-002
+    system: Session Log
+    requirement: >
+      JSON export triggers automatically on case_resolved or SceneTree.quit().
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Foundation
+    layer: Foundation
+    status: active
+
+  - id: TR-telemetria-003
+    system: Session Log
+    requirement: >
+      JSON fields: session_id, english_level, duration, clues, NPC counts, accusation attempts,
+      grammar errors, anti-stall hints, completed, correct accusation.
+    gdd: gdd/gdd_detective_noir_vr.md
+    domain: Foundation
+    layer: Foundation
+    status: active
+    note: "Schema conflicts with ADR-0007 — resolve Conflict #3."
