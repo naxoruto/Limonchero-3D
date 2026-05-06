@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+httpx
+ollama
+faster-whisper
+pytest
+pytest-asyncio
+python-multipart
