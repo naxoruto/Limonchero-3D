@@ -32,23 +32,23 @@ Vestíbulo → Salón principal → Bodega → Pasillo de servicio → Oficina d
 
 **Layout de planta única (Norte arriba):**
 ```
-╔═══════════════════════════════════════════════════╗
-║  Z3 BODEGA (9×7)   │  Z4 PASILLO (12×2.2)         ║
-║  [F4]              │  [huellas Barry]──► [Z5 →]    ║
-╠════════════════════════════════════════════════════╣
-║         Z2 SALÓN + BARRA (18×14)         corredor  ║
-║  [Barry NW]  [escenario N]  [Moni E]    ──────►Z6  ║
-║            [pista 8×8]                             ║
-║  [Gerry O]               [Lola S]                  ║
-╠══════════╣                                         ║
-║ Z1 VEST. ║                                         ║
-║ [Spud]   ║      Z6 INTERROGATORIO (5×4) ◄──────────╝
-║ [F2]     ║      [espejo] [mesa] [puerta sec. ◄ Z5]
-╚══════════╝
-                     Z5 OFICINA (8×6)
-                     [F3] [caja fuerte] [escritorio]
-                     puerta principal ← F2 requerida
-                     puerta secundaria → corredor Z6 (sin manija exterior)
+╔═════════════╦══════════════════════════╦══════════════╗
+║             ║ Z4 PASILLO (ESTE-OESTE)  ║ Z5 OFICINA   ║
+║  Z3 BODEGA  ║ [huellas]             ─► ║ [F3] [caja]  ║
+║    (9×7)    ╠══════════════════════════╣ principal ─► ║
+║    [F4]   ◄─╢                          ║ secundaria ─┐║
+║             ║      Z2 SALÓN + BARRA    ║             │║
+╠═════════════╣          (18×14)         ║ Z6 SALA DE  │║
+║             ║ [Barry NW]               ║ REUNIONES   │║
+║             ║               [Moni E]   ║ (5×4)     ◄─┘║
+║             ║   [pista 8×8]            ║ [espejo]     ║
+║             ║                          ╠══════════════╣
+║             ║ [Gerry O]     [Lola S] ─►║ CORREDOR ESTE║
+║             ║                          ║ y BAÑO [F5]  ║
+╚═════════════╬══════════════════════════╬══════════════╝
+              ║ Z1 VESTÍBULO (8×7)       ║
+              ║ [Spud] [F2 abrigo]       ║
+              ╚══════════════════════════╝
 ```
 
 **Nota de diseño:** La interrogación de NPCs secundarios (Lola, Moni, Gerry) no es un requisito para el final bueno. Un jugador que recolecta F1+F2+F3 y los marca GOOD puede confrontar a Barry directamente — esto constituye un proceso válido de investigación, no un atajo. El sistema de anti-estancamiento y el coaching de Gajito orientan hacia los NPCs, pero no los imponen.
@@ -65,7 +65,7 @@ Barry entró al club por la bodega → pasillo de servicio → oficina de Cornel
 
 ## 4. Detailed Rules — Las Seis Zonas
 
-### Zona 1 — Vestíbulo (~5m × 7m)
+### Zona 1 — Vestíbulo (~8m × 7m)
 
 **Propósito:** Primera impresión. Presión y orientación.
 
@@ -134,13 +134,13 @@ Barry entró al club por la bodega → pasillo de servicio → oficina de Cornel
 - Sub-espacio de cocina: visible a través de media puerta, no del todo accesible
 - Puerta de servicio metálica (pared este, entreabierta) → pull visual hacia Zona 4
 
-**Baño de empleados:** Accesible desde el corredor adyacente. Contiene F5 (ceniza de sobre quemado).
+**Baño de empleados:** Accesible desde el corredor este (adyacente al Salón y Sala de reuniones). Contiene F5 (ceniza de sobre quemado).
 
 **Visual:** Foco industrial único (`#D4903A`) colgante central. Sombras duras y angulares sobre las cajas. Espacio de ángulo muerto NE no visible desde la puerta.
 
 ---
 
-### Zona 4 — Pasillo de Servicio (~12m × 2.2m, norte-sur)
+### Zona 4 — Pasillo de Servicio (~12m × 2.2m, este-oeste)
 
 **Propósito:** Aislamiento y foco. El único espacio sin NPCs.
 
