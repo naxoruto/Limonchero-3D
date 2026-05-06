@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://c2c2g4yq0n7qp"]
+
+[ext_resource type="PackedScene" uid="uid://c2wq4p0q8lqf5" path="res://scenes/player/player.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://d3q4v8l6w3x2a" path="res://scenes/ui/hud.tscn" id="2"]
+[ext_resource type="Script" path="res://scripts/scenes/club_blockout.gd" id="3"]
+[ext_resource type="Script" uid="uid://dp6lrtxx4eorl" path="res://scripts/core/interaction_system.gd" id="4"]
+[ext_resource type="PackedScene" uid="uid://6q50ovjuregq" path="res://assets/models/environment/Z1_Vestibulo.glb" id="5"]
+[ext_resource type="PackedScene" uid="uid://c168csvampinq" path="res://assets/models/environment/Z2_Salon.glb" id="6"]
+[ext_resource type="PackedScene" uid="uid://1o5m5glfkb7" path="res://assets/models/environment/Z4_Pasillo.glb" id="7"]
+[ext_resource type="PackedScene" uid="uid://boamu7d7x31rw" path="res://assets/models/environment/Z5_Oficina.glb" id="8"]
+
+[node name="ClubBlockout" type="Node3D" unique_id=77431039]
+script = ExtResource("3")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=77431040]
+transform = Transform3D(0.6967067, -0.56192434, 0.4459157, 0, 0.62161, 0.7833269, -0.7173561, -0.5457491, 0.43307984, 0, 0, 0)
+
+[node name="Z1_Vestibulo" parent="." unique_id=77431041 instance=ExtResource("5")]
+
+[node name="Z2_Salon" parent="." unique_id=77431042 instance=ExtResource("6")]
+
+[node name="Z4_Pasillo" parent="." unique_id=77431043 instance=ExtResource("7")]
+
+[node name="Z5_Oficina" parent="." unique_id=77431044 instance=ExtResource("8")]
+
+[node name="Player" parent="." unique_id=77431045 instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 4)
+
+[node name="InteractionSystem" type="Node3D" parent="Player" unique_id=77431046]
+script = ExtResource("4")
+
+[node name="RayCast3D" type="RayCast3D" parent="Player/InteractionSystem" unique_id=77431047]
+target_position = Vector3(0, 0, -2)
+
+[node name="HUD" parent="." unique_id=77431048 instance=ExtResource("2")]
