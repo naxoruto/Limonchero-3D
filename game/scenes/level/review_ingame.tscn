@@ -1,0 +1,43 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="Script" path="res://scripts/scenes/sandbox.gd" id="4"]
+[ext_resource type="Script" path="res://scripts/core/interaction_system.gd" id="5"]
+
+[ext_resource type="Script" path="res://scripts/scenes/review_env.gd" id="7"]
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 1
+background_color = Color(0.06, 0.05, 0.04, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.14, 0.12, 0.10, 1)
+ambient_light_energy = 0.25
+tonemap_mode = 0
+glow_enabled = false
+fog_enabled = false
+
+[node name="ReviewInGame" type="Node3D"]
+script = ExtResource("4")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1")
+
+[node name="EnvSetup" type="Node" parent="."]
+script = ExtResource("7")
+
+[node name="Player" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 6.5)
+
+[node name="InteractionSystem" type="Node3D" parent="Player"]
+script = ExtResource("5")
+
+[node name="RayCast3D" type="RayCast3D" parent="Player/InteractionSystem"]
+target_position = Vector3(0, 0, -2)
+
+[node name="HUD" parent="." instance=ExtResource("3")]
+
+[node name="AmbientFill" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707, -0.5, 0.5, 0, 0.707, 0.707, -0.707, -0.5, 0.5, 0, 10, 0)
+light_energy = 0.2
+shadow_enabled = false

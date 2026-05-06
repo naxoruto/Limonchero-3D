@@ -7,6 +7,7 @@ const GRAVITY: float = 9.8
 const EYE_HEIGHT_ABOVE_FEET: float = 1.55
 const CAMERA_PITCH_LIMIT: float = deg_to_rad(85.0)
 
+
 @export var mouse_sensitivity: float = 0.002
 
 @onready var camera: Camera3D = $Camera3D

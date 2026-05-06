@@ -1,15 +1,15 @@
 # Level Design Document — El Agave y La Luna
 **Juego:** Limonchero 3D (Detective Noir)
-**Versión:** 1.1
-**Fecha:** 2026-04-22
-**Estado:** En revisión — v1.1 actualiza plataforma VR→PC, reemplaza F3 UV wand por Encendedor de Oro, elimina stain progression.
+**Versión:** 1.2
+**Fecha:** 2026-05-05
+**Estado:** En revisión — v1.2 elimina segundo piso; Zona 5 reubicada al extremo norte del pasillo de servicio (planta única). v1.1 actualizó plataforma VR→PC, reemplazó F3 UV wand por Encendedor de Oro, eliminó stain progression.
 **Plataforma:** PC (Windows/Linux) · Godot 4 · Controller / Mouse+Teclado
 
 ---
 
 ## 1. Overview
 
-Todo el juego transcurre en un único escenario: el club nocturno **El Agave y La Luna**, durante su gala anual. Es una noche de años 50 en una ciudad ficticia estadounidense. El dueño, Cornelius "Corn" Maize (mazorca de maíz), ha sido asesinado en su oficina del piso de arriba. El jugador es **Limonchero** (limón, detective de LATAM), asistido por **Gajito** (limón de pica, su traductor). Todos los NPCs hablan exclusivamente en inglés.
+Todo el juego transcurre en un único escenario: el club nocturno **El Agave y La Luna**, durante su gala anual. Es una noche de años 50 en una ciudad ficticia estadounidense. El dueño, Cornelius "Corn" Maize (mazorca de maíz), ha sido asesinado en su oficina privada en el ala trasera del club. El jugador es **Limonchero** (limón, detective de LATAM), asistido por **Gajito** (limón de pica, su traductor). Todos los NPCs hablan exclusivamente en inglés.
 
 El nivel es la historia completa. No hay capítulos ni zonas intermedias — un único espacio continuo con seis áreas navegables.
 
@@ -25,21 +25,40 @@ El jugador debe sentir que **el proceso es la justicia**. Barry Peel es culpable
 
 ### 3.1 Flujo crítico (inducido, no forzado)
 ```
-Vestíbulo → Salón principal → Bodega → Pasillo de servicio
-                                              ↓
-                               Oficina de Cornelius (piso 2)
-                                              ↓
-                               Sala de interrogatorio
+Vestíbulo → Salón principal → Bodega → Pasillo de servicio → Oficina de Cornelius
+                                                                        ↓
+                                                            Sala de interrogatorio
+```
+
+**Layout de planta única (Norte arriba):**
+```
+╔═══════════════════════════════════════════════════╗
+║  Z3 BODEGA (9×7)   │  Z4 PASILLO (12×2.2)         ║
+║  [F4]              │  [huellas Barry]──► [Z5 →]    ║
+╠════════════════════════════════════════════════════╣
+║         Z2 SALÓN + BARRA (18×14)         corredor  ║
+║  [Barry NW]  [escenario N]  [Moni E]    ──────►Z6  ║
+║            [pista 8×8]                             ║
+║  [Gerry O]               [Lola S]                  ║
+╠══════════╣                                         ║
+║ Z1 VEST. ║                                         ║
+║ [Spud]   ║      Z6 INTERROGATORIO (5×4) ◄──────────╝
+║ [F2]     ║      [espejo] [mesa] [puerta sec. ◄ Z5]
+╚══════════╝
+                     Z5 OFICINA (8×6)
+                     [F3] [caja fuerte] [escritorio]
+                     puerta principal ← F2 requerida
+                     puerta secundaria → corredor Z6 (sin manija exterior)
 ```
 
 **Nota de diseño:** La interrogación de NPCs secundarios (Lola, Moni, Gerry) no es un requisito para el final bueno. Un jugador que recolecta F1+F2+F3 y los marca GOOD puede confrontar a Barry directamente — esto constituye un proceso válido de investigación, no un atajo. El sistema de anti-estancamiento y el coaching de Gajito orientan hacia los NPCs, pero no los imponen.
 
 ### 3.2 Ruta de Barry (canon confirmado)
-Barry entró al club por la bodega → pasillo de servicio → escalera trasera → oficina de Cornelius. Salió por la **puerta secundaria** de la oficina hacia el corredor de la sala de reuniones (Zona 6), dejando la puerta principal de la oficina cerrada desde dentro.
+Barry entró al club por la bodega → pasillo de servicio → oficina de Cornelius (puerta principal, abierta con llave maestra). Salió por la **puerta secundaria** de la oficina hacia el corredor de la sala de reuniones (Zona 6), dejando la puerta principal de la oficina cerrada desde dentro.
 
 ### 3.3 Reglas sociales del espacio
 - Los reservados privados tienen "inmunidad social" — acercarse sin invitación es una transgresión que los NPCs notan.
-- El piso de arriba es invitation-only (no físicamente bloqueado, pero culturalmente prohibido). Que Barry tenga la llave maestra es doblemente incriminatorio.
+- La oficina de Cornelius es invitation-only (no físicamente bloqueada, pero culturalmente prohibida — nadie entra sin ser llamado por el patrón). Que Barry tenga la llave maestra es doblemente incriminatorio.
 - La parte trasera del club (bodega, pasillo) es una **frontera visual y sonora** — concreto sin pintar, silencio industrial, luz cálida única en vez de ámbar difuso. No es una frontera de idioma (los NPCs del club hablan inglés), sino de clase y territorio. La transición debe sentirse en la textura y el sonido, no en el diálogo.
 
 ---
@@ -83,8 +102,8 @@ Barry entró al club por la bodega → pasillo de servicio → escalera trasera 
   - Copa de bourbon a medio tomar
   - Acuerdo del fideicomiso (F1) boca abajo en la mesa, bajo el vaso
 - Reloj art-deco noreste (tiempo narrativo)
-- Puerta a bodega: extremo norte de la barra, no visible desde el centro del salón. **Cue de descubrimiento:** cuando el jugador se acerca a menos de 3m del extremo norte de la barra, Gajito dice (1 vez total): *"La cocina ha estado muy callada esta noche. Hay una puerta al fondo del bar."* La luz del foco industrial de la bodega (`#D4903A`) es visible a través del resquicio de la puerta entreabierta desde ese ángulo.
-- Corredor este (hacia sala de interrogatorio y baño de empleados): extremo sur de la pared este, aplique de vidrio esmerilado arriba
+- Puerta a bodega: detrás del mostrador del bar (en la pared posterior del bar, no en el pasillo del salón). Solo accesible rodeando o cruzando el mostrador — no visible ni accesible desde la pista de baile. **Cue de descubrimiento:** cuando el jugador se acerca al extremo norte del mostrador (detrás del bar), Gajito dice (1 vez total): *"La cocina ha estado muy callada esta noche. Hay una puerta detrás del bar."* La luz del foco industrial de la bodega (`#D4903A`) es visible a través del resquicio de la puerta entreabierta desde ese ángulo.
+- Corredor este (hacia sala de reuniones y baño de empleados): extremo sur de la pared este, aplique de vidrio esmerilado arriba
 
 **NPCs y posiciones:**
 | NPC | Posición | Fondo garantizado |
@@ -130,9 +149,8 @@ Barry entró al club por la bodega → pasillo de servicio → escalera trasera 
 - Tres focos de trabajo en el techo — pools de luz cálida con tramos oscuros entre ellos
 - Ventana alta con tira de neón verde `#5A7A2E` (única zona donde el neón cae al suelo — intencional)
 - Huella de barro de Barry visible entre el 2° y 3° pool de luz (find opcional)
-- Segunda huella en el rellano de la escalera (UV wand — find opcional)
-- Colilla de palillo de canela junto a la base de la escalera
-- Escalera al norte (madera sin alfombrar, pasamanos metálico, gira en el rellano)
+- Colilla de palillo de canela junto a la puerta norte (entrada a Z5)
+- Puerta al norte (madera maciza, cerradura de llave maestra) → Zona 5
 
 **Locomotión:** WASD o joystick izquierdo. La luz de la escalera es visible desde la entrada del pasillo — pull visual para mantener la navegación activa.
 
@@ -142,7 +160,7 @@ Barry entró al club por la bodega → pasillo de servicio → escalera trasera 
 
 ---
 
-### Zona 5 — Oficina de Cornelius (~8m × 6m, piso 2)
+### Zona 5 — Oficina de Cornelius (~8m × 6m)
 
 **Propósito:** Gravedad clínica. La escena del crimen.
 
@@ -162,13 +180,15 @@ Barry entró al club por la bodega → pasillo de servicio → escalera trasera 
 
 ---
 
-### Zona 6 — Sala de Interrogatorio (~5m × 4m)
+### Zona 6 — Sala de Reuniones Privada (~5m × 4m)
+
+**Nombre en universo:** Sala de reuniones de Cornelius. Esa noche la policía la usa como sala de reuniones — los NPCs la llaman "la sala del fondo."
 
 **Propósito:** Rendición de cuentas formal. El inglés aquí tiene peso.
 
 **Accesos:**
-- Corredor este desde el salón (planta baja, sin llave requerida)
-- Puerta secundaria desde Zona 5 (piso 2, baja por escalera de servicio)
+- Corredor este desde el salón (sin llave requerida)
+- Puerta secundaria desde Zona 5 (sin manija exterior — solo abre desde dentro de Z5)
 
 **Acceso temprano (sin pistas):** Si el jugador entra a Zona 6 antes de tener ninguna pista en la libreta, Gajito dice: *"No tenemos nada todavía. Esta sala no nos dice nada sin un sospechoso."* La silla frente al espejo unidireccional no tiene collider de interacción activo hasta que al menos una pista esté registrada en la libreta.
 
@@ -225,8 +245,8 @@ Sellos reversibles — el último sello activo es el que cuenta.
 6. Gajito: *"Una llave maestra. La pregunta es para qué la tenía."*
 
 **Puertas que abre:**
-- Puerta de la escalera principal del salón (ruta alternativa a Zona 5)
-- Puerta principal de la oficina de Cornelius (segunda visita)
+- Puerta norte del pasillo de servicio (única ruta a Zona 5)
+- Puerta principal de la oficina de Cornelius (si el jugador llega por otra ruta en el futuro)
 
 **Mecánica de uso:** Acercar F2 al keyhole con E/X → contorno brillante a <0.5m → confirmar → puerta abre. La llave no se consume.
 
@@ -248,7 +268,7 @@ El LLM de cada NPC recibe dos variables en el system prompt antes de cada sesió
 | 90s en interrogatorio sin nuevo testimonio | *"Quizás pregúntale dónde estaba esa noche."* | 90s |
 | Pregunta sobre tema prohibido del NPC | *"No hablará de eso. Todavía no."* | Sin cooldown |
 | Interrogando a Gerry sin F2 | *"Creo que alguna evidencia que encontramos podría soltarle la lengua."* | 1 vez por sesión |
-| Moni da T2 ("traje amarillo") y el jugador no ha visitado Zona 5 | *"Un traje amarillo subiendo. Solo uno de los invitados usa traje amarillo esta noche — y aún no hemos visto ese piso de arriba."* | 1 vez total |
+| Moni da T2 ("traje amarillo") y el jugador no ha visitado Zona 5 | *"Un traje amarillo en la parte trasera del club. Solo uno de los invitados usa traje amarillo esta noche — y aún no hemos visto la oficina de Cornelius."* | 1 vez total |
 | Interrogando a Barry sin evidencia completa | *"No tenemos todo todavía, jefe. Está muy calmado. Necesitamos más."* | 1 vez por sesión |
 
 ### 5.5 Sistema Anti-Estancamiento
@@ -272,7 +292,7 @@ El timer se reinicia con cualquier nueva adquisición. No hay escalada más all�
 | Situación | Comportamiento esperado |
 |---|---|
 | F3 adquirido antes que F1 y F2 | Válido — el gate de acusación acepta cualquier orden de adquisición |
-| Zone 5 visitada vía pasillo antes de conseguir F2 | Válido — la ruta del pasillo no requiere llave; la escalera principal sí |
+| Zone 5 visitada sin F2 | Inválido — la puerta norte del pasillo requiere llave maestra. No hay ruta alternativa a Z5. |
 | Libreta llena (8 slots) | El jugador puede sobrescribir un slot existente seleccionándolo en la UI antes de adquirir la siguiente pista — aparece un prompt de selección. Sin descarte forzado ni crash. Si F3 no está en la libreta y está llena, el jugador debe liberar un slot antes de poder escanear a Barry. |
 | Sello GOOD sobrescrito por MALA | Permitido; solo el último sello activo cuenta |
 | Talón agarrado sin levantar el cenicero | Imposible — el stub no tiene collider activo mientras el cenicero lo cubre |
@@ -327,7 +347,7 @@ Los siguientes problemas son **BLOQUEANTES** para accesibilidad total. Documenta
 | ACC-01 | STT sin fallback no-voz (usuarios sin micrófono o con impedimentos del habla) | BLOQUEANTE | Modo de selección de temas (8-12 opciones por NPC) o teclado VR en Fase 2 |
 | ACC-02 | Zona 4 solo iluminación verde — deuteranopia/protanopia no pueden navegar | BLOQUEANTE | Añadir apliques incandescentes + tiras reflectoras (fix de arte, Fase 2) |
 | ACC-03 | ~~UV wand~~ — eliminada. Deuda resuelta por remoción del sistema. | ~~BLOQUEANTE~~ | ✅ Resuelto en v1.1 |
-| ACC-04 | Zona 6 paredes muy oscuras — bajo contraste para navegación | BLOQUEANTE | Incrementar luz ambiente en la sala de interrogatorio (fix de arte, Fase 2) |
+| ACC-04 | Zona 6 paredes muy oscuras — bajo contraste para navegación | BLOQUEANTE | Incrementar luz ambiente en la sala de reuniones (fix de arte, Fase 2) |
 | ACC-05 | ~~UV wand no se ofrece en ruta Zona1→Zona4~~ — eliminada. Deuda resuelta por remoción del sistema. | ~~BLOQUEANTE~~ | ✅ Resuelto en v1.1 |
 
 **Mejoras recomendadas (no bloqueantes):**
