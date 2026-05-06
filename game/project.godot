@@ -15,6 +15,10 @@ run/main_scene="res://scenes/level/club_blockout.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/Tripo3d_Godot_Bridge/plugin.cfg")
+
 [filesystem]
 
 import/blender/enabled=false
@@ -28,3 +32,7 @@ import/blender/enabled=false
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+
+[tripo_bridge]
+
+last_cleanup="2026-05-06T13:40:49"
