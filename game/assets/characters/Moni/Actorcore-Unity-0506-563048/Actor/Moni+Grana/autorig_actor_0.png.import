@@ -2,14 +2,11 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cumn351m86o3t"
+uid="uid://dpp2pmw5h6olx"
 path.s3tc="res://.godot/imported/autorig_actor_0.png-8e4f11ec02ce7aca9cb4a6245c4980db.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
-}
-generator_parameters={
-"md5": "a5077c8ff4d46cbe8cd513f1cc2264c9"
 }
 
 [deps]

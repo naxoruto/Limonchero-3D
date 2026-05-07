@@ -445,3 +445,49 @@ game/scenes/interactables/simple_cube.tscn
 game/scripts/core/player_controller.gd
 ---
 
+## Session End: 20260506_225809
+### Commits
+73f1730 feat: integracion completa de Moni Grana con animacion singing y correccion de esqueleto (#5)
+75fe233 Feat/el agave blockout (#3)
+---
+
+## Session End: 20260506_230429
+### Commits
+73f1730 feat: integracion completa de Moni Grana con animacion singing y correccion de esqueleto (#5)
+75fe233 Feat/el agave blockout (#3)
+### Uncommitted Changes
+production/session-logs/session-log.md
+---
+
+## Session End: 20260506_233257
+### Commits
+73f1730 feat: integracion completa de Moni Grana con animacion singing y correccion de esqueleto (#5)
+75fe233 Feat/el agave blockout (#3)
+### Uncommitted Changes
+production/session-logs/session-log.md
+---
+
+## Session End: 20260506_233645
+### Commits
+73f1730 feat: integracion completa de Moni Grana con animacion singing y correccion de esqueleto (#5)
+75fe233 Feat/el agave blockout (#3)
+### Uncommitted Changes
+production/session-logs/session-log.md
+---
+
+## Session End: 20260506_233807
+### Commits
+73f1730 feat: integracion completa de Moni Grana con animacion singing y correccion de esqueleto (#5)
+75fe233 Feat/el agave blockout (#3)
+### Uncommitted Changes
+production/session-logs/session-log.md
+---
+
+## Session End: 20260506_233926
+### Commits
+73f1730 feat: integracion completa de Moni Grana con animacion singing y correccion de esqueleto (#5)
+75fe233 Feat/el agave blockout (#3)
+### Uncommitted Changes
+production/session-logs/session-log.md
+---
+
