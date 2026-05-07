@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/characters/Moni/Singing.fbx" id="1_fbx"]
+[ext_resource type="Script" path="res://assets/characters/Moni/character_auto_anim.gd" id="2_script"]
+
+[node name="Moni" instance=ExtResource("1_fbx")]
+transform = Transform3D(120, 0, 0, 0, 120, 0, 0, 0, 120, 0, 0, 0)
+script = ExtResource("2_script")
+
+[node name="AnimationPlayer" parent="." index="1"]
+autoplay = "mixamo.com"
