@@ -74,4 +74,7 @@ spot_angle = 35.0
 [node name="Moni" parent="." unique_id=2114186461 instance=ExtResource("3_moni")]
 transform = Transform3D(180, 0, 0, 0, 180, 0, 0, 0, 180, 8.460155, 0.4, -11.150253)
 
+[node name="AnimationPlayer" parent="Moni" index="1" unique_id=462912812]
+autoplay = &"mixamo.com"
+
 [editable path="Moni"]
