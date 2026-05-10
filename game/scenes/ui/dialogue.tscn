@@ -1,0 +1,89 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/dialogue.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="PanelStyle"]
+bg_color = Color(0.06, 0.06, 0.09, 0.88)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.65, 0.25, 0.6)
+content_margin_left = 24.0
+content_margin_top = 20.0
+content_margin_right = 24.0
+content_margin_bottom = 20.0
+shadow_color = Color(0, 0, 0, 0.7)
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="ChatBgStyle"]
+bg_color = Color(0, 0, 0, 0.35)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.85, 0.65, 0.25, 0.25)
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StatusBgStyle"]
+bg_color = Color(0, 0, 0, 0.45)
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+
+[node name="DialogueUI" type="CanvasLayer"]
+script = ExtResource("1_script")
+layer = 10
+
+[node name="Panel" type="PanelContainer" parent="."]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.05
+anchor_right = 0.98
+anchor_bottom = 0.95
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="NpcName" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+text = "NPC"
+theme_override_colors/font_color = Color(0.95, 0.78, 0.42, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 32
+
+[node name="ChatBg" type="PanelContainer" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("ChatBgStyle")
+
+[node name="ChatLog" type="RichTextLabel" parent="Panel/VBox/ChatBg"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 250)
+bbcode_enabled = true
+scroll_following = true
+fit_content = false
+text = ""
+theme_override_colors/default_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_font_sizes/normal_font_size = 18
+
+[node name="StatusBg" type="PanelContainer" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StatusBgStyle")
+
+[node name="Status" type="Label" parent="Panel/VBox/StatusBg"]
+layout_mode = 2
+text = "Mantén [V] para hablar — [Esc] para salir"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.7, 0.7, 0.65, 1)
+theme_override_font_sizes/font_size = 16
