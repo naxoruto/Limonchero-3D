@@ -36,7 +36,7 @@ func _process(_delta: float) -> void:
 
 	raycast.force_raycast_update()
 	var collider := raycast.get_collider()
-	var new_focused: Object = collider if _is_interactable(collider) else null
+	var new_focused: Object = _find_interactable(collider)
 
 	if new_focused != _focused:
 		_focused = new_focused
@@ -58,10 +58,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		_interact_just_pressed = true
 
 
-func _is_interactable(obj: Object) -> bool:
-	if obj == null:
-		return false
-	return obj.has_method("interact")
+func _find_interactable(obj: Object) -> Object:
+	var node := obj as Node
+	while node != null:
+		if node.has_method("interact"):
+			return node
+		node = node.get_parent()
+	return null
 
 
 func _get_interaction_label(obj: Object) -> String:

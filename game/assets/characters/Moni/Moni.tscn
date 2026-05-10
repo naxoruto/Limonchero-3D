@@ -1,11 +1,14 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
-[ext_resource type="PackedScene" path="res://assets/characters/Moni/Singing.fbx" id="1_fbx"]
-[ext_resource type="Script" path="res://assets/characters/Moni/character_auto_anim.gd" id="2_script"]
+[ext_resource type="PackedScene" path="res://assets/characters/Moni/Singing.fbx" id="1_singing"]
+[ext_resource type="PackedScene" path="res://assets/characters/Moni/Dwarf Idle.fbx" id="2_idle"]
+[ext_resource type="Script" path="res://scripts/interactables/npc_character.gd" id="3_script"]
 
-[node name="Moni" instance=ExtResource("1_fbx")]
-transform = Transform3D(120, 0, 0, 0, 120, 0, 0, 0, 120, 0, 0, 0)
-script = ExtResource("2_script")
-
-[node name="AnimationPlayer" parent="." index="1"]
-autoplay = "mixamo.com"
+[node name="Moni" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("3_script")
+npc_name = "Moni Grana"
+npc_id = "moni"
+interaction_label = "Hablar"
+talking_scene = ExtResource("1_singing")
+idle_scene = ExtResource("2_idle")

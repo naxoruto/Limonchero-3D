@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/interactables/npc_character.gd" id="1_script"]
+
+[node name="NpcCharacter" type="Node3D"]
+script = ExtResource("1_script")
+npc_name = "NPC"
+interaction_label = "Hablar"
+idle_animation = ""
+talking_animation = ""
