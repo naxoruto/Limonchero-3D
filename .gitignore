@@ -35,6 +35,7 @@ source_assets/
 
 # Common source bundles (prefer extracting what you actually ship)
 game/assets/models/**/*.zip
+game/assets/characters/**/*.zip
 
 # Nested git repo (keep separately or add as submodule later)
 tools/Claude-Code-Game-Studios/
