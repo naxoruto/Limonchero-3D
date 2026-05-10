@@ -11,9 +11,14 @@ config_version=5
 [application]
 
 config/name="Nuevo Proyecto de Juego"
-run/main_scene="res://scenes/level/club_blockout.tscn"
+run/main_scene="res://scenes/loading.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[autoload]
+
+BackendLauncher="*res://scripts/foundation/backend_launcher.gd"
+LLMClient="*res://scripts/foundation/llm_client.gd"
 
 [editor_plugins]
 
@@ -35,4 +40,4 @@ renderer/rendering_method.mobile="gl_compatibility"
 
 [tripo_bridge]
 
-last_cleanup="2026-05-07T10:51:05"
+last_cleanup="2026-05-10T02:09:10"
