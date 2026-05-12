@@ -7976,3 +7976,29 @@ ef3bb5f chore: borrar texturas y meshes de referencia obsoletos
 production/session-logs/session-log.md
 ---
 
+## Session End: 20260510_040742
+### Commits
+14b5705 docs: actualizar session log con sesiones recientes
+659bcd9 feat: actualizar Z2_Salon y agregar prop QR del formulario
+e7e8d13 feat: cablear Moni como NPC interactivo en el nivel
+70ae11e feat: agregar assets de personajes Cornelius, Lola y Moni Dwarf Idle
+ef3bb5f chore: borrar texturas y meshes de referencia obsoletos
+8ad930d feat: NPC interactable + UI de diálogo conectado al backend
+55fe624 feat: integrar backend FastAPI + loading screen con autolanzado
+32416d5 Merge branch 'master' of https://github.com/naxoruto/Limonchero-3D into limpiando-malas-referencias
+---
+
+## Session End: 20260510_040806
+### Commits
+14b5705 docs: actualizar session log con sesiones recientes
+659bcd9 feat: actualizar Z2_Salon y agregar prop QR del formulario
+e7e8d13 feat: cablear Moni como NPC interactivo en el nivel
+70ae11e feat: agregar assets de personajes Cornelius, Lola y Moni Dwarf Idle
+ef3bb5f chore: borrar texturas y meshes de referencia obsoletos
+8ad930d feat: NPC interactable + UI de diálogo conectado al backend
+55fe624 feat: integrar backend FastAPI + loading screen con autolanzado
+32416d5 Merge branch 'master' of https://github.com/naxoruto/Limonchero-3D into limpiando-malas-referencias
+### Uncommitted Changes
+production/session-logs/session-log.md
+---
+
