@@ -1,11 +1,11 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://b6w6mw8d5k3h7"]
 
-[ext_resource type="Script" path="res://scripts/scenes/loading.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://b0msa0eqbqo1g" path="res://scripts/scenes/loading.gd" id="1_script"]
 
 [sub_resource type="StyleBoxFlat" id="BgStyle"]
 bg_color = Color(0.04, 0.04, 0.06, 1)
 
-[node name="Loading" type="Control"]
+[node name="Loading" type="Control" unique_id=1890898114]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,7 +14,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Background" type="PanelContainer" parent="."]
+[node name="Background" type="PanelContainer" parent="." unique_id=1249368743]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,7 +23,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("BgStyle")
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=26180221]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -31,43 +31,43 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="CenterContainer"]
+[node name="VBox" type="VBoxContainer" parent="CenterContainer" unique_id=691892149]
 layout_mode = 2
 theme_override_constants/separation = 24
 alignment = 1
 
-[node name="Title" type="Label" parent="CenterContainer/VBox"]
+[node name="Title" type="Label" parent="CenterContainer/VBox" unique_id=471995413]
 layout_mode = 2
-text = "LIMONCHERO 3D"
-horizontal_alignment = 1
 theme_override_colors/font_color = Color(0.95, 0.78, 0.42, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
 theme_override_constants/shadow_offset_x = 3
 theme_override_constants/shadow_offset_y = 3
 theme_override_font_sizes/font_size = 56
-
-[node name="Subtitle" type="Label" parent="CenterContainer/VBox"]
-layout_mode = 2
-text = "El Agave y La Luna"
+text = "LIMONCHERO 3D"
 horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="CenterContainer/VBox" unique_id=258588389]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.55, 0.3, 1)
 theme_override_font_sizes/font_size = 22
-
-[node name="Spinner" type="Label" parent="CenterContainer/VBox"]
-layout_mode = 2
-text = "⣷"
+text = "El Agave y La Luna"
 horizontal_alignment = 1
+
+[node name="Spinner" type="Label" parent="CenterContainer/VBox" unique_id=1877721768]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.65, 0.25, 1)
 theme_override_font_sizes/font_size = 64
-
-[node name="Status" type="Label" parent="CenterContainer/VBox"]
-layout_mode = 2
-text = "Iniciando sistema de IA..."
+text = "⣷"
 horizontal_alignment = 1
+
+[node name="Status" type="Label" parent="CenterContainer/VBox" unique_id=1178642486]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.85, 0.8, 1)
 theme_override_font_sizes/font_size = 18
+text = "Iniciando sistema de IA..."
+horizontal_alignment = 1
 
-[node name="RetryButton" type="Button" parent="CenterContainer/VBox"]
+[node name="RetryButton" type="Button" parent="CenterContainer/VBox" unique_id=1652121361]
+custom_minimum_size = Vector2(160, 40)
 layout_mode = 2
 text = "Reintentar"
-custom_minimum_size = Vector2(160, 40)

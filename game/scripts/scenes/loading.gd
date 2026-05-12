@@ -3,6 +3,7 @@ extends Control
 ## Loading screen — lanza el backend, hace polling de /health, transiciona a la escena del nivel.
 
 const NEXT_SCENE := "res://scenes/level/el_agave_y_la_luna_main.tscn"
+const USE_EXTERNAL_BACKEND := true
 const POLL_INTERVAL_SEC := 1.0
 const MAX_WAIT_SEC := 600.0
 const RETRY_AFTER_SEC := 2.0
@@ -40,8 +41,11 @@ func _start_sequence() -> void:
 	_polling = true
 	_elapsed = 0.0
 	_retry_btn.visible = false
-	if not BackendLauncher.launch():
-		return
+	if not USE_EXTERNAL_BACKEND:
+		if not BackendLauncher.launch():
+			return
+	else:
+		print("Loading: usando backend externo; se omite auto-launch")
 	# Espera 2s antes del primer health check (uvicorn tarda en bootear).
 	await get_tree().create_timer(RETRY_AFTER_SEC).timeout
 	_poll()
