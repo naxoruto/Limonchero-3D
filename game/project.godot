@@ -15,10 +15,16 @@ run/main_scene="res://scenes/loading.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[audio]
+
+buses/default_bus_layout="uid://brqiuopg2hw1l"
+driver/enable_input=true
+
 [autoload]
 
 BackendLauncher="*res://scripts/foundation/backend_launcher.gd"
 LLMClient="*res://scripts/foundation/llm_client.gd"
+VoiceManager="*res://scripts/core/voice_manager.gd"
 
 [editor_plugins]
 
@@ -40,4 +46,4 @@ renderer/rendering_method.mobile="gl_compatibility"
 
 [tripo_bridge]
 
-last_cleanup="2026-05-11T12:30:19"
+last_cleanup="2026-05-12T14:41:25"

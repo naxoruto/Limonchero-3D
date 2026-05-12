@@ -47,24 +47,61 @@ logger = logging.getLogger("limonchero-backend")
 _whisper_model = None
 
 
+def _resolve_whisper_model_source() -> str:
+    if config.WHISPER_MODEL_PATH:
+        model_path = Path(config.WHISPER_MODEL_PATH).expanduser()
+        if not model_path.exists():
+            raise RuntimeError(
+                "Whisper model not found at '%s'. Download it first or update "
+                "WHISPER_MODEL_PATH." % model_path
+            )
+        return str(model_path)
+
+    if config.WHISPER_LOCAL_ONLY:
+        raise RuntimeError(
+            "WHISPER_MODEL_PATH is empty while WHISPER_LOCAL_ONLY is True. "
+            "Set WHISPER_MODEL_PATH or disable WHISPER_LOCAL_ONLY."
+        )
+
+    return config.WHISPER_MODEL_SIZE
+
+
 def _get_whisper_model():
     """Lazily load the faster-whisper model on first STT request."""
     global _whisper_model
     if _whisper_model is None:
         from faster_whisper import WhisperModel
+        model_source = _resolve_whisper_model_source()
         logger.info(
             "Loading faster-whisper model '%s' (device=%s, compute=%s)…",
-            config.WHISPER_MODEL_SIZE,
+            model_source,
             config.WHISPER_DEVICE,
             config.WHISPER_COMPUTE_TYPE,
         )
         _whisper_model = WhisperModel(
-            config.WHISPER_MODEL_SIZE,
+            model_source,
             device=config.WHISPER_DEVICE,
             compute_type=config.WHISPER_COMPUTE_TYPE,
         )
         logger.info("faster-whisper model loaded successfully.")
     return _whisper_model
+
+
+def _warm_ollama_model() -> None:
+    """Warm up the Ollama model so first NPC/grammar call is fast."""
+    try:
+        logger.info("Warming up Ollama model '%s'...", config.OLLAMA_MODEL)
+        ollama.chat(
+            model=config.OLLAMA_MODEL,
+            messages=[
+                {"role": "system", "content": "Warmup request."},
+                {"role": "user", "content": "ping"},
+            ],
+            options={"num_predict": 1, "temperature": 0.0},
+        )
+        logger.info("Ollama model warmup complete.")
+    except Exception as e:
+        logger.warning("Ollama warmup failed: %s", e)
 
 
 # ── Lifespan ────────────────────────────────────────────
@@ -77,6 +114,7 @@ async def lifespan(app: FastAPI):
     try:
         ollama.list()
         logger.info("✅ Ollama connection OK (model: %s)", config.OLLAMA_MODEL)
+        _warm_ollama_model()
     except Exception as e:
         logger.warning(
             "⚠️  Ollama not reachable at startup: %s — NPC endpoints will fail "
