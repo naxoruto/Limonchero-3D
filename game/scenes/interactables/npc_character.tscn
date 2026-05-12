@@ -6,5 +6,4 @@
 script = ExtResource("1_script")
 npc_name = "NPC"
 interaction_label = "Hablar"
-idle_animation = ""
-talking_animation = ""
+character_folder = ""

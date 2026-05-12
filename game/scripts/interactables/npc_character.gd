@@ -4,23 +4,32 @@ signal dialogue_requested(npc: Node)
 
 @export var interaction_label: String = "Hablar"
 @export var npc_name: String = "NPC"
-## ID que el backend usa (e.g. "moni", "barry", "lola"). Tiene que matchear NPC_PROMPTS del backend.
 @export var npc_id: String = ""
-## FBX con animacion idle (mismo modelo que talking_scene).
+## Carpeta base del personaje. Si se asigna, las animaciones y modelo
+## se descubren automaticamente desde subcarpetas:
+##   {folder}/animation idle/  → idle_scene
+##   {folder}/animation scene/ → talking_scene
+##   {folder}/T-pose/ o t-pose/ → model_scene
+## Solo se asignan si la propiedad correspondiente esta vacia.
+@export var character_folder: String = ""
+## Escena base del personaje (modelo + esqueleto, idealmente en T-pose).
+## Si es null, se usa talking_scene o idle_scene como fallback.
+@export var model_scene: PackedScene = null
+## FBX con animacion idle (mismo esqueleto que model_scene).
 @export var idle_scene: PackedScene = null
-## FBX con animacion de hablar/singing.
+## FBX con animacion de hablar (mismo esqueleto que model_scene).
 @export var talking_scene: PackedScene = null
-## Altura de la cara en metros (world space). Ajusta si el personaje es más alto/bajo.
 @export var face_height: float = 1.6
-## Distancia de la camara a la cara en metros (world space).
 @export var cam_distance: float = 0.8
-## Offset horizontal de la camara en metros (positivo = derecha → NPC queda a la izquierda).
 @export var cam_offset_x: float = 0.4
 
 var _anim_player: AnimationPlayer = null
 var _dialogue_camera: Camera3D = null
 var _in_dialogue: bool = false
 var _prev_camera: Camera3D = null
+var _skeleton: Skeleton3D = null
+var _hip_bone_idx: int = -1
+var _hitbox_area: Area3D = null
 
 const _IDLE_KEY := "npc_idle"
 const _TALK_KEY := "npc_talking"
@@ -28,18 +37,21 @@ const _TALK_KEY := "npc_talking"
 
 func _ready() -> void:
 	add_to_group("npcs")
-	_add_hitbox()
 	_add_dialogue_camera()
+	if not character_folder.is_empty():
+		_discover_animations_from_folder()
 	var model_instance := _setup_model()
 	if model_instance == null:
-		push_warning("NpcCharacter '%s': talking_scene no asignada." % name)
+		push_warning("NpcCharacter '%s': ninguna escena asignada (model/idle/talking)." % name)
+		_add_hitbox()
 		return
 	_anim_player = _find_animation_player(model_instance)
 	if _anim_player == null:
-		push_warning("NpcCharacter '%s': no AnimationPlayer encontrado." % name)
-		return
-	_extract_anim_to_default_lib(_anim_player, _TALK_KEY)
-	_inject_scene_anim(idle_scene, _IDLE_KEY)
+		push_warning("NpcCharacter '%s': no AnimationPlayer encontrado en el modelo." % name)
+	else:
+		_inject_animations()
+	if not _add_skeletal_hitbox(model_instance):
+		_add_hitbox()
 	_play(_IDLE_KEY)
 
 
@@ -87,7 +99,6 @@ func _add_hitbox() -> void:
 	var area := Area3D.new()
 	var shape := CollisionShape3D.new()
 	var capsule := CapsuleShape3D.new()
-	# Radio grande (1.5m) para cubrir el area donde el NPC se mueve cantando/bailando.
 	capsule.radius = 1.5 / s.x
 	capsule.height = 2.0 / s.y
 	shape.shape = capsule
@@ -96,12 +107,115 @@ func _add_hitbox() -> void:
 	add_child(area)
 
 
-func _setup_model() -> Node:
+func _add_skeletal_hitbox(model_instance: Node) -> bool:
+	var skel := _find_skeleton(model_instance)
+	if skel == null:
+		return false
+	var bone_idx := _find_hip_bone(skel)
+	if bone_idx < 0:
+		return false
+	_skeleton = skel
+	_hip_bone_idx = bone_idx
+	var area := Area3D.new()
+	area.top_level = true
+	var shape := CollisionShape3D.new()
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = 0.45
+	capsule.height = 1.6
+	shape.shape = capsule
+	area.add_child(shape)
+	add_child(area)
+	_hitbox_area = area
+	set_process(true)
+	return true
+
+
+func _find_skeleton(node: Node) -> Skeleton3D:
+	if node is Skeleton3D:
+		return node as Skeleton3D
+	for c in node.get_children():
+		var r := _find_skeleton(c)
+		if r != null:
+			return r
+	return null
+
+
+func _find_hip_bone(skel: Skeleton3D) -> int:
+	var preferred := ["mixamorig:Hips", "Hips", "Hip", "pelvis", "Pelvis"]
+	for n in preferred:
+		var idx := skel.find_bone(n)
+		if idx >= 0:
+			return idx
+	for i in skel.get_bone_count():
+		if skel.get_bone_name(i).to_lower().contains("hip"):
+			return i
+	return 0
+
+
+func _process(_delta: float) -> void:
+	if _skeleton != null and _hip_bone_idx >= 0 and _hitbox_area != null:
+		var bone_pose := _skeleton.get_bone_global_pose(_hip_bone_idx)
+		_hitbox_area.global_position = _skeleton.global_transform * bone_pose.origin
+
+
+func _discover_animations_from_folder() -> void:
+	if idle_scene == null:
+		idle_scene = _find_first_scene_in(character_folder.path_join("animation idle"))
 	if talking_scene == null:
+		talking_scene = _find_first_scene_in(character_folder.path_join("animation scene"))
+	if model_scene == null:
+		var tpose := _find_first_scene_in(character_folder.path_join("T-pose"))
+		if tpose == null:
+			tpose = _find_first_scene_in(character_folder.path_join("t-pose"))
+		model_scene = tpose
+
+
+func _find_first_scene_in(dir_path: String) -> PackedScene:
+	var dir := DirAccess.open(dir_path)
+	if dir == null:
 		return null
-	var instance := talking_scene.instantiate()
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while file_name != "":
+		if not dir.current_is_dir():
+			var lower := file_name.to_lower()
+			if lower.ends_with(".fbx") or lower.ends_with(".glb") or lower.ends_with(".gltf"):
+				dir.list_dir_end()
+				return load(dir_path.path_join(file_name)) as PackedScene
+		file_name = dir.get_next()
+	dir.list_dir_end()
+	return null
+
+
+func _setup_model() -> Node:
+	var base := model_scene
+	if base == null:
+		base = talking_scene
+	if base == null:
+		base = idle_scene
+	if base == null:
+		return null
+	var instance := base.instantiate()
 	add_child(instance)
 	return instance
+
+
+func _inject_animations() -> void:
+	var base_scene: PackedScene = model_scene
+	if base_scene == null:
+		base_scene = talking_scene
+	if base_scene == null:
+		base_scene = idle_scene
+
+	if talking_scene != null and talking_scene != base_scene:
+		_inject_scene_anim(talking_scene, _TALK_KEY)
+	else:
+		_extract_anim_to_default_lib(_anim_player, _TALK_KEY)
+
+	if idle_scene != null and idle_scene != base_scene:
+		_inject_scene_anim(idle_scene, _IDLE_KEY)
+	else:
+		_extract_anim_to_default_lib(_anim_player, _IDLE_KEY)
 
 
 func _get_default_lib() -> AnimationLibrary:
@@ -111,7 +225,6 @@ func _get_default_lib() -> AnimationLibrary:
 
 
 func _extract_anim_to_default_lib(player: AnimationPlayer, key: String) -> void:
-	# FBX animations land in named libraries — find and copy the first non-RESET one.
 	for lib_name in player.get_animation_library_list():
 		var lib := player.get_animation_library(lib_name)
 		for anim_name in lib.get_animation_list():
@@ -124,8 +237,6 @@ func _extract_anim_to_default_lib(player: AnimationPlayer, key: String) -> void:
 
 
 func _inject_scene_anim(source_scene: PackedScene, key: String) -> void:
-	if source_scene == null:
-		return
 	var instance := source_scene.instantiate()
 	var src_player := _find_animation_player(instance)
 	if src_player != null:
