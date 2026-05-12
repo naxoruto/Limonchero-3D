@@ -2,13 +2,13 @@
 
 [ext_resource type="PackedScene" uid="uid://ca24jbx2l03v8" path="res://assets/models/environment/el_agave_y_la_luna_blockout.glb" id="1_blockout"]
 [ext_resource type="PackedScene" uid="uid://c2wq4p0q8lqf5" path="res://scenes/player/player.tscn" id="2_player"]
-[ext_resource type="PackedScene" path="res://assets/characters/Moni/Moni.tscn" id="3_moni"]
-[ext_resource type="PackedScene" uid="uid://b407q6t5po0h8" path="res://assets/characters/Moni/Singing.fbx" id="4_caum7"]
-[ext_resource type="PackedScene" uid="uid://dtmiig1q3vjy3" path="res://assets/characters/Moni/Dwarf Idle.fbx" id="5_6w5th"]
-[ext_resource type="Script" path="res://scripts/scenes/main_level.gd" id="6_script"]
-[ext_resource type="Script" path="res://scripts/core/interaction_system.gd" id="7_interaction"]
-[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="8_hud"]
+[ext_resource type="Script" uid="uid://cuc10ne1r3o0x" path="res://scripts/scenes/main_level.gd" id="6_script"]
+[ext_resource type="Script" uid="uid://dp6lrtxx4eorl" path="res://scripts/core/interaction_system.gd" id="7_interaction"]
+[ext_resource type="PackedScene" uid="uid://d3q4v8l6w3x2a" path="res://scenes/ui/hud.tscn" id="8_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/dialogue.tscn" id="9_dialogue"]
+[ext_resource type="Script" path="res://scripts/interactables/npc_character.gd" id="10_npc_char"]
+[ext_resource type="PackedScene" uid="uid://cxxp66t3jsxye" path="res://assets/characters/Moni/animation scene/Singing.fbx" id="11_moni_model"]
+[ext_resource type="PackedScene" uid="uid://crmvut8enq0ge" path="res://assets/characters/Moni/animation idle/Dwarf Idle.fbx" id="12_moni_talk"]
 
 [node name="Main" type="Node3D" unique_id=1253217368]
 script = ExtResource("6_script")
@@ -84,23 +84,28 @@ shadow_enabled = true
 spot_range = 12.0
 spot_angle = 35.0
 
-[node name="Moni" parent="." unique_id=2114186461 instance=ExtResource("3_moni")]
-transform = Transform3D(180, 0, 0, 0, 180, 0, 0, 0, 180, 8.460155, 0.4, -11.150253)
-idle_scene = ExtResource("4_caum7")
-talking_scene = ExtResource("5_6w5th")
+[node name="Moni" type="Node3D" parent="." unique_id=2114186461]
+transform = Transform3D(1.7, 0, 0, 0, 1.7, 0, 0, 0, 1.7, 9.0, 0.4, -12.25)
+script = ExtResource("10_npc_char")
+npc_name = "Moni Grana Fert"
+npc_id = "moni"
+character_folder = "res://assets/characters/Moni/"
+model_scene = ExtResource("11_moni_model")
+idle_scene = ExtResource("11_moni_model")
+talking_scene = ExtResource("12_moni_talk")
 
-[node name="HUD" parent="." instance=ExtResource("8_hud")]
+[node name="HUD" parent="." unique_id=1751490325 instance=ExtResource("8_hud")]
 
-[node name="DialogueUI" parent="." instance=ExtResource("9_dialogue")]
+[node name="DialogueUI" parent="." unique_id=1274670137 instance=ExtResource("9_dialogue")]
 
-[node name="FadeOverlay" type="CanvasLayer" parent="."]
+[node name="FadeOverlay" type="CanvasLayer" parent="." unique_id=938550197]
 layer = 100
 
-[node name="FadeRect" type="ColorRect" parent="FadeOverlay"]
+[node name="FadeRect" type="ColorRect" parent="FadeOverlay" unique_id=1219676803]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0)
 mouse_filter = 2
+color = Color(0, 0, 0, 0)
