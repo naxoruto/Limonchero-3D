@@ -61,6 +61,11 @@ jobs:
           use-dotnet: false
           include-templates: true
 
+      - name: Prepare paths
+        run: |
+          echo "GAME_EXPORT_PATH=$GITHUB_WORKSPACE/${{ matrix.game_out }}" >> $GITHUB_ENV
+          echo "BACKEND_PATH=$GITHUB_WORKSPACE/dist/backend/${{ matrix.backend_name }}" >> $GITHUB_ENV
+
       - name: Install backend dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
@@ -82,16 +87,16 @@ jobs:
 
       - name: Export game
         run: |
-          mkdir -p dist/game
-          godot --headless --path game --export-release "${{ matrix.godot_preset }}" "${{ matrix.game_out }}"
+          mkdir -p "$GITHUB_WORKSPACE/dist/game"
+          godot --headless --path game --export-release "${{ matrix.godot_preset }}" "$GAME_EXPORT_PATH"
 
       - name: Ensure game executable (Linux)
         if: runner.os == 'Linux'
-        run: chmod +x "${{ matrix.game_out }}"
+        run: chmod +x "$GAME_EXPORT_PATH"
 
       - name: Ensure backend executable (Linux/macOS)
         if: runner.os != 'Windows'
-        run: chmod +x "dist/backend/${{ matrix.backend_name }}"
+        run: chmod +x "$BACKEND_PATH"
 
       - name: Stage installer files (Windows)
         if: runner.os == 'Windows'
