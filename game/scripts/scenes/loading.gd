@@ -3,7 +3,7 @@ extends Control
 ## Loading screen — lanza el backend, hace polling de /health, transiciona a la escena del nivel.
 
 const NEXT_SCENE := "res://scenes/level/el_agave_y_la_luna_main.tscn"
-const USE_EXTERNAL_BACKEND := true
+const EXTERNAL_BACKEND_ENV := "LIMONCHERO_EXTERNAL_BACKEND"
 const POLL_INTERVAL_SEC := 1.0
 const MAX_WAIT_SEC := 600.0
 const RETRY_AFTER_SEC := 2.0
@@ -15,9 +15,11 @@ const RETRY_AFTER_SEC := 2.0
 var _elapsed: float = 0.0
 var _spinner_phase: int = 0
 var _polling: bool = false
+var _use_external_backend: bool = false
 
 
 func _ready() -> void:
+	_use_external_backend = _should_use_external_backend()
 	_retry_btn.visible = false
 	_retry_btn.pressed.connect(_on_retry_pressed)
 	LLMClient.health_check_done.connect(_on_health_check_done)
@@ -41,7 +43,7 @@ func _start_sequence() -> void:
 	_polling = true
 	_elapsed = 0.0
 	_retry_btn.visible = false
-	if not USE_EXTERNAL_BACKEND:
+	if not _use_external_backend:
 		if not BackendLauncher.launch():
 			return
 	else:
@@ -87,3 +89,12 @@ func _on_retry_pressed() -> void:
 
 func _set_status(text: String) -> void:
 	_status.text = text
+
+
+func _should_use_external_backend() -> bool:
+	if Engine.is_editor_hint():
+		return true
+	var override := OS.get_environment(EXTERNAL_BACKEND_ENV).strip_edges().to_lower()
+	if override.is_empty():
+		return false
+	return override in ["1", "true", "yes"]
