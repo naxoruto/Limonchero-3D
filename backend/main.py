@@ -47,9 +47,35 @@ logger = logging.getLogger("limonchero-backend")
 _whisper_model = None
 
 
+def _ensure_whisper_model(model_path: Path) -> None:
+    if model_path.exists():
+        return
+
+    if not config.WHISPER_AUTO_DOWNLOAD:
+        raise RuntimeError(
+            "Whisper model not found at '%s'. Download it first or update "
+            "WHISPER_MODEL_PATH." % model_path
+        )
+
+    logger.info(
+        "Whisper model not found at '%s'. Downloading '%s'...",
+        model_path,
+        config.WHISPER_MODEL_SIZE,
+    )
+
+    model_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        from faster_whisper import download_model
+        download_model(config.WHISPER_MODEL_SIZE, output_dir=str(model_path))
+    except Exception as e:
+        raise RuntimeError("Whisper model download failed: %s" % e) from e
+
+
 def _resolve_whisper_model_source() -> str:
     if config.WHISPER_MODEL_PATH:
         model_path = Path(config.WHISPER_MODEL_PATH).expanduser()
+        if not model_path.exists() and config.WHISPER_LOCAL_ONLY:
+            _ensure_whisper_model(model_path)
         if not model_path.exists():
             raise RuntimeError(
                 "Whisper model not found at '%s'. Download it first or update "
