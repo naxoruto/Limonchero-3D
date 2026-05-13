@@ -4,6 +4,7 @@ extends Control
 
 const NEXT_SCENE := "res://scenes/level/el_agave_y_la_luna_main.tscn"
 const EXTERNAL_BACKEND_ENV := "LIMONCHERO_EXTERNAL_BACKEND"
+const BACKEND_URL_ENV := "LIMONCHERO_BACKEND_URL"
 const POLL_INTERVAL_SEC := 1.0
 const MAX_WAIT_SEC := 600.0
 const RETRY_AFTER_SEC := 2.0
@@ -93,6 +94,9 @@ func _set_status(text: String) -> void:
 
 func _should_use_external_backend() -> bool:
 	if Engine.is_editor_hint():
+		return true
+	var url_override := OS.get_environment(BACKEND_URL_ENV).strip_edges()
+	if not url_override.is_empty():
 		return true
 	var override := OS.get_environment(EXTERNAL_BACKEND_ENV).strip_edges().to_lower()
 	if override.is_empty():

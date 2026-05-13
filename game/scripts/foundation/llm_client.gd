@@ -8,8 +8,11 @@ signal npc_response_ready(npc_id: String, text: String)
 signal npc_request_failed(npc_id: String, error: String)
 signal health_check_done(ok: bool)
 
-const BASE_URL := "http://127.0.0.1:8000"
+const DEFAULT_BASE_URL := "http://127.0.0.1:8000"
+const BACKEND_URL_ENV := "LIMONCHERO_BACKEND_URL"
 const REQUEST_TIMEOUT_SEC := 60.0
+
+var _base_url: String = DEFAULT_BASE_URL
 
 var _stt_req: HTTPRequest = null
 var _npc_req: HTTPRequest = null
@@ -18,6 +21,7 @@ var _pending_npc_id: String = ""
 
 
 func _ready() -> void:
+	_base_url = _resolve_base_url()
 	_stt_req = HTTPRequest.new()
 	_npc_req = HTTPRequest.new()
 	_health_req = HTTPRequest.new()
@@ -30,6 +34,15 @@ func _ready() -> void:
 	_stt_req.request_completed.connect(_on_stt_completed)
 	_npc_req.request_completed.connect(_on_npc_completed)
 	_health_req.request_completed.connect(_on_health_completed)
+
+
+func _resolve_base_url() -> String:
+	var url := OS.get_environment(BACKEND_URL_ENV).strip_edges()
+	if url.is_empty():
+		url = DEFAULT_BASE_URL
+	if url.ends_with("/"):
+		url = url.trim_suffix("/")
+	return url
 
 
 # ── Public API ────────────────────────────────────────────────────────────
@@ -45,7 +58,7 @@ func request_stt(wav_bytes: PackedByteArray) -> void:
 		"Content-Type: multipart/form-data; boundary=%s" % boundary,
 		"Content-Length: %d" % body.size(),
 	]
-	var url := "%s/stt" % BASE_URL
+	var url := "%s/stt" % _base_url
 	var err := _stt_req.request_raw(url, headers, HTTPClient.METHOD_POST, body)
 	if err != OK:
 		stt_failed.emit("HTTPRequest error: %d" % err)
@@ -61,7 +74,7 @@ func request_npc(npc_id: String, message: String, history: Array) -> void:
 	}
 	var body := JSON.stringify(payload)
 	var headers := ["Content-Type: application/json"]
-	var url := "%s/npc/%s" % [BASE_URL, npc_id]
+	var url := "%s/npc/%s" % [_base_url, npc_id]
 	var err := _npc_req.request(url, headers, HTTPClient.METHOD_POST, body)
 	if err != OK:
 		npc_request_failed.emit(npc_id, "HTTPRequest error: %d" % err)
@@ -69,7 +82,7 @@ func request_npc(npc_id: String, message: String, history: Array) -> void:
 
 ## GET /health — verifica que backend este vivo.
 func check_health() -> void:
-	var err := _health_req.request("%s/health" % BASE_URL)
+	var err := _health_req.request("%s/health" % _base_url)
 	if err != OK:
 		health_check_done.emit(false)
 
