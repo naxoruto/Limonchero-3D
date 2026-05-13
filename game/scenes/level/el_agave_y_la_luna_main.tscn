@@ -9,6 +9,8 @@
 [ext_resource type="Script" path="res://scripts/interactables/npc_character.gd" id="10_npc_char"]
 [ext_resource type="PackedScene" uid="uid://cxxp66t3jsxye" path="res://assets/characters/Moni/animation scene/Singing.fbx" id="11_moni_model"]
 [ext_resource type="PackedScene" uid="uid://crmvut8enq0ge" path="res://assets/characters/Moni/animation idle/Dwarf Idle.fbx" id="12_moni_talk"]
+[ext_resource type="PackedScene" uid="uid://bnckdyc4wqlnn" path="res://assets/characters/Spud/animation idle/Salute.fbx" id="13_spud_idle"]
+[ext_resource type="PackedScene" uid="uid://bt6kgqmty1em5" path="res://assets/characters/Spud/animation scene/Thoughtful Head Shake.fbx" id="14_spud_talk"]
 
 [node name="Main" type="Node3D" unique_id=1253217368]
 script = ExtResource("6_script")
@@ -94,6 +96,17 @@ model_scene = ExtResource("11_moni_model")
 idle_scene = ExtResource("11_moni_model")
 talking_scene = ExtResource("12_moni_talk")
 cam_offset_x = 0.8
+
+[node name="Spud" type="Node3D" parent="." unique_id=1845221764]
+transform = Transform3D(0, 0, -1.7, 0, 1.7, 0, 1.7, 0, 0, 11.0, 0.0, 1.5)
+script = ExtResource("10_npc_char")
+npc_name = "Commissioner Spud"
+npc_id = "spud"
+character_folder = "res://assets/characters/Spud/"
+model_scene = ExtResource("13_spud_idle")
+idle_scene = ExtResource("13_spud_idle")
+talking_scene = ExtResource("14_spud_talk")
+cam_offset_x = 0.4
 
 [node name="HUD" parent="." unique_id=1751490325 instance=ExtResource("8_hud")]
 

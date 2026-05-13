@@ -19,8 +19,12 @@ signal dialogue_requested(npc: Node)
 @export var idle_scene: PackedScene = null
 ## FBX con animacion de hablar (mismo esqueleto que model_scene).
 @export var talking_scene: PackedScene = null
-@export var face_height: float = 1.6
+## Override manual de altura de cara en espacio LOCAL del NPC.
+## Si es <= 0, se detecta automaticamente desde el hueso 'Head' (o AABB).
+@export var face_height: float = 0.0
+## Distancia de la camara a la cara, en metros mundo.
 @export var cam_distance: float = 0.8
+## Desplazamiento lateral de la camara, en metros mundo (eje X local del NPC).
 @export var cam_offset_x: float = 0.4
 
 var _anim_player: AnimationPlayer = null
@@ -29,6 +33,9 @@ var _in_dialogue: bool = false
 var _prev_camera: Camera3D = null
 var _skeleton: Skeleton3D = null
 var _hip_bone_idx: int = -1
+var _head_bone_idx: int = -1
+var _head_top_bone_idx: int = -1
+var _model_root: Node3D = null
 var _hitbox_area: Area3D = null
 
 const _IDLE_KEY := "npc_idle"
@@ -45,6 +52,8 @@ func _ready() -> void:
 		push_warning("NpcCharacter '%s': ninguna escena asignada (model/idle/talking)." % name)
 		_add_hitbox()
 		return
+	if model_instance is Node3D:
+		_model_root = model_instance as Node3D
 	_anim_player = _find_animation_player(model_instance)
 	if _anim_player == null:
 		push_warning("NpcCharacter '%s': no AnimationPlayer encontrado en el modelo." % name)
@@ -52,6 +61,9 @@ func _ready() -> void:
 		_inject_animations()
 	if not _add_skeletal_hitbox(model_instance):
 		_add_hitbox()
+	else:
+		_head_bone_idx = _find_head_bone(_skeleton)
+		_head_top_bone_idx = _find_head_top_bone(_skeleton)
 	_play(_IDLE_KEY)
 
 
@@ -65,6 +77,7 @@ func interact() -> void:
 	_in_dialogue = true
 	_prev_camera = get_viewport().get_camera_3d()
 	_play(_TALK_KEY)
+	_update_dialogue_camera_pose()
 	dialogue_requested.emit(self)
 
 
@@ -87,11 +100,72 @@ func close_dialogue() -> void:
 # --- private ---
 
 func _add_dialogue_camera() -> void:
-	var s := scale
 	var cam := Camera3D.new()
-	cam.position = Vector3(cam_offset_x / s.x, face_height / s.y, cam_distance / s.z)
+	cam.top_level = true
 	add_child(cam)
 	_dialogue_camera = cam
+
+
+func _update_dialogue_camera_pose() -> void:
+	if _dialogue_camera == null:
+		return
+	var face_world: Vector3 = _compute_face_world()
+	var basis_world: Basis = global_transform.basis.orthonormalized()
+	# Camara en NPC local +Z (modelos Mixamo miran a +Z) y NPC local +X lateral.
+	# cam_distance y cam_offset_x en metros mundo.
+	var cam_pos: Vector3 = face_world + basis_world.z * cam_distance + basis_world.x * cam_offset_x
+	# Basis alineado al NPC: camera -Z = -NPC.Z. Mira al frente del modelo, sin yaw.
+	_dialogue_camera.global_transform = Transform3D(basis_world, cam_pos)
+
+
+func _compute_face_world() -> Vector3:
+	# Altura desde hueso Head (Y local NPC). Lateral siempre = origen NPC.
+	var h: float = _compute_face_height_local()
+	return global_transform * Vector3(0.0, h, 0.0)
+
+
+func _compute_face_height_local() -> float:
+	if face_height > 0.0:
+		return face_height
+	if _skeleton != null and _head_bone_idx >= 0:
+		var head_pose: Transform3D = _skeleton.get_bone_global_pose(_head_bone_idx)
+		var head_local: Vector3 = head_pose.origin
+		if _head_top_bone_idx >= 0:
+			var top_pose: Transform3D = _skeleton.get_bone_global_pose(_head_top_bone_idx)
+			head_local = head_local.lerp(top_pose.origin, 0.5)
+		var head_in_npc: Vector3 = global_transform.affine_inverse() * (_skeleton.global_transform * head_local)
+		return head_in_npc.y
+	return 1.6
+
+
+func _find_head_bone(skel: Skeleton3D) -> int:
+	if skel == null:
+		return -1
+	var preferred := ["mixamorig:Head", "Head", "head"]
+	for n in preferred:
+		var idx := skel.find_bone(n)
+		if idx >= 0:
+			return idx
+	for i in skel.get_bone_count():
+		var bn := skel.get_bone_name(i).to_lower()
+		if bn.contains("head") and not bn.contains("top") and not bn.contains("end"):
+			return i
+	return -1
+
+
+func _find_head_top_bone(skel: Skeleton3D) -> int:
+	if skel == null:
+		return -1
+	var preferred := ["mixamorig:HeadTop_End", "HeadTop_End", "HeadTop", "head_top"]
+	for n in preferred:
+		var idx := skel.find_bone(n)
+		if idx >= 0:
+			return idx
+	for i in skel.get_bone_count():
+		var bn := skel.get_bone_name(i).to_lower()
+		if bn.contains("head") and (bn.contains("top") or bn.contains("end")):
+			return i
+	return -1
 
 
 func _add_hitbox() -> void:
