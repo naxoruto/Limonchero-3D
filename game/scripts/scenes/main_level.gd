@@ -1,6 +1,7 @@
 extends Node3D
 
 const FADE_DURATION := 0.6
+const HISTORY_MAX_MESSAGES := 20  # ventana deslizante por NPC
 
 @onready var _interaction_system: Node = $Player/InteractionSystem
 @onready var _hud: CanvasLayer = $HUD
@@ -10,7 +11,7 @@ const FADE_DURATION := 0.6
 
 var _player_camera: Camera3D = null
 var _active_npc: Node = null
-var _history: Array = []  # historial conversacion del NPC activo
+var _histories: Dictionary = {}  # npc_id -> Array de mensajes {role, content}
 var _pending_player_text: String = ""
 
 
@@ -59,7 +60,7 @@ func _on_stt_completed(transcript: String) -> void:
 		return
 	_pending_player_text = text
 	_dialogue.add_player_message(text)
-	LLMClient.request_npc(_active_npc.npc_id, text, _history)
+	LLMClient.request_npc(_active_npc.npc_id, text, _get_history(_active_npc.npc_id))
 
 
 func _on_stt_failed(error: String) -> void:
@@ -69,10 +70,13 @@ func _on_stt_failed(error: String) -> void:
 func _on_npc_response_ready(npc_id: String, text: String) -> void:
 	if _active_npc == null or _active_npc.npc_id != npc_id:
 		return
+	var history := _get_history(npc_id)
 	if not _pending_player_text.is_empty():
-		_history.append({"role": "user", "content": _pending_player_text})
+		history.append({"role": "user", "content": _pending_player_text})
 		_pending_player_text = ""
-	_history.append({"role": "assistant", "content": text})
+	history.append({"role": "assistant", "content": text})
+	_trim_history(history)
+	_histories[npc_id] = history
 	_dialogue.add_npc_message(text)
 
 
@@ -91,7 +95,6 @@ func _on_dialogue_requested(npc: Node) -> void:
 	if _active_npc != null:
 		return
 	_active_npc = npc
-	_history.clear()
 	_pending_player_text = ""
 	_hud.set_interaction_prompt("")
 	_fade_then(func():
@@ -122,3 +125,14 @@ func _fade_then(action: Callable) -> void:
 	tween.tween_property(_fade, "color", Color(0, 0, 0, 1), FADE_DURATION)
 	tween.tween_callback(action)
 	tween.tween_property(_fade, "color", Color(0, 0, 0, 0), FADE_DURATION)
+
+
+func _get_history(npc_id: String) -> Array:
+	if not _histories.has(npc_id):
+		_histories[npc_id] = []
+	return _histories[npc_id]
+
+
+func _trim_history(history: Array) -> void:
+	while history.size() > HISTORY_MAX_MESSAGES:
+		history.remove_at(0)
