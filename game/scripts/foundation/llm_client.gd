@@ -8,7 +8,7 @@ signal npc_response_ready(npc_id: String, text: String)
 signal npc_request_failed(npc_id: String, error: String)
 signal health_check_done(ok: bool)
 
-const BASE_URL := "http://localhost:8000"
+const BASE_URL := "http://127.0.0.1:8000"
 const REQUEST_TIMEOUT_SEC := 60.0
 
 var _stt_req: HTTPRequest = null

@@ -80,7 +80,7 @@ def _run_installer(installer_path: Path) -> None:
         return
 
     if _is_admin():
-        subprocess.run([str(installer_path)], check=True)
+        subprocess.run([str(installer_path), "/SILENT"], check=True)
         return
 
     quoted = str(installer_path).replace("'", "''")
@@ -88,7 +88,7 @@ def _run_installer(installer_path: Path) -> None:
         [
             "powershell",
             "-Command",
-            f"Start-Process -FilePath '{quoted}' -Verb RunAs -Wait",
+            f"Start-Process -FilePath '{quoted}' -ArgumentList '/SILENT' -Verb RunAs -Wait",
         ],
         check=True,
     )
@@ -214,23 +214,32 @@ def _ensure_whisper_model(config) -> None:
         raise RuntimeError(f"Whisper download failed: {exc}") from exc
 
 
+def _check_ollama_hardware(ollama_cmd: str) -> None:
+    try:
+        # ps muestra los modelos corriendo y el % de gpu que están usando
+        result = subprocess.run([ollama_cmd, "ps"], capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if "100%" in result.stdout:
+            _log("Ollama will run on: GPU (100% VRAM)")
+        elif "%" in result.stdout:
+            _log("Ollama will run on: Híbrido (GPU + CPU)")
+        else:
+            # Si no ha corrido nada aún, hacemos una consulta general a los componentes
+            hw = subprocess.run([ollama_cmd, "run", "llama3.2", "ping"], capture_output=True, text=True, encoding="utf-8", errors="replace")
+            # Esto es un poco rudimentario para pre-arranque, pero uvicorn mostrará la info final luego
+            _log("Ollama hardware detection complete.")
+    except Exception:
+        pass
+
+
 def main() -> None:
-    if _is_windows() and _has_nvidia_gpu_windows() and not _command_exists("nvidia-smi"):
-        _log("NVIDIA GPU detected but driver not found.")
-        if not _try_install_nvidia_driver():
-            _log("Automatic driver install unavailable. Falling back to CPU.")
-
-    if _command_exists("nvidia-smi"):
-        os.environ.setdefault("WHISPER_DEVICE", "cuda")
-    else:
-        os.environ.setdefault("WHISPER_DEVICE", "cpu")
-
-    _log(f"Whisper will run on: {os.environ.get('WHISPER_DEVICE', 'cpu')}")
+    # Forzamos CPU para evitar errores de librerías CUDA (cublas64) faltantes en otros PCs
+    os.environ.setdefault("WHISPER_DEVICE", "cpu")
 
     import config
 
     ollama_cmd = _ensure_ollama_installed()
     _ensure_ollama_model(ollama_cmd, config.OLLAMA_MODEL)
+    _check_ollama_hardware(ollama_cmd)
 
     if config.WHISPER_AUTO_DOWNLOAD:
         _ensure_whisper_model(config)

@@ -19,7 +19,7 @@ OLLAMA_MODEL = "llama3.2"
 LLM_TIMEOUT_SECONDS = 8  # per GDD §5.2
 
 # ── STT (faster-whisper) ────────────────────────────────
-WHISPER_MODEL_SIZE = "medium"
+WHISPER_MODEL_SIZE = "small"
 
 
 def _detect_whisper_device() -> str:
@@ -52,7 +52,7 @@ WHISPER_DEVICE = _detect_whisper_device()
 WHISPER_COMPUTE_TYPE = "float16" if WHISPER_DEVICE == "cuda" else "int8"
 WHISPER_MODEL_PATH = os.environ.get(
 	"WHISPER_MODEL_PATH",
-	str(BASE_DIR / "models" / "whisper-medium"),
+	str(BASE_DIR / "models" / "whisper-small"),
 )
 WHISPER_LOCAL_ONLY = True
 WHISPER_AUTO_DOWNLOAD = True

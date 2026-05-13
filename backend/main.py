@@ -390,12 +390,13 @@ async def speech_to_text(file: UploadFile = File(...)):
         model = _get_whisper_model()
 
         # Write to a temp file because faster-whisper needs a file path
-        with tempfile.NamedTemporaryFile(suffix=".wav", delete=True) as tmp:
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
             tmp.write(audio_bytes)
-            tmp.flush()
+            tmp_name = tmp.name
 
+        try:
             segments, info = model.transcribe(
-                tmp.name,
+                tmp_name,
                 language="en",  # NPCs speak English; player speaks English
                 beam_size=5,
                 best_of=5,
@@ -406,6 +407,13 @@ async def speech_to_text(file: UploadFile = File(...)):
             transcript_parts = []
             for segment in segments:
                 transcript_parts.append(segment.text.strip())
+        finally:
+            # Clean up the temp file after reading
+            try:
+                import os
+                os.remove(tmp_name)
+            except OSError:
+                pass
 
         transcript = " ".join(transcript_parts).strip()
         elapsed_ms = int((time.monotonic() - start_time) * 1000)
