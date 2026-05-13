@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://40efnfuyc7b"]
+
+[ext_resource type="PackedScene" uid="uid://c2wq4p0q8lqf5" path="res://scenes/player/player.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://b1xq0mfsn0q5y" path="res://scenes/interactables/simple_cube.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://d3q4v8l6w3x2a" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="Script" uid="uid://drqx7nru827vc" path="res://scripts/scenes/sandbox.gd" id="4"]
+[ext_resource type="Script" uid="uid://dp6lrtxx4eorl" path="res://scripts/core/interaction_system.gd" id="5"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+size = Vector3(12, 0.2, 12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
+size = Vector3(12, 0.2, 12)
+
+[node name="Sandbox" type="Node3D" unique_id=2004657521]
+script = ExtResource("4")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=545279064]
+transform = Transform3D(0.6967067, -0.56192434, 0.4459157, 0, 0.62161, 0.7833269, -0.7173561, -0.5457491, 0.43307984, 0, 0, 0)
+
+[node name="Floor" type="StaticBody3D" parent="." unique_id=1810270234]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" unique_id=430672060]
+mesh = SubResource("BoxMesh_1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=1105373761]
+shape = SubResource("BoxShape3D_1")
+
+[node name="Player" parent="." unique_id=1311903520 instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 4)
+
+[node name="InteractionSystem" type="Node3D" parent="Player" unique_id=918103053]
+script = ExtResource("5")
+
+[node name="RayCast3D" type="RayCast3D" parent="Player/InteractionSystem" unique_id=1414955297]
+target_position = Vector3(0, 0, -2)
+
+[node name="SimpleCube" parent="." unique_id=168693728 instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+
+[node name="HUD" parent="." unique_id=1263376373 instance=ExtResource("3")]

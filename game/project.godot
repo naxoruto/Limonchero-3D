@@ -1,0 +1,49 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Nuevo Proyecto de Juego"
+run/main_scene="res://scenes/loading.tscn"
+config/features=PackedStringArray("4.6", "GL Compatibility")
+config/icon="res://icon.svg"
+
+[audio]
+
+buses/default_bus_layout="uid://brqiuopg2hw1l"
+driver/enable_input=true
+
+[autoload]
+
+BackendLauncher="*res://scripts/foundation/backend_launcher.gd"
+LLMClient="*res://scripts/foundation/llm_client.gd"
+VoiceManager="*res://scripts/core/voice_manager.gd"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/Tripo3d_Godot_Bridge/plugin.cfg")
+
+[filesystem]
+
+import/blender/enabled=false
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+rendering_device/driver.windows="d3d12"
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+
+[tripo_bridge]
+
+last_cleanup="2026-05-12T14:41:25"

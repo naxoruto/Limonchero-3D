@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://b1xq0mfsn0q5y"]
+
+[ext_resource type="Script" uid="uid://113jquu7l5og" path="res://scripts/interactables/simple_interactable.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://c6lb2mjsxmcq7" path="res://assets/models/Brocolini/Brocolini-front.png" id="2_mxfja"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2vtyl"]
+albedo_texture = ExtResource("2_mxfja")
+
+[sub_resource type="BoxMesh" id="BoxMesh_1"]
+size = Vector3(0.6, 0.6, 0.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
+size = Vector3(0.6, 0.6, 0.6)
+
+[node name="SimpleCube" type="StaticBody3D" unique_id=1403021239]
+script = ExtResource("1")
+interaction_label = "Examinar cubo (E)"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1360138611]
+material_override = SubResource("StandardMaterial3D_2vtyl")
+mesh = SubResource("BoxMesh_1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=916262373]
+shape = SubResource("BoxShape3D_1")
