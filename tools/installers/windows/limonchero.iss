@@ -1,8 +1,8 @@
 #define AppName "Limonchero 3D"
 #define AppPublisher "PUCV"
 #define AppVersion "0.0.0"
-#define SourceDir "dist\\installer"
-#define OutputDir "dist\\installer-out"
+#define SourceDir "..\\..\\..\\dist\\installer"
+#define OutputDir "..\\..\\..\\dist\\installer-out"
 #define OutputBaseFilename "limonchero-setup-win"
 #define AppExe "game\\limons.exe"
 

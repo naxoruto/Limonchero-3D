@@ -118,8 +118,8 @@ jobs:
           $version = "${{ github.ref_name }}".TrimStart("v")
           iscc `
             "/DAppVersion=$version" `
-            "/DSourceDir=dist\installer" `
-            "/DOutputDir=dist\installer-out" `
+            "/DSourceDir=${env:GITHUB_WORKSPACE}\dist\installer" `
+            "/DOutputDir=${env:GITHUB_WORKSPACE}\dist\installer-out" `
             "/DOutputBaseFilename=limonchero-setup-win" `
             "tools\installers\windows\limonchero.iss"
 
