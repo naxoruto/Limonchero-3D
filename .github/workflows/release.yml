@@ -70,7 +70,7 @@ jobs:
 
       - name: Build backend
         run: |
-          python -m pyinstaller --clean --noconfirm --onefile \
+          python -m PyInstaller --clean --noconfirm --onefile \
             --name limonchero-backend \
             --paths backend \
             --hidden-import config \
