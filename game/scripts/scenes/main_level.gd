@@ -131,6 +131,8 @@ func _on_gajito_evaluation_ready(passed: bool, _score: float, correction: String
 	if passed:
 		var transcript := _pending_player_text
 		_dialogue.add_player_message_with_translation(transcript, translation_es)
+		if not tip.strip_edges().is_empty():
+			GajitoPopup.show_message(tip, "low")
 		LLMClient.request_npc(_active_npc.npc_id, transcript, _get_history(_active_npc.npc_id))
 	else:
 		# Texto rechazado por Gajito. Descartar audio y mostrar corrección.
@@ -155,15 +157,25 @@ func _on_exit_to_main_menu() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
-		# Si hay diálogo abierto, DialogueUI maneja ESC (cierra el diálogo).
-		# Si el menú de pausa ya está abierto, su propio handler procesa ESC.
-		# Sólo abrimos el menú si nada captura el evento antes.
-		if _dialogue.is_open() or _pause_menu.is_open():
+	if event is InputEventKey and event.pressed and not event.echo:
+		# DEBUG: smoke test GajitoPopup. Borrar antes de release.
+		if event.keycode == KEY_F9:
+			GajitoPopup.show_message("Prueba LOW: buen ingles, intenta mas natural.", "low")
+			get_viewport().set_input_as_handled()
 			return
-		_player.enable_input(false)
-		_pause_menu.open()
-		get_viewport().set_input_as_handled()
+		if event.keycode == KEY_F10:
+			GajitoPopup.show_message("Prueba HIGH: revisa el guardarropa.", "high")
+			get_viewport().set_input_as_handled()
+			return
+		if event.keycode == KEY_ESCAPE:
+			# Si hay diálogo abierto, DialogueUI maneja ESC (cierra el diálogo).
+			# Si el menú de pausa ya está abierto, su propio handler procesa ESC.
+			# Sólo abrimos el menú si nada captura el evento antes.
+			if _dialogue.is_open() or _pause_menu.is_open():
+				return
+			_player.enable_input(false)
+			_pause_menu.open()
+			get_viewport().set_input_as_handled()
 
 
 func _on_stt_failed(error: String) -> void:

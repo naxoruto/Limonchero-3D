@@ -7,7 +7,6 @@ signal interaction_prompt_clicked()
 @onready var subtitle_panel: Control = $SubtitlePanel
 @onready var ptt_indicator: Control = $PTTIndicator
 @onready var inventory_notification: Label = $InventoryNotification
-@onready var anti_stall_hint: Label = $AntiStallHint
 
 var _npc_colors := {
 	"gajito": Color("#8BC34A"),
@@ -177,10 +176,7 @@ var _hints := {
 func show_anti_stall_hint(level: int) -> void:
 	if level < 1 or level > 3:
 		return
-	anti_stall_hint.text = _hints[level]
-	anti_stall_hint.visible = true
-	await get_tree().create_timer(4.0).timeout
-	anti_stall_hint.visible = false
+	GajitoPopup.show_message(_hints[level], "high")
 
 
 # ── Global visibility toggle ──────────────────────────────────────
@@ -190,3 +186,5 @@ func set_hud_visible(visible: bool) -> void:
 	ptt_indicator.visible = visible
 	interaction_prompt.visible = visible
 	inventory_notification.visible = visible
+	if not visible:
+		GajitoPopup.dismiss()

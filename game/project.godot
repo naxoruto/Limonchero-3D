@@ -25,6 +25,7 @@ driver/enable_input=true
 BackendLauncher="*res://scripts/foundation/backend_launcher.gd"
 GameManager="*res://scripts/foundation/game_manager.gd"
 HUDManager="*res://scenes/ui/hud_manager.tscn"
+GajitoPopup="*res://scenes/ui/gajito_popup.tscn"
 LLMClient="*res://scripts/foundation/llm_client.gd"
 VoiceManager="*res://scripts/core/voice_manager.gd"
 
