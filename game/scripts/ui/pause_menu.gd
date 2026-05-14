@@ -119,8 +119,6 @@ func close() -> void:
 func _wire_buttons() -> void:
 	_resume_btn.pressed.connect(close)
 	_notes_btn.pressed.connect(_on_notes_pressed)
-	_notes_btn.disabled = true
-	_notes_btn.tooltip_text = "Próximamente (G3.1)"
 	_settings_btn.pressed.connect(func(): _show_sub(SubPanel.SETTINGS))
 	_exit_btn.pressed.connect(func(): _show_sub(SubPanel.EXIT_CONFIRM))
 	_settings_back_btn.pressed.connect(func(): _show_sub(SubPanel.MAIN))

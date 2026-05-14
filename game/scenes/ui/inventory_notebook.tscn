@@ -1,0 +1,116 @@
+[gd_scene format=3 uid="uid://mx4hc00bkcli"]
+
+[ext_resource type="Script" path="res://scripts/ui/inventory_notebook.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_leather"]
+bg_color = Color(0.239, 0.145, 0.063, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0.122, 0.078, 0.039, 1)
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_paper"]
+bg_color = Color(0.961, 0.925, 0.784, 1)
+content_margin_left = 24.0
+content_margin_top = 20.0
+content_margin_right = 24.0
+content_margin_bottom = 20.0
+
+[node name="InventoryNotebook" type="CanvasLayer"]
+layer = 14
+script = ExtResource("1")
+
+[node name="BG" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0, 0, 0, 0.55)
+
+[node name="Frame" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -480.0
+offset_top = -360.0
+offset_right = 480.0
+offset_bottom = 360.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_leather")
+
+[node name="Pages" type="PanelContainer" parent="Frame"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_paper")
+
+[node name="Body" type="VBoxContainer" parent="Frame/Pages"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="Label" parent="Frame/Pages/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.165, 0.102, 0.031, 1)
+theme_override_font_sizes/font_size = 18
+text = "LIMONCHERO 3D — LIBRETA DE NOTAS"
+horizontal_alignment = 1
+
+[node name="HSep" type="HSeparator" parent="Frame/Pages/Body"]
+layout_mode = 2
+
+[node name="Columns" type="HBoxContainer" parent="Frame/Pages/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="HechosColumn" type="VBoxContainer" parent="Frame/Pages/Body/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="HechosLabel" type="Label" parent="Frame/Pages/Body/Columns/HechosColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.165, 0.353, 0.125, 1)
+theme_override_font_sizes/font_size = 14
+text = "HECHOS"
+horizontal_alignment = 1
+
+[node name="HechosGrid" type="GridContainer" parent="Frame/Pages/Body/Columns/HechosColumn"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 2
+
+[node name="VSep" type="VSeparator" parent="Frame/Pages/Body/Columns"]
+layout_mode = 2
+
+[node name="SospechasColumn" type="VBoxContainer" parent="Frame/Pages/Body/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="SospechasLabel" type="Label" parent="Frame/Pages/Body/Columns/SospechasColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.416, 0.082, 0.125, 1)
+theme_override_font_sizes/font_size = 14
+text = "SOSPECHAS"
+horizontal_alignment = 1
+
+[node name="SospechasGrid" type="GridContainer" parent="Frame/Pages/Body/Columns/SospechasColumn"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 2

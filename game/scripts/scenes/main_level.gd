@@ -8,6 +8,7 @@ const HISTORY_MAX_MESSAGES := 20
 @onready var _player: CharacterBody3D = $Player
 @onready var _fade: ColorRect = $FadeOverlay/FadeRect
 @onready var _pause_menu: CanvasLayer = $PauseMenu
+@onready var _notebook: CanvasLayer = $InventoryNotebook
 
 const MAIN_MENU_SCENE := "res://scenes/ui/main_menu.tscn"
 
@@ -15,6 +16,18 @@ var _player_camera: Camera3D = null
 var _active_npc: Node = null
 var _histories: Dictionary = {}
 var _pending_player_text: String = ""
+
+# DEBUG: catalogo para smoke test del notebook. Borrar antes de release.
+const _DEBUG_CLUES := [
+	{"id": "F1", "name": "Acuerdo del Fideicomiso", "type": "physical", "state": "BUENA", "implica_a": "Barry"},
+	{"id": "F2", "name": "Llave Maestra", "type": "physical", "state": "BUENA", "implica_a": "Barry"},
+	{"id": "F3", "name": "Encendedor de Oro", "type": "physical", "state": "SIN_REVISAR", "implica_a": "?"},
+	{"id": "F4", "name": "Maleta de Moni", "type": "physical", "state": "MALA", "implica_a": "Moni"},
+	{"id": "F5", "name": "Sobre Quemado", "type": "physical", "state": "MALA", "implica_a": "Lola"},
+]
+var _debug_clue_index: int = 0
+var _debug_last_clue_id: String = ""
+const _DEBUG_STATE_CYCLE := ["SIN_REVISAR", "BUENA", "MALA"]
 
 
 func _ready() -> void:
@@ -43,6 +56,10 @@ func _ready() -> void:
 	_pause_menu.bind_player(_player)
 	_pause_menu.resumed.connect(_on_pause_resumed)
 	_pause_menu.exit_to_main_menu.connect(_on_exit_to_main_menu)
+	_pause_menu.open_notebook.connect(_on_open_notebook_from_pause)
+	_notebook.opened.connect(_on_notebook_opened)
+	_notebook.closed.connect(_on_notebook_closed)
+	_notebook.inspect_requested.connect(_on_inspect_requested)
 	set_process_unhandled_input(true)
 
 	for npc in get_tree().get_nodes_in_group("npcs"):
@@ -156,7 +173,64 @@ func _on_exit_to_main_menu() -> void:
 	get_tree().change_scene_to_file(MAIN_MENU_SCENE)
 
 
+# ── Inventory Notebook ────────────────────────────────────────────────────────
+
+func _on_notebook_opened() -> void:
+	_player.enable_input(false)
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+
+func _on_notebook_closed() -> void:
+	# No reactivar input si hay diálogo o pausa activos.
+	if _dialogue.is_open() or _pause_menu.is_open():
+		return
+	_player.enable_input(true)
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
+func _on_inspect_requested(clue_id: String) -> void:
+	# Stub para G3.2 InspectOverlay. Por ahora cierra el notebook y loggea.
+	print("[Inventory] inspect_requested: ", clue_id)
+
+
+func _on_open_notebook_from_pause() -> void:
+	_pause_menu.close()
+	_notebook.open()
+
+
+# DEBUG: smoke test pickup. Borrar antes de release.
+func _debug_add_next_clue() -> void:
+	if _debug_clue_index >= _DEBUG_CLUES.size():
+		print("[Debug] No quedan clues en el catalogo de prueba.")
+		return
+	var entry: Dictionary = _DEBUG_CLUES[_debug_clue_index]
+	if GameManager.add_clue(String(entry["id"]), entry):
+		_debug_last_clue_id = String(entry["id"])
+		print("[Debug] add_clue OK: ", _debug_last_clue_id, " state=", entry["state"])
+		HUDManager.show_inventory_notification(String(entry["name"]))
+	_debug_clue_index += 1
+
+
+func _debug_cycle_last_clue_state() -> void:
+	if _debug_last_clue_id.is_empty():
+		print("[Debug] No hay clue para ciclar estado. Pulsa F11 primero.")
+		return
+	var current: String = String(GameManager.get_clue(_debug_last_clue_id).get("state", "SIN_REVISAR"))
+	var idx := _DEBUG_STATE_CYCLE.find(current)
+	var next: String = _DEBUG_STATE_CYCLE[(idx + 1) % _DEBUG_STATE_CYCLE.size()]
+	GameManager.set_clue_state(_debug_last_clue_id, next)
+	print("[Debug] set_clue_state ", _debug_last_clue_id, " -> ", next)
+
+
 func _unhandled_input(event: InputEvent) -> void:
+	# Tab toggle del notebook (acción Input "inventory_toggle").
+	if event.is_action_pressed("inventory_toggle"):
+		if _dialogue.is_open() or _pause_menu.is_open():
+			return
+		_notebook.toggle()
+		get_viewport().set_input_as_handled()
+		return
+
 	if event is InputEventKey and event.pressed and not event.echo:
 		# DEBUG: smoke test GajitoPopup. Borrar antes de release.
 		if event.keycode == KEY_F9:
@@ -167,7 +241,19 @@ func _unhandled_input(event: InputEvent) -> void:
 			GajitoPopup.show_message("Prueba HIGH: revisa el guardarropa.", "high")
 			get_viewport().set_input_as_handled()
 			return
+		if event.keycode == KEY_F11:
+			if event.shift_pressed:
+				_debug_cycle_last_clue_state()
+			else:
+				_debug_add_next_clue()
+			get_viewport().set_input_as_handled()
+			return
 		if event.keycode == KEY_ESCAPE:
+			# Si notebook abierto, ESC lo cierra y no abre pausa.
+			if _notebook.is_open():
+				_notebook.close()
+				get_viewport().set_input_as_handled()
+				return
 			# Si hay diálogo abierto, DialogueUI maneja ESC (cierra el diálogo).
 			# Si el menú de pausa ya está abierto, su propio handler procesa ESC.
 			# Sólo abrimos el menú si nada captura el evento antes.

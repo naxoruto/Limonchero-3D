@@ -6,6 +6,12 @@ signal clue_state_changed(clue_id: String, state: String)
 signal gate_opened()
 signal session_initialized(session_id: String)
 
+# ── Clue states ───────────────────────────────────────────────────────────────
+const STATE_GOOD := "BUENA"
+const STATE_BAD := "MALA"
+const STATE_UNREVIEWED := "SIN_REVISAR"
+const VALID_STATES := [STATE_GOOD, STATE_BAD, STATE_UNREVIEWED]
+
 # ── Session identity ──────────────────────────────────────────────────────────
 var session_id: String = ""
 var english_level: String = "intermediate"
@@ -43,3 +49,55 @@ func initialize_session(p_session_id: String, p_english_level: String) -> void:
 	completed = false
 	correct_accusation = false
 	_session_exported = false
+	session_initialized.emit(session_id)
+
+
+# ── Clue API ──────────────────────────────────────────────────────────────────
+
+## Agrega una pista nueva al inventario. Devuelve false si ya existía.
+## data debe incluir al menos: name, type, state. Otros campos: implica_a, description, icon_path.
+func add_clue(clue_id: String, data: Dictionary) -> bool:
+	if clue_id.is_empty():
+		push_warning("GameManager.add_clue: clue_id vacio")
+		return false
+	if clues.has(clue_id):
+		return false
+	var entry := data.duplicate(true)
+	entry["id"] = clue_id
+	if not entry.has("state") or not VALID_STATES.has(entry["state"]):
+		entry["state"] = STATE_UNREVIEWED
+	if not entry.has("type"):
+		entry["type"] = "physical"
+	if not entry.has("name"):
+		entry["name"] = clue_id
+	clues[clue_id] = entry
+	clue_added.emit(clue_id)
+	return true
+
+
+## Cambia el estado de una pista existente. No-op si no existe o estado inválido.
+func set_clue_state(clue_id: String, state: String) -> void:
+	if not clues.has(clue_id):
+		push_warning("GameManager.set_clue_state: clue '%s' no existe" % clue_id)
+		return
+	if not VALID_STATES.has(state):
+		push_warning("GameManager.set_clue_state: estado '%s' invalido" % state)
+		return
+	if clues[clue_id]["state"] == state:
+		return
+	clues[clue_id]["state"] = state
+	clue_state_changed.emit(clue_id, state)
+
+
+func get_clue(clue_id: String) -> Dictionary:
+	if not clues.has(clue_id):
+		return {}
+	return (clues[clue_id] as Dictionary).duplicate(true)
+
+
+func get_all_clues() -> Dictionary:
+	return clues.duplicate(true)
+
+
+func has_clue(clue_id: String) -> bool:
+	return clues.has(clue_id)
