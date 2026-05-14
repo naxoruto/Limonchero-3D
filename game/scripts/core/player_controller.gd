@@ -52,9 +52,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera.rotation.x = _pitch
 		return
 
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-		# Sandbox convenience: toggle capture.
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED else Input.MOUSE_MODE_CAPTURED
+	# ESC global lo maneja PauseMenu / DialogueUI — no togglear mouse aquí.
+
 
 
 func _physics_process(delta: float) -> void:

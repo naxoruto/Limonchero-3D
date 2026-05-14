@@ -1,4 +1,3 @@
-class_name GameManager
 extends Node
 
 # ── Signals (public API contract — emitted in future stories) ─────────────────

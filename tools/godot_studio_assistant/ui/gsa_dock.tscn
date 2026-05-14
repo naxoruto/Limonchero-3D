@@ -1,0 +1,40 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/godot_studio_assistant/ui/gsa_dock.gd" id="1_0d3u4"]
+
+[node name="GSADock" type="PanelContainer"]
+script = ExtResource("1_0d3u4")
+
+[node name="Margin" type="MarginContainer" parent="."]
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Root" type="VBoxContainer" parent="Margin"]
+theme_override_constants/separation = 8
+
+[node name="Buttons" type="VBoxContainer" parent="Margin/Root"]
+theme_override_constants/separation = 6
+
+[node name="CreateConfig" type="Button" parent="Margin/Root/Buttons"]
+text = "Create/Update Config (gsa_config.tres)"
+
+[node name="ExportConfig" type="Button" parent="Margin/Root/Buttons"]
+text = "Export Config JSON (gsa_config.export.json)"
+
+[node name="RunDoctor" type="Button" parent="Margin/Root/Buttons"]
+text = "Run Doctor"
+
+[node name="RunSceneLint" type="Button" parent="Margin/Root/Buttons"]
+text = "Run Scene Lint"
+
+[node name="RunContextPack" type="Button" parent="Margin/Root/Buttons"]
+text = "Generate Context Pack"
+
+[node name="Sep" type="HSeparator" parent="Margin/Root"]
+
+[node name="Output" type="TextEdit" parent="Margin/Root"]
+custom_minimum_size = Vector2(0, 260)
+editable = false
+wrap_mode = 1

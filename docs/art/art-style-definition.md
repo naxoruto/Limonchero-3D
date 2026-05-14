@@ -68,7 +68,7 @@ Flat shading. Sin smooth shading. Cada cara del mesh debe verse intencionada.
 | Mobiliario (mesa, silla) | ~100–300 tris |
 | Crowd siluetas (fondo) | ~50–80 tris — `MultiMeshInstance3D` obligatorio |
 
-**Total draw calls escena:** < 100 (budget de Quest 2 mantenido por compatibilidad).
+**Total draw calls escena:** < 150 (budget conservador para PC).
 
 ---
 

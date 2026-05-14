@@ -10,8 +10,8 @@ config_version=5
 
 [application]
 
-config/name="Nuevo Proyecto de Juego"
-run/main_scene="res://scenes/loading.tscn"
+config/name="Limonchero 3D"
+run/main_scene="res://scenes/ui/main_menu.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -23,6 +23,8 @@ driver/enable_input=true
 [autoload]
 
 BackendLauncher="*res://scripts/foundation/backend_launcher.gd"
+GameManager="*res://scripts/foundation/game_manager.gd"
+HUDManager="*res://scenes/ui/hud_manager.tscn"
 LLMClient="*res://scripts/foundation/llm_client.gd"
 VoiceManager="*res://scripts/core/voice_manager.gd"
 
@@ -33,6 +35,10 @@ enabled=PackedStringArray("res://addons/Tripo3d_Godot_Bridge/plugin.cfg")
 [filesystem]
 
 import/blender/enabled=false
+
+[gui]
+
+theme="res://assets/fonts/theme.tres"
 
 [physics]
 

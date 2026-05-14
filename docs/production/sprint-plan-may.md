@@ -259,23 +259,26 @@ Tareas previstas:
 
 ---
 
-## Sprint 3 — Arte + Audio + NPC Hardcoding
+## Sprint 3 — Arte + Audio + HUD/UI
 **Fechas:** 2026-05-19 → 2026-05-26  
+**Goal:** Art assets, audio completo, y capa de presentación (HUD, Inventario, UI System) operativa.  
 *(Detalle completo se expande al cerrar Sprint 2)*
 
 Tareas previstas:
-- Arte: Modelos pistas físicas completados, Agave (prop decorativo)
-- Sofía: Audio completo (música, SFX, balbuceos)
-- Ignacio: Inventory System, HUD, NPC Controller
-- Martín: NPC prompts hardcoded + test confesión Barry
+- **Ignacio — HUD/UI Epic (pesado):** HUDManager autoload, subtítulos typewriter, PTT indicator, inventario notebook (Tab), overlay inspección, Gajito popup, pause menu + settings, UI theme + fonts
+- **Arte:** Modelos pistas físicas completados, Agave (prop decorativo)
+- **Sofía:** Audio completo (música, SFX, balbuceos)
+- **Martín:** NPC prompts hardcoded + test confesión Barry
 
 ---
 
 ## Sprint 4 — Integración + Playtest
 **Fechas:** 2026-05-26 → 2026-06-02  
+**Goal:** Demo completa integrada — pistas → interrogatorio → acusación con UI operativa.  
 *(Detalle completo se expande al cerrar Sprint 3)*
 
 Tareas previstas:
+- **Ignacio:** Completar stories UI restantes (acusación, resolución, accesibilidad), integración HUD ↔ GameManager ↔ Interacción ↔ LLM
 - Smoke test crítico completo
 - Primer playtest interno (toda la ruta: pistas → interrogatorio → acusación)
 - Medición de latencia STT + LLM

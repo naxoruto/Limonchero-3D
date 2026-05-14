@@ -1,0 +1,290 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="MainPanelStyle"]
+bg_color = Color(0.1, 0.07, 0.03, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.83, 0.63, 0.19, 0.7)
+content_margin_left = 32.0
+content_margin_top = 28.0
+content_margin_right = 32.0
+content_margin_bottom = 28.0
+shadow_color = Color(0, 0, 0, 0.7)
+shadow_size = 16
+
+[sub_resource type="StyleBoxFlat" id="SubPanelStyle"]
+bg_color = Color(0.07, 0.05, 0.03, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.83, 0.63, 0.19, 0.6)
+content_margin_left = 28.0
+content_margin_top = 24.0
+content_margin_right = 28.0
+content_margin_bottom = 24.0
+shadow_color = Color(0, 0, 0, 0.7)
+shadow_size = 14
+
+[node name="PauseMenu" type="CanvasLayer"]
+script = ExtResource("1_script")
+layer = 20
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.55)
+mouse_filter = 0
+
+[node name="MainPanel" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -180.0
+offset_right = 200.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("MainPanelStyle")
+
+[node name="MainVBox" type="VBoxContainer" parent="MainPanel"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="MainPanel/MainVBox"]
+layout_mode = 2
+text = "PAUSA"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.95, 0.78, 0.42, 1)
+theme_override_font_sizes/font_size = 36
+
+[node name="Spacer" type="Control" parent="MainPanel/MainVBox"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+[node name="ResumeBtn" type="Button" parent="MainPanel/MainVBox"]
+custom_minimum_size = Vector2(320, 44)
+layout_mode = 2
+text = "Continuar"
+
+[node name="NotesBtn" type="Button" parent="MainPanel/MainVBox"]
+custom_minimum_size = Vector2(320, 44)
+layout_mode = 2
+text = "Revisar notas"
+
+[node name="SettingsBtn" type="Button" parent="MainPanel/MainVBox"]
+custom_minimum_size = Vector2(320, 44)
+layout_mode = 2
+text = "Configuración"
+
+[node name="ExitBtn" type="Button" parent="MainPanel/MainVBox"]
+custom_minimum_size = Vector2(320, 44)
+layout_mode = 2
+text = "Salir al menú principal"
+
+[node name="SettingsPanel" type="PanelContainer" parent="."]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -260.0
+offset_right = 300.0
+offset_bottom = 260.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("SubPanelStyle")
+
+[node name="SettingsVBox" type="VBoxContainer" parent="SettingsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="SettingsTitle" type="Label" parent="SettingsPanel/SettingsVBox"]
+layout_mode = 2
+text = "Configuración"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.95, 0.78, 0.42, 1)
+theme_override_font_sizes/font_size = 28
+
+[node name="FovRow" type="HBoxContainer" parent="SettingsPanel/SettingsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FovLabel" type="Label" parent="SettingsPanel/SettingsVBox/FovRow"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "FOV"
+
+[node name="FovSlider" type="HSlider" parent="SettingsPanel/SettingsVBox/FovRow"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FovValue" type="Label" parent="SettingsPanel/SettingsVBox/FovRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "75°"
+horizontal_alignment = 2
+
+[node name="MouseRow" type="HBoxContainer" parent="SettingsPanel/SettingsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MouseLabel" type="Label" parent="SettingsPanel/SettingsVBox/MouseRow"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Sensibilidad mouse"
+
+[node name="MouseSlider" type="HSlider" parent="SettingsPanel/SettingsVBox/MouseRow"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MouseValue" type="Label" parent="SettingsPanel/SettingsVBox/MouseRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "0.0020"
+horizontal_alignment = 2
+
+[node name="FontRow" type="HBoxContainer" parent="SettingsPanel/SettingsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FontLabel" type="Label" parent="SettingsPanel/SettingsVBox/FontRow"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Tamaño de fuente"
+
+[node name="FontSlider" type="HSlider" parent="SettingsPanel/SettingsVBox/FontRow"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FontValue" type="Label" parent="SettingsPanel/SettingsVBox/FontRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "16pt"
+horizontal_alignment = 2
+
+[node name="VolMasterRow" type="HBoxContainer" parent="SettingsPanel/SettingsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="VolMasterLabel" type="Label" parent="SettingsPanel/SettingsVBox/VolMasterRow"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Volumen general"
+
+[node name="VolMasterSlider" type="HSlider" parent="SettingsPanel/SettingsVBox/VolMasterRow"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VolMasterValue" type="Label" parent="SettingsPanel/SettingsVBox/VolMasterRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "0.0 dB"
+horizontal_alignment = 2
+
+[node name="VolSfxRow" type="HBoxContainer" parent="SettingsPanel/SettingsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="VolSfxLabel" type="Label" parent="SettingsPanel/SettingsVBox/VolSfxRow"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Volumen efectos"
+
+[node name="VolSfxSlider" type="HSlider" parent="SettingsPanel/SettingsVBox/VolSfxRow"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VolSfxValue" type="Label" parent="SettingsPanel/SettingsVBox/VolSfxRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "0.0 dB"
+horizontal_alignment = 2
+
+[node name="VolMicRow" type="HBoxContainer" parent="SettingsPanel/SettingsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="VolMicLabel" type="Label" parent="SettingsPanel/SettingsVBox/VolMicRow"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Volumen micrófono"
+
+[node name="VolMicSlider" type="HSlider" parent="SettingsPanel/SettingsVBox/VolMicRow"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VolMicValue" type="Label" parent="SettingsPanel/SettingsVBox/VolMicRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "0.0 dB"
+horizontal_alignment = 2
+
+[node name="Spacer2" type="Control" parent="SettingsPanel/SettingsVBox"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+[node name="BackBtn" type="Button" parent="SettingsPanel/SettingsVBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "← Volver"
+
+[node name="ExitConfirmPanel" type="PanelContainer" parent="."]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -110.0
+offset_right = 220.0
+offset_bottom = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("SubPanelStyle")
+
+[node name="ExitVBox" type="VBoxContainer" parent="ExitConfirmPanel"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Question" type="Label" parent="ExitConfirmPanel/ExitVBox"]
+layout_mode = 2
+text = "¿Salir al menú principal?
+Perderás el progreso actual."
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_font_sizes/font_size = 18
+
+[node name="ButtonRow" type="HBoxContainer" parent="ExitConfirmPanel/ExitVBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 24
+
+[node name="ExitYesBtn" type="Button" parent="ExitConfirmPanel/ExitVBox/ButtonRow"]
+custom_minimum_size = Vector2(140, 44)
+layout_mode = 2
+text = "Sí, salir"
+
+[node name="ExitCancelBtn" type="Button" parent="ExitConfirmPanel/ExitVBox/ButtonRow"]
+custom_minimum_size = Vector2(140, 44)
+layout_mode = 2
+text = "Cancelar"

@@ -4,13 +4,14 @@
 [ext_resource type="PackedScene" uid="uid://c2wq4p0q8lqf5" path="res://scenes/player/player.tscn" id="2_player"]
 [ext_resource type="Script" uid="uid://cuc10ne1r3o0x" path="res://scripts/scenes/main_level.gd" id="6_script"]
 [ext_resource type="Script" uid="uid://dp6lrtxx4eorl" path="res://scripts/core/interaction_system.gd" id="7_interaction"]
-[ext_resource type="PackedScene" uid="uid://d3q4v8l6w3x2a" path="res://scenes/ui/hud.tscn" id="8_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/dialogue.tscn" id="9_dialogue"]
 [ext_resource type="Script" path="res://scripts/interactables/npc_character.gd" id="10_npc_char"]
 [ext_resource type="PackedScene" uid="uid://cxxp66t3jsxye" path="res://assets/characters/Moni/animation scene/Singing.fbx" id="11_moni_model"]
 [ext_resource type="PackedScene" uid="uid://crmvut8enq0ge" path="res://assets/characters/Moni/animation idle/Dwarf Idle.fbx" id="12_moni_talk"]
 [ext_resource type="PackedScene" uid="uid://bnckdyc4wqlnn" path="res://assets/characters/Spud/animation idle/Salute.fbx" id="13_spud_idle"]
 [ext_resource type="PackedScene" uid="uid://bt6kgqmty1em5" path="res://assets/characters/Spud/animation scene/Thoughtful Head Shake.fbx" id="14_spud_talk"]
+[ext_resource type="PackedScene" path="res://scenes/companions/gajito.tscn" id="15_gajito"]
+[ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="16_pause"]
 
 [node name="Main" type="Node3D" unique_id=1253217368]
 script = ExtResource("6_script")
@@ -108,9 +109,12 @@ idle_scene = ExtResource("13_spud_idle")
 talking_scene = ExtResource("14_spud_talk")
 cam_offset_x = 0.4
 
-[node name="HUD" parent="." unique_id=1751490325 instance=ExtResource("8_hud")]
+[node name="Gajito" parent="." instance=ExtResource("15_gajito")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.8, 0.5, 1.0)
 
 [node name="DialogueUI" parent="." unique_id=1274670137 instance=ExtResource("9_dialogue")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("16_pause")]
 
 [node name="FadeOverlay" type="CanvasLayer" parent="." unique_id=938550197]
 layer = 100

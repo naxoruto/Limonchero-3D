@@ -15,7 +15,7 @@
 ## 1. Visión General
 
 ### 1.1. Concepto del Juego
-Un juego de detectives en primera persona en Realidad Virtual donde el jugador investiga un crimen. Debe explorar escenarios, recoger pistas e interrogar sospechosos controlados por un LLM con personalidades únicas, usando su propia voz (Speech-to-Text). El entorno general y la interfaz están en español, pero **todos los NPCs hablan en inglés**, y **el jugador está obligado a hablar en inglés** para interrogar. Un asistente de IA integrado escucha al jugador y, si se equivoca, salta para corregir los errores e indicarle cómo debió decirlo. El objetivo es descubrir al culpable y presentar tu caso al jefe.
+Un juego de detectives en primera persona para PC donde el jugador investiga un crimen. Debe explorar escenarios, recoger pistas e interrogar sospechosos controlados por un LLM con personalidades únicas, usando su propia voz (Speech-to-Text). El entorno general y la interfaz están en español, pero **todos los NPCs hablan en inglés**, y **el jugador está obligado a hablar en inglés** para interrogar. Un asistente de IA integrado escucha al jugador y, si se equivoca, salta para corregir los errores e indicarle cómo debió decirlo. El objetivo es descubrir al culpable y presentar tu caso al jefe.
 
 ### 1.2. Género
 Noir / Detective / Misterio / Aventura narrativa
@@ -28,7 +28,7 @@ Noir / Detective / Misterio / Aventura narrativa
 - Personas que quieran practicar inglés en un contexto interactivo con retroalimentación en tiempo real
 
 ### 1.5. Propuesta de Valor Única (USP)
-El primer juego de detectives en PC donde el jugador realmente le habla a los sospechosos: cada interrogatorio es único gracias a IA conversacional (STT → LLM), los NPCs responden con texto y un balbuceo característico por personaje (estilo Animal Crossing), y el juego corrige tu inglés de forma natural mientras investigas.
+Un juego de detectives en PC donde el jugador realmente le habla a los sospechosos: cada interrogatorio es único gracias a IA conversacional (STT → LLM), los NPCs responden con texto y un balbuceo característico por personaje (estilo Animal Crossing), y el juego corrige tu inglés de forma natural mientras investigas.
 
 ### 1.6. Componente Educativo
 La interfaz general (menús, inventario) y la voz del ayudante están en **español**, pero el contenido core del juego está en **inglés**. 
@@ -433,28 +433,101 @@ Los NPCs no tienen voz sintetizada. Cada uno tiene un **clip de balbuceo corto**
 
 ## 8. UI/UX en PC
 
-### 8.1. Principios de Diseño PC
-- UI principal como **HUD 2D** superpuesta al juego 3D — legible, no obstructiva
-- Texto de subtítulos y diálogos con contraste suficiente sobre escenas oscuras (noir)
-- El tablón de pistas diegético (en pared del juego) se complementa con vista de **inventario Tab** para legibilidad en pantalla plana
-- Feedback explícito en todas las acciones: el jugador siempre sabe qué tiene y qué pasó
-- Opciones de accesibilidad: FOV ajustable (70–110°), tamaño de subtítulos
+> **Filosofía rectora:** Diegética adaptada a PC. La pantalla es un portal al mundo noir — no un HUD flotante, sino una extensión de la identidad del detective. El jugador no mira menús: *investiga*. Los elementos funcionales imprescindibles van en HUD overlay minimalista; todo lo demás existe dentro del mundo del juego.
 
-### 8.2. Elementos de UI
+### 8.1. Principios de Diseño PC
+
+1. **Diegético primero:** El notebook físico en mano es el inventario. Las pistas son fotos que el jugador sostiene. El reloj de pared marca el tiempo narrativo. Si un detective de los 50 no lo usaría, el jugador no lo ve.
+2. **HUD overlay solo para lo esencial:** Subtítulos, indicador PTT, popup Gajito y prompt de interacción. Nada más. Sin barras de vida, sin minimapa, sin popups de logros.
+3. **Contraste noir:** Texto blanco cálido (`#E8D5A3`) sobre fondos oscuros semi-transparentes. Tipografía monospace tipo máquina de escribir (*Special Elite*).
+4. **Feedback explícito:** Cada acción tiene respuesta visual o textual inmediata. El jugador siempre sabe qué pasó.
+5. **Accesibilidad:** FOV ajustable (70–110°), tamaño de subtítulos configurable, todos los indicadores críticos tienen respaldo de forma (no solo color) para daltonismo.
+6. **Menús como umbral:** Los menús de sistema (pausa, settings) usan temperatura de color opuesta al mundo (`#D8DCE0` frío vs `#D4A030` ámbar) para señalar que el jugador está "fuera" de la investigación.
+
+### 8.2. Capas de Interfaz
+
+| Capa | Tipo | Anclaje | Ejemplos |
+|------|------|---------|----------|
+| **Diegética** | Existe en el mundo 3D | World-space, objeto 3D o SubViewport | Notebook de inventario, fotos de pistas, reloj de pared, tablón de diálogo en pared |
+| **HUD Overlay** | CanvasLayer 2D sobre la vista | Screen-space, fijo en pantalla | Subtítulos dual-channel, indicador PTT, popup Gajito, prompt de interacción |
+| **Sistema** | Menús fuera del gameplay | Screen-space, solo en pausa | Menú principal, pausa, settings, acusación, resolución del caso |
+
+**Regla:** Los elementos de Sistema solo aparecen cuando el juego está pausado o en transición. Durante gameplay, todo es Diegético o HUD Overlay mínimo.
+
+### 8.3. Elementos de UI
+
+#### 8.3.1 Elementos Diegéticos
 
 | Elemento | Tipo | Descripción |
 |----------|------|-------------|
-| Tablón de pistas | Diegético (pared) + Tab para vista completa | Pistas recopiladas como fotos/notas en pared del mundo; Tab abre vista de inventario legible |
-| Indicador de NPC | Diegético | Ícono sutil sobre NPC cuando puedes interactuar |
-| Menú contextual NPC | HUD overlay | Al presionar E/X cerca de NPC: opciones "Interrogar / Examinar" |
-| Subtítulos | HUD inferior | Lo que dice el NPC (canal izq.) y lo que dijiste tú (canal der.) |
-| Modo inspección | Overlay centrado | Objeto mostrado en pantalla al inspeccionarlo; botón de cierre (Esc/B) visible |
-| Asistente de inglés (Gajito) | Pop-up esquina inf. izq. | Correcciones gramaticales en español; desaparece solo tras unos segundos |
-| Indicador de grabación (PTT) | HUD superior | Pulso/color mientras el micrófono está activo; "Gajito está pensando…" mientras espera respuesta |
-| Menú de pausa | Overlay centrado | Opciones, salir, volumen, FOV |
+| **Notebook de inventario** | Diegético 3D (mano / Tab) | Libreta de cuero oscuro que el jugador sostiene al presionar Tab. Páginas amarillentas con pistas como fotos pegadas y notas manuscritas. Layout: columna izq. = hechos, columna der. = sospechas. Sellos BUENA/MALA en tinta. |
+| **Fotos de pistas** | Diegético (inspección) | Cada pista física se representa como fotografía blanco y negro con borde blanco y código de evidencia al reverso. El jugador puede rotarlas con el mouse. |
+| **Reloj de pared** | Diegético (mundo) | Reloj art deco en el salón principal. No muestra tiempo real — avanza en saltos narrativos al completar objetivos. Sin barra de progreso digital. |
+| **Indicador de NPC** | Diegético (world-space) | Anillo hexagonal sutil (`#E8D5A3`) que aparece alrededor del NPC cuando está en rango de interacción (≤1.5m). Sin texto por defecto. |
+| **Tablón de diálogo** | Diegético (pared) | SubViewport proyectado como textura en una superficie del mundo (pared de la sala de interrogatorio). Muestra la respuesta del NPC letra por letra con efecto typewriter. |
 
-### 8.3. Mockups
-`[TODO: Insertar mockups de las vistas principales]`
+#### 8.3.2 Elementos HUD Overlay
+
+| Elemento | Posición | Descripción |
+|----------|----------|-------------|
+| **Subtítulos dual-channel** | HUD inferior, 80% ancho centrado | Canal izquierdo: nombre del NPC en su color identidad + texto. Canal derecho: "[Tú]" en lightblue + tu frase. Efecto typewriter (0.03s/carácter). Fondo semi-transparente `#000000` 70%. |
+| **Indicador PTT** | Esquina superior-izquierda | Ícono de micrófono (tres barras de audio) + texto de estado: "Grabando..." (ámbar pulsante `#D4A030`), "Gajito pensando..." (procesando), inactivo (`#4A4035` casi invisible). |
+| **Prompt de interacción** | Centro-inferior | Texto contextual: "[E] Examinar", "[E] Interrogar", "[E] Recoger". Fuente monospace, color `#E8D5A3`. Solo visible en rango de interacción. |
+| **Popup Gajito** | Esquina inferior-izquierda | Corrección gramatical en español. Fondo lime green `#7ABE30` semi-transparente. Auto-dismiss tras 5 segundos. Animación de entrada: fade in 0.2s. |
+| **Notificación de inventario** | Centro-superior | "[pista] añadida al inventario". Aparece 1.5s al recoger una pista. Fade out automático. |
+| **Anti-stall hint** | Centro-inferior (sobre subtítulos) | Si el jugador no adquiere evidencias por 4+ minutos, Gajito sugiere sutilmente dónde buscar. Prioridad: L1 (4min) > L2 (5min) > L3 (7min). |
+
+#### 8.3.3 Elementos de Sistema (Menús)
+
+| Elemento | Activación | Descripción |
+|----------|------------|-------------|
+| **Menú principal** | Inicio del juego | Título "LIMONCHERO 3D", campo para session_id, indicador de estado del backend (saludable/error), botón "Iniciar Investigación", botón "Salir". Fondo: arte conceptual del club. |
+| **Menú de pausa** | ESC | Fondo del juego desaturado al 60% con desenfoque. Panel central de cuero oscuro `#1A1208` con opciones: Continuar, Revisar notas (abre notebook), Configuración, Salir al menú principal. Jazz al 15% volumen. |
+| **Configuración** | Desde pausa | Slider FOV (70–110°), tamaño fuente subtítulos (12–24pt), volumen master/voice/ambiente, sensibilidad mouse. Persiste vía ConfigFile. |
+| **Overlay de inspección** | E sobre pista en inventario | Objeto centrado en pantalla, fondo oscurecido. Nombre + descripción. Botones: "Añadir al inventario", "Cerrar" (ESC). Cursor liberado. |
+| **Árbol de acusación** | Diálogo con Spud | Al presentar caso: checkboxes para seleccionar hasta 3 evidencias, campo de texto para nombre del acusado. Botón "Acusar". |
+| **Pantalla de resolución** | Post-acusación | Caso resuelto (BUENA): sello verde, resumen del caso, session_id. Caso fallido: sello MALA, explicación. Botón "Volver al menú". |
+
+### 8.4. Colores de Identidad por Personaje
+
+| Personaje | Color de nombre | Hex |
+|-----------|----------------|-----|
+| Gajito | Verde lima | `#8BC34A` |
+| Commissioner Spud | Marrón tierra | `#6B4423` |
+| Moni Graná Fert | Granate | `#8B2332` |
+| Gerry Broccolini | Verde oscuro | `#4A6B30` |
+| Lola Persimmon | Naranja-marrón | `#C4703A` |
+| Barry Peel | Amarillo frío | `#D4C840` |
+
+### 8.5. Especificaciones Técnicas de UI
+
+| Parámetro | Valor |
+|-----------|-------|
+| Fuente | *Special Elite* (monospace serif typewriter, OFL/Apache 2.0) |
+| Tamaño base cuerpo | 16pt |
+| Tamaño títulos | 24pt |
+| Tamaño subtítulos por defecto | 14pt (configurable 12–24pt) |
+| Velocidad typewriter | 0.03s por carácter |
+| Fade in/out estándar | 0.2s |
+| Auto-dismiss Gajito | 5s |
+| Notificación inventario | 1.5s |
+| Anti-stall L1 / L2 / L3 | 4 / 5 / 7 minutos sin adquirir evidencias |
+| Slots de inventario | 8 (grid 4 columnas × 2 filas) |
+| Capa CanvasLayer HUD | Layer 10 |
+| Capa CanvasLayer Gajito | Layer 15 |
+| Capa CanvasLayer Sistema | Layer 20 |
+
+### 8.6. Lo que Está Prohibido en la UI
+
+- Barras de vida, stamina o medidores de estado (no es un juego de acción)
+- Minimapa (el club es un espacio contenido que se navega físicamente)
+- Pop-ups de logros durante gameplay (rompen inmersión noir)
+- Colores de alta saturación fuera del sistema de identidad
+- Fuentes sans-serif redondeadas (incompatibles con estética noir-frutícola)
+- Texto en pantalla completa que no sea diegético
+
+### 8.7. Mockups
+`[TODO: Insertar mockups de las vistas principales — ver docs/design/ux/ para especificaciones por pantalla]`
 
 ---
 
@@ -521,7 +594,7 @@ Los NPCs no tienen voz sintetizada. Cada uno tiene un **clip de balbuceo corto**
 |------|---------|---------------|
 | Fase 1 – Diseño + PoC | 7 abr – 27 abr 2026 | Entrega 1: Informe diseño + prototipo básico |
 | Fase 2 – Desarrollo 70% | 28 abr – 1 jun 2026 | Entrega 2: Demo funcional + diseño pruebas |
-| Fase 3 – Final + Validación | 2 jun – 29 jun 2026 | Entrega 3: Build APK final + resultados pruebas |
+| Fase 3 – Final + Validación | 2 jun – 29 jun 2026 | Entrega 3: Build PC final + resultados pruebas |
 
 ---
 
