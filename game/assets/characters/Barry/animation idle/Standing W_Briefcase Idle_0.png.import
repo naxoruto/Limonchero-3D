@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://d1kiu8q81lrw0"
 path.s3tc="res://.godot/imported/Standing W_Briefcase Idle_0.png-6c891f7a9a5c89e17e10345ad65ebc64.s3tc.ctex"
+path.etc2="res://.godot/imported/Standing W_Briefcase Idle_0.png-6c891f7a9a5c89e17e10345ad65ebc64.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/characters/Barry/animation idle/Standing W_Briefcase Idle_0.png"
-dest_files=["res://.godot/imported/Standing W_Briefcase Idle_0.png-6c891f7a9a5c89e17e10345ad65ebc64.s3tc.ctex"]
+dest_files=["res://.godot/imported/Standing W_Briefcase Idle_0.png-6c891f7a9a5c89e17e10345ad65ebc64.s3tc.ctex", "res://.godot/imported/Standing W_Briefcase Idle_0.png-6c891f7a9a5c89e17e10345ad65ebc64.etc2.ctex"]
 
 [params]
 

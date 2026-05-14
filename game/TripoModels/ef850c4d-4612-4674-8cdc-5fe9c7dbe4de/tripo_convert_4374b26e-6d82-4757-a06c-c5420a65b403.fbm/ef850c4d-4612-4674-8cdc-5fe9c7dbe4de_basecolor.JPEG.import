@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dlqfw18u7m376"
 path.s3tc="res://.godot/imported/ef850c4d-4612-4674-8cdc-5fe9c7dbe4de_basecolor.JPEG-15a7072b993dcecf997b940292a5968d.s3tc.ctex"
+path.etc2="res://.godot/imported/ef850c4d-4612-4674-8cdc-5fe9c7dbe4de_basecolor.JPEG-15a7072b993dcecf997b940292a5968d.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://TripoModels/ef850c4d-4612-4674-8cdc-5fe9c7dbe4de/tripo_convert_4374b26e-6d82-4757-a06c-c5420a65b403.fbm/ef850c4d-4612-4674-8cdc-5fe9c7dbe4de_basecolor.JPEG"
-dest_files=["res://.godot/imported/ef850c4d-4612-4674-8cdc-5fe9c7dbe4de_basecolor.JPEG-15a7072b993dcecf997b940292a5968d.s3tc.ctex"]
+dest_files=["res://.godot/imported/ef850c4d-4612-4674-8cdc-5fe9c7dbe4de_basecolor.JPEG-15a7072b993dcecf997b940292a5968d.s3tc.ctex", "res://.godot/imported/ef850c4d-4612-4674-8cdc-5fe9c7dbe4de_basecolor.JPEG-15a7072b993dcecf997b940292a5968d.etc2.ctex"]
 
 [params]
 

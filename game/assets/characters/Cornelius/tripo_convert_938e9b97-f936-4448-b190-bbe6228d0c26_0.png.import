@@ -4,18 +4,19 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://bkkh28aqjf8ii"
 path.s3tc="res://.godot/imported/tripo_convert_938e9b97-f936-4448-b190-bbe6228d0c26_0.png-95a96b7e5a0697116950faf54cf586e7.s3tc.ctex"
+path.etc2="res://.godot/imported/tripo_convert_938e9b97-f936-4448-b190-bbe6228d0c26_0.png-95a96b7e5a0697116950faf54cf586e7.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "fd76b5e5b31caab1011f8ecb61794d6c"
+"md5": "36abfd48c6b1bde172d23f54134f8bea"
 }
 
 [deps]
 
 source_file="res://assets/characters/Cornelius/tripo_convert_938e9b97-f936-4448-b190-bbe6228d0c26_0.png"
-dest_files=["res://.godot/imported/tripo_convert_938e9b97-f936-4448-b190-bbe6228d0c26_0.png-95a96b7e5a0697116950faf54cf586e7.s3tc.ctex"]
+dest_files=["res://.godot/imported/tripo_convert_938e9b97-f936-4448-b190-bbe6228d0c26_0.png-95a96b7e5a0697116950faf54cf586e7.s3tc.ctex", "res://.godot/imported/tripo_convert_938e9b97-f936-4448-b190-bbe6228d0c26_0.png-95a96b7e5a0697116950faf54cf586e7.etc2.ctex"]
 
 [params]
 

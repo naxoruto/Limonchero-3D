@@ -4,18 +4,19 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cll4myuymdoi1"
 path.s3tc="res://.godot/imported/Receiving Cpr_0.png-1cfe91e6b98cc3cea9f9a33743ecf638.s3tc.ctex"
+path.etc2="res://.godot/imported/Receiving Cpr_0.png-1cfe91e6b98cc3cea9f9a33743ecf638.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "fd76b5e5b31caab1011f8ecb61794d6c"
+"md5": "2ea2be093407df815d5e81e3cadbd5c5"
 }
 
 [deps]
 
 source_file="res://assets/characters/Cornelius/Receiving Cpr_0.png"
-dest_files=["res://.godot/imported/Receiving Cpr_0.png-1cfe91e6b98cc3cea9f9a33743ecf638.s3tc.ctex"]
+dest_files=["res://.godot/imported/Receiving Cpr_0.png-1cfe91e6b98cc3cea9f9a33743ecf638.s3tc.ctex", "res://.godot/imported/Receiving Cpr_0.png-1cfe91e6b98cc3cea9f9a33743ecf638.etc2.ctex"]
 
 [params]
 
