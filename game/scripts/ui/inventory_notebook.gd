@@ -14,6 +14,7 @@ extends CanvasLayer
 signal opened()
 signal closed()
 signal inspect_requested(clue_id: String)
+signal accuse_requested()
 
 const COLOR_PAPER := Color(0.961, 0.925, 0.784)
 const COLOR_LEATHER := Color(0.239, 0.145, 0.063)
@@ -30,6 +31,7 @@ const TOTAL_SLOTS := 8
 @onready var _bg: ColorRect = $BG
 @onready var _hechos_grid: GridContainer = $Frame/Pages/Body/Columns/HechosColumn/HechosGrid
 @onready var _sospechas_grid: GridContainer = $Frame/Pages/Body/Columns/SospechasColumn/SospechasGrid
+@onready var _accuse_btn: Button = $Frame/Pages/Body/Footer/AccuseBtn
 
 var _is_open: bool = false
 var _blocked: bool = false
@@ -41,6 +43,7 @@ func _ready() -> void:
 	GameManager.clue_added.connect(_on_clue_changed)
 	GameManager.clue_state_changed.connect(_on_clue_state_changed)
 	_bg.gui_input.connect(_on_bg_gui_input)
+	_accuse_btn.pressed.connect(_on_accuse_pressed)
 	refresh()
 
 
@@ -98,6 +101,7 @@ func refresh() -> void:
 
 	_populate_column(_hechos_grid, hechos)
 	_populate_column(_sospechas_grid, sospechas)
+	_accuse_btn.disabled = hechos.is_empty()
 
 
 func _populate_column(grid: GridContainer, clues: Array) -> void:
@@ -220,3 +224,7 @@ func _on_bg_gui_input(event: InputEvent) -> void:
 	# Click fuera del frame cierra. El frame captura sus propios eventos.
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		close()
+
+
+func _on_accuse_pressed() -> void:
+	accuse_requested.emit()

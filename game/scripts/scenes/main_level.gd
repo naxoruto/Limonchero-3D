@@ -9,6 +9,7 @@ const HISTORY_MAX_MESSAGES := 20
 @onready var _fade: ColorRect = $FadeOverlay/FadeRect
 @onready var _pause_menu: CanvasLayer = $PauseMenu
 @onready var _notebook: CanvasLayer = $InventoryNotebook
+@onready var _accusation: CanvasLayer = $AccusationDialog
 
 const MAIN_MENU_SCENE := "res://scenes/ui/main_menu.tscn"
 
@@ -60,6 +61,12 @@ func _ready() -> void:
 	_notebook.opened.connect(_on_notebook_opened)
 	_notebook.closed.connect(_on_notebook_closed)
 	_notebook.inspect_requested.connect(_on_inspect_requested)
+	_notebook.accuse_requested.connect(_on_accuse_requested)
+	_accusation.opened.connect(_on_accusation_opened)
+	_accusation.canceled.connect(_on_accusation_canceled)
+	_accusation.accusation_confirmed.connect(_on_accusation_confirmed)
+	GameManager.case_resolved.connect(_on_case_resolved)
+	GameManager.case_failed.connect(_on_case_failed)
 	set_process_unhandled_input(true)
 
 	for npc in get_tree().get_nodes_in_group("npcs"):
@@ -198,6 +205,44 @@ func _on_open_notebook_from_pause() -> void:
 	_notebook.open()
 
 
+# ── Accusation flow ──────────────────────────────────────────────────────────
+
+func _on_accuse_requested() -> void:
+	_notebook.close()
+	_accusation.open()
+
+
+func _on_accusation_opened() -> void:
+	_player.enable_input(false)
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	# Bloquear UI ambiental durante acusación.
+	GajitoPopup.set_blocked(true)
+	_notebook.set_blocked(true)
+
+
+func _on_accusation_canceled() -> void:
+	GajitoPopup.set_blocked(false)
+	_notebook.set_blocked(false)
+	_player.enable_input(true)
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
+func _on_accusation_confirmed(accused: String, evidence: Array) -> void:
+	GameManager.register_accusation(accused, evidence)
+	# Mantener UI ambiental bloqueada — la pantalla de resolución (G4.2) tomará control.
+	# GajitoPopup/notebook se desbloquean cuando G4.2 vuelva al menú principal.
+
+
+func _on_case_resolved() -> void:
+	# Stub G4.2. Por ahora log + fade rápido.
+	print("[Accusation] case_resolved — Barry confeso. (G4.2 pantalla pendiente)")
+
+
+func _on_case_failed(reason: String) -> void:
+	# Stub G4.2. Por ahora log.
+	print("[Accusation] case_failed: ", reason, " (G4.2 pantalla pendiente)")
+
+
 # DEBUG: smoke test pickup. Borrar antes de release.
 func _debug_add_next_clue() -> void:
 	if _debug_clue_index >= _DEBUG_CLUES.size():
@@ -225,7 +270,7 @@ func _debug_cycle_last_clue_state() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	# Tab toggle del notebook (acción Input "inventory_toggle").
 	if event.is_action_pressed("inventory_toggle"):
-		if _dialogue.is_open() or _pause_menu.is_open():
+		if _dialogue.is_open() or _pause_menu.is_open() or _accusation.is_open():
 			return
 		_notebook.toggle()
 		get_viewport().set_input_as_handled()
@@ -249,6 +294,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			return
 		if event.keycode == KEY_ESCAPE:
+			# Durante acusación, ESC es ignorado (cancelación solo por botón).
+			if _accusation.is_open():
+				get_viewport().set_input_as_handled()
+				return
 			# Si notebook abierto, ESC lo cierra y no abre pausa.
 			if _notebook.is_open():
 				_notebook.close()

@@ -5,12 +5,20 @@ signal clue_added(clue_id: String)
 signal clue_state_changed(clue_id: String, state: String)
 signal gate_opened()
 signal session_initialized(session_id: String)
+signal case_failed(reason: String)   # "wrong_accusation" | "insufficient_evidence"
+signal case_resolved()
 
 # ── Clue states ───────────────────────────────────────────────────────────────
 const STATE_GOOD := "BUENA"
 const STATE_BAD := "MALA"
 const STATE_UNREVIEWED := "SIN_REVISAR"
 const VALID_STATES := [STATE_GOOD, STATE_BAD, STATE_UNREVIEWED]
+
+# ── Confession gate ──────────────────────────────────────────────────────────
+const CONFESSION_CLUES := ["F1", "F2", "F3"]
+const CULPRIT_ID := "barry"
+const ACCUSATION_REASON_WRONG := "wrong_accusation"
+const ACCUSATION_REASON_INSUFFICIENT := "insufficient_evidence"
 
 # ── Session identity ──────────────────────────────────────────────────────────
 var session_id: String = ""
@@ -101,3 +109,44 @@ func get_all_clues() -> Dictionary:
 
 func has_clue(clue_id: String) -> bool:
 	return clues.has(clue_id)
+
+
+# ── Confession Gate / Accusation ─────────────────────────────────────────────
+
+## Devuelve true si las 3 pistas requeridas (F1+F2+F3) están en estado BUENA.
+func is_confession_gate_open() -> bool:
+	for clue_id in CONFESSION_CLUES:
+		var clue: Dictionary = clues.get(clue_id, {})
+		if clue.get("state", "") != STATE_GOOD:
+			return false
+	return true
+
+
+## Registra el intento de acusación en telemetría. Devuelve true si la acusación
+## es correcta (Barry + puerta abierta). Emite case_resolved o case_failed.
+## Punto de no retorno — la lógica del caller decide la pantalla final.
+func register_accusation(accused_id: String, presented_evidence: Array, _is_correct_unused: bool = false) -> bool:
+	var normalized := accused_id.strip_edges().to_lower()
+	var gate_open := is_confession_gate_open()
+	var is_correct := (normalized == CULPRIT_ID) and gate_open
+
+	accusation_attempts.append({
+		"accused": normalized,
+		"evidence": presented_evidence.duplicate(),
+		"is_correct": is_correct,
+		"timestamp": Time.get_unix_time_from_system(),
+	})
+
+	completed = true
+	correct_accusation = is_correct
+
+	if is_correct:
+		gate_opened.emit()
+		case_resolved.emit()
+		return true
+
+	if normalized != CULPRIT_ID:
+		case_failed.emit(ACCUSATION_REASON_WRONG)
+	else:
+		case_failed.emit(ACCUSATION_REASON_INSUFFICIENT)
+	return false

@@ -114,3 +114,16 @@ size_flags_vertical = 3
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 10
 columns = 2
+
+[node name="FooterSep" type="HSeparator" parent="Frame/Pages/Body"]
+layout_mode = 2
+
+[node name="Footer" type="HBoxContainer" parent="Frame/Pages/Body"]
+layout_mode = 2
+alignment = 2
+
+[node name="AccuseBtn" type="Button" parent="Frame/Pages/Body/Footer"]
+layout_mode = 2
+disabled = true
+modulate = Color(1, 0.6, 0.4, 1)
+text = "Hacer acusación final"
