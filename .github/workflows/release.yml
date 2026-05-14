@@ -30,7 +30,7 @@ jobs:
             artifact_path: dist/installer-out/limonchero-setup-win.exe
           - os: ubuntu-latest
             platform: linux
-            godot_preset: juego_linux
+            godot_preset: limons.x86_64
             game_out: dist/game/limons.x86_64
             backend_name: limonchero-backend
             artifact_name: limonchero-linux-deb
