@@ -131,6 +131,12 @@ jobs:
           chmod +x tools/installers/linux/build_deb.sh
           VERSION="$VERSION" tools/installers/linux/build_deb.sh
 
+      - name: Build Linux tar.gz
+        if: runner.os == 'Linux'
+        run: |
+          chmod +x tools/installers/linux/build_tarball.sh
+          tools/installers/linux/build_tarball.sh
+
       - name: Build macOS DMG
         if: runner.os == 'macOS'
         run: |
@@ -142,6 +148,13 @@ jobs:
         with:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.artifact_path }}
+
+      - name: Upload Linux tar.gz artifact
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: limonchero-linux-tarball
+          path: dist/installer/limonchero-linux-x86_64.tar.gz
 
   release:
     name: Create release
