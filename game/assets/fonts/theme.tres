@@ -1,0 +1,81 @@
+[gd_resource type="Theme" load_steps=7 format=3 uid="uid://b4c3p7m2s5t2q"]
+
+[ext_resource type="DynamicFontData" path="res://assets/fonts/SpecialElite-Regular.ttf" id="1"]
+
+[resource]
+name = "LimoncheroUI"
+
+[sub_resource type="DynamicFont" id="2]
+font_data = ExtResource("1")
+size = 10
+
+[sub_resource type="DynamicFont" id="3]
+font_data = ExtResource("1")
+size = 12
+
+[sub_resource type="DynamicFont" id="4]
+font_data = ExtResource("1")
+size = 14
+
+[sub_resource type="DynamicFont" id="5]
+font_data = ExtResource("1")
+size = 18
+
+[sub_resource type="DynamicFont" id="6]
+font_data = ExtResource("1")
+size = 24
+
+# --- Default font ---
+theme/default_font = SubResource("4")
+theme/default_font_size = 14
+
+# --- Colors ---
+theme/colors/font_color = Color(0.91, 0.84, 0.64, 1.0)
+theme/colors/font_color_hover = Color(0.96, 0.90, 0.75, 1.0)
+theme/colors/font_color_pressed = Color(0.85, 0.78, 0.55, 1.0)
+theme/colors/font_color_disabled = Color(0.48, 0.42, 0.31, 1.0)
+
+# --- Label ---
+Label/styles/normal = null
+Label/colors/font_color = Color(0.91, 0.84, 0.64, 1.0)
+Label/constants/outline_size = 0
+
+# --- Button ---
+Button/colors/font_color = Color(0.91, 0.84, 0.64, 1.0)
+Button/colors/font_color_hover = Color(0.96, 0.90, 0.75, 1.0)
+Button/colors/font_color_pressed = Color(0.85, 0.78, 0.55, 1.0)
+Button/colors/font_color_disabled = Color(0.48, 0.42, 0.31, 1.0)
+Button/colors/icon_color_hover = Color(0.91, 0.84, 0.64, 1.0)
+Button/colors/icon_color_pressed = Color(0.85, 0.78, 0.55, 1.0)
+Button/fonts/font = SubResource("4")
+Button/font_sizes/font_size = 14
+Button/constants/outline_size = 0
+
+# --- Panel ---
+Panel/colors/bg_color = Color(0.05, 0.05, 0.05, 0.9)
+Panel/styles/panel = null
+
+# --- LineEdit ---
+LineEdit/fonts/font = SubResource("4")
+LineEdit/font_sizes/font_size = 14
+LineEdit/colors/font_color = Color(0.91, 0.84, 0.64, 1.0)
+LineEdit/colors/font_uneditable_color = Color(0.48, 0.42, 0.31, 1.0)
+LineEdit/colors/cursor_color = Color(0.83, 0.63, 0.19, 1.0)
+LineEdit/constants/outline_size = 0
+
+# --- RichTextLabel ---
+RichTextLabel/colors/default_color = Color(0.91, 0.84, 0.64, 1.0)
+RichTextLabel/colors/font_shadow_color = Color(0.0, 0.0, 0.0, 0.0)
+RichTextLabel/fonts/normal_font = SubResource("4")
+RichTextLabel/font_sizes/normal_font_size = 14
+RichTextLabel/constants/outline_size = 0
+
+# --- CheckBox ---
+CheckBox/colors/font_color = Color(0.91, 0.84, 0.64, 1.0)
+CheckBox/fonts/font = SubResource("4")
+CheckBox/font_sizes/font_size = 14
+CheckBox/constants/outline_size = 0
+
+# --- HSlider ---
+HSlider/colors/slider_color = Color(0.24, 0.19, 0.13, 1.0)
+HSlider/colors/grabber_color = Color(0.83, 0.63, 0.19, 1.0)

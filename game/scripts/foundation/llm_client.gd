@@ -1,38 +1,52 @@
 extends Node
 ## LLMClient — Autoload. Wrapper HTTP del backend Python (FastAPI).
-## Endpoints consumidos: POST /stt, POST /npc/{npc_id}, GET /health.
+## Endpoints consumidos: POST /stt, POST /npc/{npc_id}, POST /gajito/evaluate, GET /health.
 
 signal stt_completed(transcript: String)
 signal stt_failed(error: String)
 signal npc_response_ready(npc_id: String, text: String)
 signal npc_request_failed(npc_id: String, error: String)
+signal gajito_evaluation_ready(passed: bool, score: float, correction: String, tip: String, translation_es: String)
+signal gajito_evaluation_failed(error: String)
 signal health_check_done(ok: bool)
 
 const DEFAULT_BASE_URL := "http://127.0.0.1:8000"
 const BACKEND_URL_ENV := "LIMONCHERO_BACKEND_URL"
 const REQUEST_TIMEOUT_SEC := 60.0
 
+## Mientras el backend no exponga /gajito/evaluate, simulamos la respuesta
+## localmente. Cambiar a false cuando el endpoint esté listo.
+const MOCK_GAJITO_EVAL := true
+const MOCK_GAJITO_DELAY := 0.8
+const MOCK_GAJITO_FAIL_RATIO := 0.35
+
 var _base_url: String = DEFAULT_BASE_URL
 
 var _stt_req: HTTPRequest = null
 var _npc_req: HTTPRequest = null
+var _gajito_req: HTTPRequest = null
 var _health_req: HTTPRequest = null
 var _pending_npc_id: String = ""
+var _pending_gajito_transcript: String = ""
 
 
 func _ready() -> void:
 	_base_url = _resolve_base_url()
 	_stt_req = HTTPRequest.new()
 	_npc_req = HTTPRequest.new()
+	_gajito_req = HTTPRequest.new()
 	_health_req = HTTPRequest.new()
 	add_child(_stt_req)
 	add_child(_npc_req)
+	add_child(_gajito_req)
 	add_child(_health_req)
 	_stt_req.timeout = REQUEST_TIMEOUT_SEC
 	_npc_req.timeout = REQUEST_TIMEOUT_SEC
+	_gajito_req.timeout = REQUEST_TIMEOUT_SEC
 	_health_req.timeout = 3.0
 	_stt_req.request_completed.connect(_on_stt_completed)
 	_npc_req.request_completed.connect(_on_npc_completed)
+	_gajito_req.request_completed.connect(_on_gajito_completed)
 	_health_req.request_completed.connect(_on_health_completed)
 
 
@@ -80,11 +94,48 @@ func request_npc(npc_id: String, message: String, history: Array) -> void:
 		npc_request_failed.emit(npc_id, "HTTPRequest error: %d" % err)
 
 
+## POST /gajito/evaluate — body JSON {transcript, target_language}.
+## Respuesta JSON: {pass, score, correction, tip, translation_es}.
+func request_gajito_evaluation(transcript: String) -> void:
+	if transcript.strip_edges().is_empty():
+		gajito_evaluation_failed.emit("Transcript vacio")
+		return
+	_pending_gajito_transcript = transcript
+	if MOCK_GAJITO_EVAL:
+		_run_mock_gajito_evaluation(transcript)
+		return
+	var payload := {
+		"transcript": transcript,
+		"target_language": "en",
+	}
+	var body := JSON.stringify(payload)
+	var headers := ["Content-Type: application/json"]
+	var url := "%s/gajito/evaluate" % _base_url
+	var err := _gajito_req.request(url, headers, HTTPClient.METHOD_POST, body)
+	if err != OK:
+		gajito_evaluation_failed.emit("HTTPRequest error: %d" % err)
+
+
 ## GET /health — verifica que backend este vivo.
 func check_health() -> void:
 	var err := _health_req.request("%s/health" % _base_url)
 	if err != OK:
 		health_check_done.emit(false)
+
+
+# ── Mock Gajito (mientras backend no entregue endpoint) ─────────────────────
+
+func _run_mock_gajito_evaluation(transcript: String) -> void:
+	await get_tree().create_timer(MOCK_GAJITO_DELAY).timeout
+	var passed := randf() > MOCK_GAJITO_FAIL_RATIO
+	var score := 0.85 if passed else 0.45
+	var correction := ""
+	var tip := ""
+	var translation_es := "[mock] Traducción ES de: %s" % transcript
+	if not passed:
+		correction = "Should be: \"%s?\" (revisa la pronunciación)." % transcript.capitalize()
+		tip = "Mock: practica la entonación final de la pregunta."
+	gajito_evaluation_ready.emit(passed, score, correction, tip, translation_es)
 
 
 # ── Callbacks ─────────────────────────────────────────────────────────────
@@ -111,6 +162,24 @@ func _on_npc_completed(result: int, code: int, _headers: PackedStringArray, body
 		npc_request_failed.emit(npc_id, "Respuesta NPC invalida")
 		return
 	npc_response_ready.emit(npc_id, parsed["response"])
+
+
+func _on_gajito_completed(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	_pending_gajito_transcript = ""
+	if result != HTTPRequest.RESULT_SUCCESS or code != 200:
+		gajito_evaluation_failed.emit("Gajito HTTP %d (result %d)" % [code, result])
+		return
+	var parsed = JSON.parse_string(body.get_string_from_utf8())
+	if parsed == null or not parsed.has("pass"):
+		gajito_evaluation_failed.emit("Respuesta Gajito invalida")
+		return
+	gajito_evaluation_ready.emit(
+		bool(parsed.get("pass", false)),
+		float(parsed.get("score", 0.0)),
+		String(parsed.get("correction", "")),
+		String(parsed.get("tip", "")),
+		String(parsed.get("translation_es", ""))
+	)
 
 
 func _on_health_completed(result: int, code: int, _headers: PackedStringArray, _body: PackedByteArray) -> void:

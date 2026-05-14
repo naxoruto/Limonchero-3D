@@ -3,15 +3,19 @@ extends Node
 signal recording_started()
 signal recording_stopped()
 signal audio_captured(wav_bytes: PackedByteArray)
+signal playback_started()
+signal playback_finished()
 
 const BUS_NAME := "Mic"
 const TARGET_SAMPLE_RATE := 16000
 
 var _capture_effect: AudioEffectCapture = null
 var _stream_player: AudioStreamPlayer = null
+var _playback_player: AudioStreamPlayer = null
 var _is_recording := false
 var _sample_rate := TARGET_SAMPLE_RATE
 var _available := false
+var _last_wav_bytes: PackedByteArray = PackedByteArray()
 
 
 func _ready() -> void:
@@ -34,6 +38,10 @@ func _ready() -> void:
 	_stream_player.stream = AudioStreamMicrophone.new()
 	_stream_player.bus = BUS_NAME
 	add_child(_stream_player)
+	_playback_player = AudioStreamPlayer.new()
+	_playback_player.bus = "Master"
+	_playback_player.finished.connect(_on_playback_finished)
+	add_child(_playback_player)
 	_available = true
 
 
@@ -57,7 +65,62 @@ func stop_recording() -> void:
 	if buffer.is_empty():
 		return
 	var wav_bytes := _build_wav(buffer, _sample_rate)
+	_last_wav_bytes = wav_bytes
 	audio_captured.emit(wav_bytes)
+
+
+func has_last_audio() -> bool:
+	return not _last_wav_bytes.is_empty()
+
+
+func get_last_audio() -> PackedByteArray:
+	return _last_wav_bytes
+
+
+func clear_last_audio() -> void:
+	_last_wav_bytes = PackedByteArray()
+
+
+func is_playing() -> bool:
+	return _playback_player != null and _playback_player.playing
+
+
+func play_last_audio() -> void:
+	if _last_wav_bytes.is_empty() or _playback_player == null:
+		return
+	var stream := _build_stream_from_wav(_last_wav_bytes)
+	if stream == null:
+		push_warning("VoiceManager: no se pudo construir AudioStreamWAV.")
+		return
+	_playback_player.stop()
+	_playback_player.stream = stream
+	_playback_player.play()
+	playback_started.emit()
+
+
+func stop_playback() -> void:
+	if _playback_player != null and _playback_player.playing:
+		_playback_player.stop()
+		playback_finished.emit()
+
+
+func _on_playback_finished() -> void:
+	playback_finished.emit()
+
+
+func _build_stream_from_wav(wav: PackedByteArray) -> AudioStreamWAV:
+	if wav.size() < 44:
+		return null
+	# Cabecera WAV PCM mono 16-bit que genera _build_wav (44 bytes fijos).
+	# Lee sample_rate del offset 24 y data del offset 44.
+	var sample_rate: int = wav.decode_u32(24)
+	var pcm := wav.slice(44)
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = sample_rate
+	stream.stereo = false
+	stream.data = pcm
+	return stream
 
 
 func _build_wav(buffer: PackedVector2Array, sample_rate: int) -> PackedByteArray:

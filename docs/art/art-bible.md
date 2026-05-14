@@ -1,8 +1,8 @@
-# Art Bible — Limonchero 3D (Detective Noir VR)
-**Versión:** 1.0
-**Fecha:** 2026-04-16
+# Art Bible — Limonchero 3D (Detective Noir)
+**Versión:** 1.1
+**Fecha:** 2026-05-14
 **Equipo:** Ignacio Cuevas, Martin Cevallos, Sofia Meza, Diego Espinosa
-**Motor:** Godot 4 · Plataforma objetivo: Meta Quest 2
+**Motor:** Godot 4 · Plataforma objetivo: PC (Windows / Linux)
 
 ---
 
@@ -120,9 +120,9 @@ El estilo low-poly facetado es una declaración estética, no un límite técnic
 
 **Descriptores atmosféricos:**
 - El balbuceo de Gajito se activa — su voz energética en un espacio silencioso es un marcador tonal
-- La UI de la libreta aparece en world-space con un sonido de papel que ancla la pista al mundo físico
+- La libreta se abre en primer plano con un sonido de papel que ancla la pista al mundo físico
 - El entorno baja temporalmente su luminosidad en 15% (vignette suave) para centrar el foco
-- La pista flota en la mano del jugador 1.5 segundos antes de ir al inventario
+- Una notificación HUD "[pista] añadida al inventario" aparece 1.5 segundos
 - Silencio del jazz durante 2 segundos: el mundo acknowledges el descubrimiento
 
 **Nivel de energía:** Pico corto y dirigido. No euforia — precisión.
@@ -233,7 +233,7 @@ El estilo low-poly facetado es una declaración estética, no un límite técnic
 - Sellos de caucho para marcadores BUENA/MALA: círculo con borde grueso + texto en caps. La forma circular contrasta con la geometría angular del entorno, haciéndolo visualmente prominente sin usar color adicional
 - Las fotografías de pistas tienen borde blanco fino — el marco fotográfico de época es la UI que separa la pista del mundo
 
-**Indicadores de interacción en world-space:** Un anillo de contorno hexagonal (no circular) que aparece alrededor del objeto interactivo. La forma hexagonal conecta con los tiles hexagonales del vestíbulo — el mismo vocabulario geométrico del suelo aparece como indicador de interacción.
+**Indicadores de interacción diegéticos:** Un anillo de contorno hexagonal (no circular) que aparece alrededor del objeto interactivo en el mundo 3D. La forma hexagonal conecta con los tiles hexagonales del vestíbulo — el mismo vocabulario geométrico del suelo aparece como indicador de interacción. Complementado por un prompt textual en HUD overlay (`[E] Examinar`, etc.) para claridad en monitor 2D.
 
 ---
 
@@ -356,7 +356,7 @@ La estética low-poly no es una limitación de presupuesto — es el idioma visu
 
 ### 5.1 Filosofía de Silueta por Arquetipo
 
-Un jugador de VR debe identificar el rol narrativo de un personaje **a 3 metros de distancia, en escena oscura, sin leer etiquetas**. La silueta es el único canal que funciona en esas condiciones. Cada arquetipo tiene una firma de silueta no negociable.
+Un jugador en primera persona debe identificar el rol narrativo de un personaje **a 3 metros de distancia, en escena oscura, sin leer etiquetas**. La silueta es el único canal que funciona en esas condiciones. Cada arquetipo tiene una firma de silueta no negociable.
 
 #### 5.1.1 Tabla de Siluetas por Rol
 
@@ -370,7 +370,7 @@ Un jugador de VR debe identificar el rol narrativo de un personaje **a 3 metros 
 
 #### 5.1.2 Jerarquía de Altura
 
-La altura comunica poder e importancia narrativa de forma inmediata en VR. Mantén esta escala relativa en todas las escenas. Limonchero = 100% (referencia base).
+La altura comunica poder e importancia narrativa de forma inmediata en primera persona. Mantén esta escala relativa en todas las escenas. Limonchero = 100% (referencia base).
 
 ```
 Gerry Broccolini     ████████████  125%  (el más alto — presencia física intimidante)
@@ -551,10 +551,10 @@ El estilo low-poly impone restricciones reales en la expresividad facial. Estas 
 
 #### 5.5.2 Lo que Está Prohibido
 
-- **Morphs de cara completa**: el presupuesto de polígonos no permite blend shapes complejos en Quest 2. No planificar expresiones que requieran deformación de más de 3 regiones faciales simultáneamente
+- **Morphs de cara completa**: el presupuesto de polígonos no permite blend shapes complejos. No planificar expresiones que requieran deformación de más de 3 regiones faciales simultáneamente
 - **Arrugas geométricas**: no intentar modelar arrugas de expresión — en este estilo y presupuesto no se leen, solo añaden ruido visual
 - **Labios detallados**: los labios son una línea de borde con ligero bisel — no modelar labio superior e inferior por separado
-- **Ojos como sprite/billboard**: en VR el parallax binocular los hace flotar visualmente — usar geometría siempre
+- **Ojos como sprite/billboard**: en primera persona el parallax puede hacerlos flotar visualmente — usar geometría siempre
 
 #### 5.5.3 Escala de Expresividad por Personaje
 
@@ -571,9 +571,9 @@ No todos los personajes tienen el mismo rango expresivo. Esto es intencional y d
 
 **Regla para Barry**: su cara es la más difícil de modelar correctamente porque hace casi nada. La boca está en la misma posición en todas las interacciones. Los ojos tienen una apertura del 70% constante — ni muy abiertos (sorpresa) ni cerrados (cansancio). Es la geometría de alguien que controla cada músculo.
 
-#### 5.5.4 Ojos en VR — Consideración de Escala
+#### 5.5.4 Ojos en Primera Persona — Consideración de Escala
 
-A distancia de conversación (~1–1.5 metros), los ojos son el punto focal del NPC en VR:
+A distancia de conversación (~1–1.5 metros), los ojos son el punto focal del NPC en primera persona:
 - Mínimo 8 polígonos por ojo
 - El iris debe ser claramente diferenciado por color en la textura
 - No usar billboard/sprite para los ojos
@@ -633,9 +633,9 @@ Las manos de fruta son masas geométricas, no dedos individuales.
 
 ---
 
-### 5.7 LOD y Legibilidad en VR
+### 5.7 LOD y Legibilidad en Primera Persona
 
-Meta Quest 2 con mobile renderer requiere mínimo 2 LODs por personaje. La legibilidad en VR tiene reglas específicas que no aplican en monitor.
+El renderizado en PC no tiene las restricciones de mobile VR, pero la legibilidad en primera persona sigue requiriendo mínimo 2 LODs por personaje para mantener consistencia visual a distintas distancias.
 
 #### 5.7.1 Definición de LODs
 
@@ -675,12 +675,12 @@ Estos elementos se preservan hasta LOD 1. Solo pueden eliminarse en LOD 2.
 Antes de aprobar cualquier modelo de personaje:
 
 1. Colocar el modelo en escena de club con iluminación noir (luz principal lateral, 60% del cuerpo en sombra)
-2. Capturar screenshot a resolución Quest 2 (1832×1920 por ojo)
+2. Capturar screenshot a resolución 1080p (1920×1080)
 3. Reducir la imagen al 25% de tamaño — simula la percepción a ~4 metros
 4. La silueta debe ser reconocible sin conocer el nombre del personaje
 5. Si no pasa, revisar E1 (silueta) antes de cualquier otro cambio
 
-**Regla adicional para VR**: revisar siempre el modelo en vista 3/4 lateral, no solo en frontal. La vista 3/4 es la vista de facto durante una conversación en VR.
+**Regla adicional para primera persona**: revisar siempre el modelo en vista 3/4 lateral, no solo en frontal. La vista 3/4 es la vista de facto durante una conversación.
 
 #### 5.7.4 Atlas de Texturas — Estrategia de Agrupación
 
@@ -1310,46 +1310,50 @@ Estos prompts están diseñados para guiar herramientas de generación 3D con IA
 
 ### 7.0 Principio Rector
 
-En un juego de VR en primera persona, **la pantalla no existe**. No hay HUD flotante pegado a la cámara. Toda la UI es diegética o espacial — existe dentro del mundo del juego, no encima de él. El jugador de Limonchero 3D es un detective noir: no mira menús, *investiga*.
+**"La pantalla es un portal al mundo noir, no un HUD flotante."**
+
+En Limonchero 3D para PC, la UI es una extensión de la identidad del detective. El jugador no mira menús — *investiga*. Todo lo que puede existir dentro del mundo del juego (notebook, fotos, reloj de pared) existe como objeto diegético. Solo lo estrictamente funcional e imposible de diegetizar (subtítulos, indicador de micrófono, popup de corrección) va en overlay de pantalla. Y los menús de sistema (pausa, settings) usan un lenguaje visual opuesto al mundo para señalar inequívocamente que el jugador está "fuera" de la investigación.
 
 La regla de oro: **si un detective de los 50 no lo usaría, el jugador no lo ve**.
 
 ---
 
-### 7.1 Filosofía de UI en VR Noir
+### 7.1 Filosofía de UI en PC Noir
 
 #### Tres capas de interfaz
 
 | Capa | Tipo | Ejemplos | Anclaje |
-|---|---|---|---|
-| **Diegética** | Existe en el mundo | Libreta de notas, fotografías de pistas, reloj de pared | World-space, objeto 3D |
-| **Espacial** | Flota en el mundo, no en la cámara | Subtítulos durante diálogo, indicadores de interacción | World-space, billboard |
-| **Sistema** | Menús fuera del mundo | Pausa, configuración, créditos | Screen-space, solo cuando necesario |
+|------|------|----------|---------|
+| **Diegética** | Existe en el mundo | Libreta de notas, fotografías de pistas, reloj de pared, tablón de diálogo en pared | World-space, objeto 3D o SubViewport |
+| **HUD Overlay** | CanvasLayer sobre la vista | Subtítulos dual-channel, indicador PTT, pop-up Gajito, prompt de interacción, notificación de inventario | Screen-space, fijo en pantalla |
+| **Sistema** | Menús fuera del gameplay | Pausa, configuración, menú principal, acusación, créditos | Screen-space, solo cuando el juego está pausado |
 
-**Regla**: los elementos de Sistema solo aparecen cuando el juego está pausado. Durante gameplay, todo es Diegético o Espacial.
+**Regla**: los elementos de Sistema solo aparecen cuando el juego está pausado o en transición. Durante gameplay activo, todo es Diegético o HUD Overlay mínimo. El HUD overlay existe únicamente para información que no puede representarse diegéticamente en un monitor 2D (estado de micrófono, correcciones gramaticales, subtítulos de accesibilidad).
 
 ---
 
 ### 7.2 Elementos Diegéticos
 
-#### 7.2.1 La Libreta de Notas (inventory principal)
+#### 7.2.1 La Libreta de Notas (inventario principal)
 
-El jugador lleva una libreta física en el bolsillo de la gabardina. Al sacarla, se convierte en el hub de información.
+El jugador accede al inventario presionando Tab. La libreta aparece en primer plano como objeto diegético que el jugador sostiene y hojea con el mouse.
 
 - **Material visual**: cuero marrón oscuro desgastado, `#3D2510`. Cantos con desgaste geométrico — sin suavizado
 - **Páginas internas**: papel amarillento, `#F5ECC8`. Texto en fuente monospace tipo máquina de escribir
 - **Pistas añadidas**: aparecen como fotografías en blanco y negro pegadas con cinta adhesiva, o notas manuscritas con tinta azul oscuro
 - **No hay iconos de color**: todo en escala de grises + sepia, excepto marcadores de importancia en rojo tinta `#8B1A1A`
 - **Layout de página**: columna izquierda para hechos confirmados, columna derecha para sospechas — separados por una línea vertical de tinta
+- **Navegación**: clic y arrastre para pasar páginas. Rueda del mouse para zoom. Clic derecho sobre una pista para inspeccionarla en detalle (abre overlay de inspección).
 
 #### 7.2.2 Fotografías de Pistas
 
-Las pistas físicas se representan como fotografías en blanco y negro que el jugador puede sostener y examinar.
+Las pistas físicas se representan como fotografías en blanco y negro que el jugador puede examinar en el overlay de inspección o directamente en la libreta.
 
 - **Borde**: blanco crudo `#F0EDE0`, 4–6mm de grosor geométrico
 - **Imagen**: desaturada al 100%, con ligero viñetado en las esquinas
 - **Reverso**: texto de máquina de escribir con código de evidencia — formato `EV-[número]-[inicial de escena]`
 - **Desgaste**: esquinas ligeramente dobladas (deformación geométrica sutil, no textura)
+- **Interacción**: clic en la libreta abre overlay de inspección a pantalla completa. El jugador puede rotar la foto con el mouse para ver el reverso.
 
 #### 7.2.3 Reloj de Pared (indicador de tiempo narrativo)
 
@@ -1361,32 +1365,38 @@ En la escena del club, un reloj de pared art deco indica la presión temporal de
 
 ---
 
-### 7.3 Elementos Espaciales
+### 7.3 Elementos HUD Overlay
+
+El HUD overlay agrupa la información funcional que no puede representarse diegéticamente en un monitor 2D. Es mínimo, no obstructivo, y sigue la misma paleta tipográfica que el mundo.
 
 #### 7.3.1 Indicadores de Interacción
 
-Cuando el jugador apunta a un objeto interactuable, aparece un indicador mínimo.
+Cuando el jugador apunta a un objeto interactuable, aparece un indicador en pantalla.
 
-- **Forma**: punto de luz `#E8D5A3` (blanco cálido), 8px equivalente en world-space
-- **Sin texto por defecto** — el objeto debe ser legible por sí mismo
-- **Con texto solo si es ambiguo**: fuente monospace, tamaño mínimo legible en Quest 2 (≥18pt en world-space equivalente), color `#E8D5A3`
-- **Distancia de aparición**: solo visible a ≤1.5 metros del objeto
-- **Sin animación pulsante**: el indicador es estático. El movimiento en VR causa fatiga visual
+- **Forma**: texto contextual en fuente monospace, color `#E8D5A3` (blanco cálido)
+- **Texto contextual**: `[E] Examinar`, `[E] Interrogar`, `[E] Recoger`, `[E] Abrir`
+- **Sin texto por defecto** — el objeto debe ser legible por sí mismo. El texto aparece solo cuando el raycast detecta un interactuable
+- **Posición**: centro-inferior de la pantalla, sobre el crosshair
+- **Distancia de aparición**: solo visible a ≤2.0 metros del objeto (mayor que en VR porque el monitor tiene menos percepción de profundidad)
+- **Transición**: fade in/out 0.15s — suficiente para ser notado sin distraer
 
 #### 7.3.2 Subtítulos de Diálogo
 
-Durante interrogatorio, los diálogos del NPC tienen subtítulos opcionales (accesibilidad).
+Los subtítulos son el canal principal de comunicación NPC → jugador en PC. A diferencia del enfoque VR (billboard sobre el NPC), en PC los subtítulos van en HUD overlay inferior para garantizar legibilidad en un monitor 2D.
 
-- **Posición**: billboard anclado a 20cm por encima de la cabeza del NPC, no en la pantalla
-- **Fondo**: panel negro semi-transparente `#000000` a 70% opacidad, bordes sin redondear
-- **Texto**: blanco `#FFFFFF`, fuente monospace, máximo 2 líneas, máximo 40 caracteres por línea
-- **Nombre del hablante**: línea superior en color de identidad del personaje (ver tabla abajo), mayúsculas, tamaño ligeramente menor
-- **Desaparece**: al terminar la frase de audio, fade out en 0.3s — sin esperar input
+- **Formato**: dual-channel — canal izquierdo para el NPC, canal derecho para el jugador
+- **Canal NPC**: nombre del personaje en su color de identidad (ver tabla abajo) + texto de su diálogo en blanco `#FFFFFF`
+- **Canal jugador**: `[Tú]` en `#87CEEB` (lightblue) + transcripción de lo que dijiste
+- **Fondo**: panel negro semi-transparente `#000000` a 70% opacidad, bordes rectos sin redondear, 80% del ancho de pantalla centrado
+- **Fuente**: monospace, máximo 2 líneas por canal, máximo 50 caracteres por línea (más que VR por el mayor espacio de pantalla)
+- **Efecto typewriter**: el texto aparece letra por letra a 0.03s por carácter. El balbuceo del NPC se sincroniza con esta velocidad
+- **Desaparición**: al terminar la frase, fade out en 0.3s — sin esperar input del jugador
+- **Persistencia**: el historial completo de la conversación se mantiene en el chat log del panel de diálogo (accesible manteniendo el diálogo activo)
 
 #### Colores de identidad para subtítulos
 
 | Personaje | Color de nombre | Hex |
-|---|---|---|
+|-----------|---|---|
 | Gajito | Verde lima | `#8BC34A` |
 | Commissioner Spud | Marrón tierra | `#6B4423` |
 | Moni Graná Fert | Granate | `#8B2332` |
@@ -1394,26 +1404,29 @@ Durante interrogatorio, los diálogos del NPC tienen subtítulos opcionales (acc
 | Lola Persimmon | Naranja-marrón | `#C4703A` |
 | Barry Peel | Amarillo frío | `#D4C840` |
 
-#### 7.3.3 Indicador de Voz Activa (STT)
+#### 7.3.3 Indicador de Voz Activa (PTT)
 
-Cuando el micrófono está escuchando la voz del jugador, aparece un indicador mínimo.
+Cuando el jugador mantiene V (PTT) para hablar, aparece un indicador de estado del micrófono.
 
-- **Posición**: esquina inferior izquierda del campo visual, anclado a head-space (no world-space)
-- **Forma**: tres líneas horizontales de audio equalizadas — animación de onda cuando detecta voz
-- **Color activo**: `#E8D5A3` (blanco cálido). **Color inactivo**: `#4A4035` (casi invisible en escena oscura)
-- **Tamaño**: 32×16px equivalente — mínimo perceptible, no más
-- **Sin texto "escuchando..."** — el ícono es suficiente
+- **Posición**: esquina superior-izquierda de la pantalla
+- **Forma del ícono**: tres líneas horizontales de audio equalizadas — animación de onda sutil cuando detecta voz
+- **Estados visuales**:
+  - **IDLE** (mic inactivo): ícono en `#4A4035` (casi invisible en escena oscura), sin texto
+  - **RECORDING** (V presionado, capturando audio): ícono en `#D4A030` (ámbar pulsante Bourbon), texto "Grabando..." en `#D4A030`
+  - **PROCESSING** (audio enviado, esperando respuesta): ícono en `#D4A030` estático, texto "Gajito pensando..." en `#D4A030`
+- **Tamaño**: 32×16px para el ícono, texto 12pt monospace — mínimo perceptible sin ser intrusivo
+- **Transición entre estados**: fade 0.15s
 
 ---
 
 ### 7.4 Elementos de Sistema (Menús)
 
-Solo accesibles desde pausa. El mundo se congela y desatura al 20% cuando están activos.
+Solo accesibles desde pausa. El mundo se congela y desatura al 60% cuando están activos. La escena de fondo continúa renderizándose con desenfoque de profundidad aumentado. La temperatura de color del menú es fría-neutra (`#C8D0D8`), en contraste deliberado con el ámbar del juego activo — esto señala que el jugador está "fuera" de la investigación.
 
 #### 7.4.1 Paleta de Sistema
 
 | Elemento | Color | Uso |
-|---|---|---|
+|-----------|---|---|
 | Fondo de panel | `#0D0D0D` | Negro casi puro — el mundo desaturado es el "fondo" |
 | Borde de panel | `#3D3020` | Marrón oscuro, 1px geométrico |
 | Texto primario | `#E8D5A3` | Blanco cálido — nunca blanco puro en noir |
@@ -1423,14 +1436,14 @@ Solo accesibles desde pausa. El mundo se congela y desatura al 20% cuando están
 
 #### 7.4.2 Tipografía de Sistema
 
-- **Fuente**: monospace serif (tipo máquina de escribir). Referencia: *Special Elite* o equivalente con licencia libre
-- **Tamaño mínimo en Quest 2**: 16pt para texto de cuerpo, 24pt para títulos — nunca menor
+- **Fuente**: monospace serif (tipo máquina de escribir). Referencia: *Special Elite* o equivalente con licencia libre (OFL/Apache 2.0)
+- **Tamaño mínimo en monitor 1080p**: 14pt para texto de cuerpo, 20pt para títulos — legible a distancia de monitor (~60cm). El tamaño de subtítulos es configurable (12–24pt) desde el menú de opciones
 - **Sin bold pesado**: el noir es delgado. Usar peso regular, itálica para énfasis
 - **Sin iconos de color**: los íconos son outline geométrico en `#E8D5A3`
 
 #### 7.4.3 Layout del Menú de Pausa
 
-Panel único centrado, sin tabs ni navegación profunda. Ancho máximo: 60% del FOV.
+Panel único centrado, sin tabs ni navegación profunda. Ancho máximo: 40% del ancho de pantalla (suficiente en monitor vs el 60% de FOV en VR).
 
 ```
 ┌─────────────────────────────┐
@@ -1444,7 +1457,7 @@ Panel único centrado, sin tabs ni navegación profunda. Ancho máximo: 60% del 
 └─────────────────────────────┘
 ```
 
-Sin animaciones de entrada/salida elaboradas — fade simple a 0.2s.
+Fade in/out de 0.2s. Sin animaciones elaboradas. El jazz ambiente baja a 15% de volumen, filtrado como si viniera de otra habitación.
 
 ---
 
@@ -1455,8 +1468,8 @@ Sin animaciones de entrada/salida elaboradas — fade simple a 0.2s.
 - **Pop-ups de logros durante gameplay**: interrumpen la inmersión noir
 - **Colores de alta saturación fuera del sistema** (excepto rojo tinta `#8B1A1A` para confirmaciones destructivas)
 - **Fuentes sans-serif redondeadas**: incompatibles con la estética noir-frutícola
-- **Animaciones de UI que duren más de 0.3s**: en VR el movimiento de UI causa incomodidad
 - **Texto en pantalla completa que no sea diegético**: el noir es mostrar, no explicar
+- **HUD persistente no esencial**: durante gameplay, solo los elementos de §7.3 deben ser visibles. Todo lo demás pertenece al mundo diegético o a los menús de sistema
 
 ---
 

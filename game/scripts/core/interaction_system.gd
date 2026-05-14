@@ -1,6 +1,7 @@
 extends Node3D
 
 signal focus_label_changed(label: String)
+signal focus_changed(node: Node)
 
 @export var max_distance: float = 2.0
 
@@ -41,6 +42,7 @@ func _process(_delta: float) -> void:
 	if new_focused != _focused:
 		_focused = new_focused
 		focus_label_changed.emit(_get_interaction_label(_focused))
+		focus_changed.emit(_focused)
 
 	if _interact_just_pressed:
 		if _focused != null:

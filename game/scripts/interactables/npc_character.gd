@@ -2,7 +2,7 @@ extends Node3D
 
 signal dialogue_requested(npc: Node)
 
-@export var interaction_label: String = "Hablar"
+@export var interaction_label: String = "[E] Hablar"
 @export var npc_name: String = "NPC"
 @export var npc_id: String = ""
 ## Carpeta base del personaje. Si se asigna, las animaciones y modelo
@@ -45,6 +45,7 @@ const _TALK_KEY := "npc_talking"
 func _ready() -> void:
 	add_to_group("npcs")
 	_add_dialogue_camera()
+	_add_world_label()
 	if not character_folder.is_empty():
 		_discover_animations_from_folder()
 	var model_instance := _setup_model()
@@ -69,6 +70,12 @@ func _ready() -> void:
 
 func get_dialogue_camera() -> Camera3D:
 	return _dialogue_camera
+
+
+func set_label_visible(vis: bool) -> void:
+	var lbl := get_node_or_null("WorldLabel") as Label3D
+	if lbl:
+		lbl.visible = vis
 
 
 func interact() -> void:
@@ -104,6 +111,19 @@ func _add_dialogue_camera() -> void:
 	cam.top_level = true
 	add_child(cam)
 	_dialogue_camera = cam
+
+
+func _add_world_label() -> void:
+	var label := Label3D.new()
+	label.name = "WorldLabel"
+	label.text = interaction_label
+	label.font_size = 28
+	label.pixel_size = 0.004
+	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	label.modulate = Color.WHITE
+	label.visible = false
+	label.position = Vector3(0, 1.0, 0)
+	add_child(label)
 
 
 func _update_dialogue_camera_pose() -> void:

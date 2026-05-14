@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/dialogue.gd" id="1_script"]
 
@@ -34,6 +34,20 @@ content_margin_left = 12.0
 content_margin_top = 8.0
 content_margin_right = 12.0
 content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="GajitoPanelStyle"]
+bg_color = Color(0.06, 0.1, 0.06, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.545, 0.765, 0.29, 0.7)
+content_margin_left = 16.0
+content_margin_top = 14.0
+content_margin_right = 16.0
+content_margin_bottom = 14.0
+shadow_color = Color(0, 0, 0, 0.7)
+shadow_size = 8
 
 [node name="DialogueUI" type="CanvasLayer"]
 script = ExtResource("1_script")
@@ -87,3 +101,120 @@ text = "Mantén [V] para hablar — [Esc] para salir"
 horizontal_alignment = 1
 theme_override_colors/font_color = Color(0.7, 0.7, 0.65, 1)
 theme_override_font_sizes/font_size = 16
+
+[node name="AudioReviewBg" type="PanelContainer" parent="Panel/VBox"]
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StatusBgStyle")
+
+[node name="AudioReviewHBox" type="HBoxContainer" parent="Panel/VBox/AudioReviewBg"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 24
+
+[node name="PlayBtn" type="Button" parent="Panel/VBox/AudioReviewBg/AudioReviewHBox"]
+layout_mode = 2
+text = "▶ Reproducir"
+
+[node name="RetryBtn" type="Button" parent="Panel/VBox/AudioReviewBg/AudioReviewHBox"]
+layout_mode = 2
+text = "↻ Regrabar"
+
+[node name="SendBtn" type="Button" parent="Panel/VBox/AudioReviewBg/AudioReviewHBox"]
+layout_mode = 2
+text = "✓ Enviar"
+
+[node name="TextReviewBg" type="PanelContainer" parent="Panel/VBox"]
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StatusBgStyle")
+
+[node name="TextReviewVBox" type="VBoxContainer" parent="Panel/VBox/TextReviewBg"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EnglishLabel" type="Label" parent="Panel/VBox/TextReviewBg/TextReviewVBox"]
+layout_mode = 2
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_font_sizes/font_size = 18
+
+[node name="SpanishLabel" type="Label" parent="Panel/VBox/TextReviewBg/TextReviewVBox"]
+visible = false
+layout_mode = 2
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.545, 0.765, 0.29, 1)
+theme_override_font_sizes/font_size = 14
+
+[node name="TextReviewHBox" type="HBoxContainer" parent="Panel/VBox/TextReviewBg/TextReviewVBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 24
+
+[node name="TextRetryBtn" type="Button" parent="Panel/VBox/TextReviewBg/TextReviewVBox/TextReviewHBox"]
+layout_mode = 2
+text = "↻ Regrabar"
+
+[node name="TextConfirmBtn" type="Button" parent="Panel/VBox/TextReviewBg/TextReviewVBox/TextReviewHBox"]
+layout_mode = 2
+text = "✓ Confirmar"
+
+[node name="GajitoPanel" type="PanelContainer" parent="."]
+visible = false
+anchor_left = 0.02
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_top = -210.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("GajitoPanelStyle")
+
+[node name="GajitoHBox" type="HBoxContainer" parent="GajitoPanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Portrait" type="TextureRect" parent="GajitoPanel/GajitoHBox"]
+custom_minimum_size = Vector2(140, 140)
+layout_mode = 2
+size_flags_vertical = 1
+expand_mode = 1
+stretch_mode = 5
+
+[node name="GajitoVBox" type="VBoxContainer" parent="GajitoPanel/GajitoHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="GajitoTitle" type="Label" parent="GajitoPanel/GajitoHBox/GajitoVBox"]
+layout_mode = 2
+text = "Gajito te corrige:"
+theme_override_colors/font_color = Color(0.545, 0.765, 0.29, 1)
+theme_override_font_sizes/font_size = 18
+
+[node name="CorrectionLabel" type="Label" parent="GajitoPanel/GajitoHBox/GajitoVBox"]
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_font_sizes/font_size = 15
+
+[node name="TipLabel" type="Label" parent="GajitoPanel/GajitoHBox/GajitoVBox"]
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.7, 0.7, 0.65, 1)
+theme_override_font_sizes/font_size = 12
+
+[node name="ButtonRow" type="HBoxContainer" parent="GajitoPanel/GajitoHBox/GajitoVBox"]
+layout_mode = 2
+alignment = 2
+
+[node name="GajitoAckBtn" type="Button" parent="GajitoPanel/GajitoHBox/GajitoVBox/ButtonRow"]
+layout_mode = 2
+text = "Entendido — reintentar"
