@@ -29,6 +29,11 @@ var _health_req: HTTPRequest = null
 var _pending_npc_id: String = ""
 var _pending_gajito_transcript: String = ""
 
+# Guardamos el resultado del ultimo STT para usarlo en Gajito
+var _last_clarity_score: int = 0
+var _last_words: Array = []
+var _last_language: String = "en"
+
 
 func _ready() -> void:
 	_base_url = _resolve_base_url()
@@ -58,6 +63,9 @@ func _resolve_base_url() -> String:
 		url = url.trim_suffix("/")
 	return url
 
+
+func get_last_language() -> String:
+	return _last_language
 
 # ── Public API ────────────────────────────────────────────────────────────
 
@@ -123,18 +131,36 @@ func check_health() -> void:
 		health_check_done.emit(false)
 
 
-# ── Mock Gajito (mientras backend no entregue endpoint) ─────────────────────
+# ── Mock Gajito (integrado con STT clarity score) ─────────────────────
 
 func _run_mock_gajito_evaluation(transcript: String) -> void:
-	await get_tree().create_timer(MOCK_GAJITO_DELAY).timeout
-	var passed := randf() > MOCK_GAJITO_FAIL_RATIO
-	var score := 0.85 if passed else 0.45
+	await get_tree().create_timer(0.3).timeout # Simular leve delay de red
+	var passed := true
+	var score := float(_last_clarity_score) / 100.0
 	var correction := ""
 	var tip := ""
-	var translation_es := "[mock] Traducción ES de: %s" % transcript
-	if not passed:
-		correction = "Should be: \"%s?\" (revisa la pronunciación)." % transcript.capitalize()
-		tip = "Mock: practica la entonación final de la pregunta."
+	var translation_es := "Traducción ES de: %s" % transcript
+	
+	if _last_language == "es":
+		passed = false
+		correction = "¡Hablaste en español! No se admiten trampas."
+		tip = "Recuerda que Gajito sólo revisa y te ayuda si intentas pensar en inglés."
+	elif _last_clarity_score > 0 and _last_clarity_score < 50:
+		passed = false
+		correction = "No se te entendió casi nada (Claridad total: %d%%)." % _last_clarity_score
+		tip = "Intenta hablar más claro y con mejor volumen."
+	else:
+		var bad_words := PackedStringArray()
+		for w in _last_words:
+			if typeof(w) == TYPE_DICTIONARY and w.has("probability") and w.has("word"):
+				if int(w["probability"]) < 60:
+					bad_words.append(w["word"])
+					
+		if bad_words.size() > 0:
+			passed = false
+			correction = "Pronunciaste mal algunas palabras: " + ", ".join(bad_words)
+			tip = "La oración se entiende (Claridad: %d%%), pero falla tu acento en esas sílabas." % _last_clarity_score
+
 	gajito_evaluation_ready.emit(passed, score, correction, tip, translation_es)
 
 
@@ -148,6 +174,12 @@ func _on_stt_completed(result: int, code: int, _headers: PackedStringArray, body
 	if parsed == null or not parsed.has("transcript"):
 		stt_failed.emit("Respuesta STT invalida")
 		return
+	
+	_last_clarity_score = int(parsed.get("clarity_score", 0))
+	_last_language = parsed.get("language", "en")
+	var words_data = parsed.get("words", [])
+	_last_words = words_data if typeof(words_data) == TYPE_ARRAY else []
+		
 	stt_completed.emit(parsed["transcript"])
 
 
