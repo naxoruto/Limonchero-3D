@@ -97,6 +97,15 @@ func _on_stt_completed(transcript: String) -> void:
 	if text.is_empty():
 		_dialogue.add_npc_message("[color=yellow]No se detecto voz.[/color]")
 		return
+		
+	# Si detectó español, no darle la opción de confirmar el texto, que Gajito
+	# lo castigue y rechace inmediatamente para que solo pueda reintentar.
+	if LLMClient.get_last_language() == "es":
+		_pending_player_text = text
+		_dialogue.show_gajito_evaluating()
+		LLMClient.request_gajito_evaluation(text)
+		return
+
 	# Mostrar panel de revisión de texto. El envío al NPC se dispara al confirmar.
 	# La traducción al español se rellenará cuando el endpoint Gajito esté listo.
 	_dialogue.show_text_review(text, "")

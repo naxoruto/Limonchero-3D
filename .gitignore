@@ -38,13 +38,14 @@ android/
 # Source art that isn't used at runtime (keep your game-ready assets versioned)
 source_assets/
 
+backend/models/whisper-small
 # Common source bundles (prefer extracting what you actually ship)
 game/assets/models/**/*.zip
 game/assets/characters/**/*.zip
 
 # Nested git repo (keep separately or add as submodule later)
 tools/Claude-Code-Game-Studios/
-
+backend/test_stt_mic.py
 # Local AI tooling (keep out of git)
 .claude/
 opencode.json

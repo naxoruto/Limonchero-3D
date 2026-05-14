@@ -364,10 +364,19 @@ async def grammar_check(body: GrammarRequest):
 #  STORY 002 — Speech-to-Text (STT)
 # ═══════════════════════════════════════════════════════
 
+from typing import List
+
+class WordDetail(BaseModel):
+    word: str
+    probability: int
+
 class STTResponse(BaseModel):
     """Response body from /stt."""
     transcript: str
     duration_ms: int
+    clarity_score: int = Field(default=0, description="Pronunciation clarity from 0 to 100")
+    words: List[WordDetail] = Field(default_factory=list, description="Word by word pronunciation score")
+    language: str = Field(default="en", description="Detected language")
 
 
 @app.post("/stt", response_model=STTResponse)
@@ -397,16 +406,33 @@ async def speech_to_text(file: UploadFile = File(...)):
         try:
             segments, info = model.transcribe(
                 tmp_name,
-                language="en",  # NPCs speak English; player speaks English
+                # language="en",  # Eliminado para no forzar la traducción y auto-detectar
                 beam_size=5,
                 best_of=5,
                 vad_filter=True,
+                word_timestamps=True, # Requerido para obtener la probabilidad por palabra
             )
 
-            # Collect all segment texts
+            # Collect all segment texts and probabilities
             transcript_parts = []
+            clarity_sum = 0.0
+            word_count = 0
+            word_details = []
+            
             for segment in segments:
                 transcript_parts.append(segment.text.strip())
+                if segment.words:
+                    for w in segment.words:
+                        clarity_sum += w.probability
+                        word_count += 1
+                        word_details.append(
+                            WordDetail(
+                                word=w.word.strip(),
+                                probability=int(w.probability * 100)
+                            )
+                        )
+                        
+            clarity_score = int((clarity_sum / word_count * 100)) if word_count > 0 else 0
         finally:
             # Clean up the temp file after reading
             try:
@@ -416,15 +442,32 @@ async def speech_to_text(file: UploadFile = File(...)):
                 pass
 
         transcript = " ".join(transcript_parts).strip()
+        
+        # Whisper a veces confunde el español con árabe u otros idiomas (por la estática o acentos).
+        # Para nuestro juego, si no evaluó claramente que es inglés ("en"), sumimos que trató de hablar español.
+        detected_lang = "en" if info.language == "en" else "es"
+        
+        if detected_lang == "es":
+            logger.warning("El jugador NO habló en inglés (detectó %s). Asumiendo español.", info.language)
+            clarity_score = 0
+            
         elapsed_ms = int((time.monotonic() - start_time) * 1000)
 
         logger.info(
-            "🎤 STT result (%dms): '%s'",
+            "🎤 STT result (%dms, clarity: %d%%, lang: %s): '%s'",
             elapsed_ms,
+            clarity_score,
+            detected_lang,
             transcript[:100],
         )
 
-        return STTResponse(transcript=transcript, duration_ms=elapsed_ms)
+        return STTResponse(
+            transcript=transcript, 
+            duration_ms=elapsed_ms, 
+            clarity_score=clarity_score,
+            words=word_details,
+            language=detected_lang
+        )
 
     except Exception as e:
         logger.error("STT error: %s", e)
