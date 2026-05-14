@@ -24,6 +24,8 @@ def _base_dir() -> Path:
 
 
 BASE_DIR = _base_dir()
+LOG_FILE_NAME = "backend.log"
+_LOG_FILE_HANDLE = None
 OLLAMA_INSTALLER_URL = os.environ.get(
     "OLLAMA_INSTALLER_URL",
     "https://ollama.com/download/OllamaSetup.exe",
@@ -34,6 +36,31 @@ AUTO_INSTALL_NVIDIA_DRIVER = os.environ.get("AUTO_INSTALL_NVIDIA_DRIVER", "1")
 
 def _log(message: str) -> None:
     print(message, flush=True)
+
+
+def _resolve_log_path() -> Path:
+    if "--log-file" in sys.argv:
+        idx = sys.argv.index("--log-file")
+        if idx + 1 < len(sys.argv):
+            return Path(sys.argv[idx + 1]).expanduser()
+
+    env_path = os.environ.get("LIMONCHERO_LOG_FILE")
+    if env_path:
+        return Path(env_path).expanduser()
+
+    return BASE_DIR / LOG_FILE_NAME
+
+
+def _setup_log_file() -> None:
+    global _LOG_FILE_HANDLE
+    log_path = _resolve_log_path()
+    try:
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        _LOG_FILE_HANDLE = open(log_path, "a", encoding="utf-8", errors="replace", buffering=1)
+    except Exception:
+        return
+    sys.stdout = _LOG_FILE_HANDLE
+    sys.stderr = _LOG_FILE_HANDLE
 
 
 def _command_exists(command: str) -> bool:
@@ -232,6 +259,7 @@ def _check_ollama_hardware(ollama_cmd: str) -> None:
 
 
 def main() -> None:
+    _setup_log_file()
     # Forzamos CPU para evitar errores de librerías CUDA (cublas64) faltantes en otros PCs
     os.environ.setdefault("WHISPER_DEVICE", "cpu")
 

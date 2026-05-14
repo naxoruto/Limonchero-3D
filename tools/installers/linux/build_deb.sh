@@ -4,6 +4,7 @@ set -euo pipefail
 PKG_NAME="limonchero"
 VERSION="${VERSION:-0.0.0}"
 ARCH="${ARCH:-amd64}"
+INSTALL_DIR_NAME="JuegoLimonchero"
 
 STAGE_DIR="dist/deb/${PKG_NAME}_${VERSION}_${ARCH}"
 OUT_DIR="dist/installer"
@@ -12,20 +13,20 @@ OUT_FILE="${OUT_DIR}/${PKG_NAME}-linux-${ARCH}.deb"
 rm -rf "$STAGE_DIR"
 mkdir -p \
   "$STAGE_DIR/DEBIAN" \
-  "$STAGE_DIR/opt/${PKG_NAME}/game" \
-  "$STAGE_DIR/opt/${PKG_NAME}/backend" \
+  "$STAGE_DIR/opt/${INSTALL_DIR_NAME}/game" \
+  "$STAGE_DIR/opt/${INSTALL_DIR_NAME}/backend" \
   "$STAGE_DIR/usr/bin" \
   "$STAGE_DIR/usr/share/applications" \
   "$STAGE_DIR/usr/share/icons/hicolor/scalable/apps" \
   "$OUT_DIR"
 
-cp -R dist/game/. "$STAGE_DIR/opt/${PKG_NAME}/game"
-cp -R dist/backend/. "$STAGE_DIR/opt/${PKG_NAME}/backend"
+cp -R dist/game/. "$STAGE_DIR/opt/${INSTALL_DIR_NAME}/game"
+cp -R dist/backend/. "$STAGE_DIR/opt/${INSTALL_DIR_NAME}/backend"
 
 cat > "$STAGE_DIR/usr/bin/limonchero" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
-BASE="/opt/limonchero"
+BASE="/opt/JuegoLimonchero"
 exec "$BASE/game/limons.x86_64"
 EOF
 chmod +x "$STAGE_DIR/usr/bin/limonchero"

@@ -3,7 +3,7 @@ set -euo pipefail
 
 ARCH="${ARCH:-x86_64}"
 
-STAGE_DIR="dist/tar/limonchero-linux-${ARCH}"
+STAGE_DIR="dist/tar/JuegoLimonchero"
 OUT_DIR="dist/installer"
 OUT_FILE="${OUT_DIR}/limonchero-linux-${ARCH}.tar.gz"
 

@@ -59,8 +59,8 @@ func launch() -> bool:
 		backend_failed.emit(msg)
 		return false
 
-	_log_path = _binary_path.get_base_dir().path_join(LOG_FILE_NAME)
-	var pid := _spawn_with_logging(_binary_path, _log_path)
+	_log_path = OS.get_user_data_dir().path_join(LOG_FILE_NAME)
+	var pid := _spawn_backend(_binary_path, _log_path)
 	if pid <= 0:
 		var msg2 := "OS.create_process fallo para %s" % _binary_path
 		push_error("[BackendLauncher] " + msg2)
@@ -139,15 +139,7 @@ func _candidate_paths() -> Array[String]:
 	]
 
 
-## Spawnea el binario redirigiendo stdout/stderr a un archivo log.
-## Usa shell wrapper porque OS.create_process no soporta redireccion directa.
-func _spawn_with_logging(binary: String, log_file: String) -> int:
-	if OS.has_feature("windows"):
-		var cmd := "\"%s\" > \"%s\" 2>&1" % [binary, log_file]
-		return OS.create_process("cmd.exe", ["/c", cmd], false)
-	# Linux / macOS
-	var shell_cmd := "exec \"%s\" > \"%s\" 2>&1" % [
-		binary.replace("\"", "\\\""),
-		log_file.replace("\"", "\\\""),
-	]
-	return OS.create_process("/bin/sh", ["-c", shell_cmd], false)
+## Spawnea el binario directamente.
+## El backend escribe su propio log en la ruta indicada.
+func _spawn_backend(binary: String, log_file: String) -> int:
+	return OS.create_process(binary, ["--log-file", log_file], false)
