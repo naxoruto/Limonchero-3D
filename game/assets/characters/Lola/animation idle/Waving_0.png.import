@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dgul16lqxs7oo"
 path.s3tc="res://.godot/imported/Waving_0.png-6a8ce7cd4eae7f9cc0bf5c5b985b6ec9.s3tc.ctex"
+path.etc2="res://.godot/imported/Waving_0.png-6a8ce7cd4eae7f9cc0bf5c5b985b6ec9.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/characters/Lola/animation idle/Waving_0.png"
-dest_files=["res://.godot/imported/Waving_0.png-6a8ce7cd4eae7f9cc0bf5c5b985b6ec9.s3tc.ctex"]
+dest_files=["res://.godot/imported/Waving_0.png-6a8ce7cd4eae7f9cc0bf5c5b985b6ec9.s3tc.ctex", "res://.godot/imported/Waving_0.png-6a8ce7cd4eae7f9cc0bf5c5b985b6ec9.etc2.ctex"]
 
 [params]
 

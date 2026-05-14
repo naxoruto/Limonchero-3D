@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://bb3grs5r0iqal"
 path.s3tc="res://.godot/imported/Breakdance Ready_0.png-4a3d8dcb9cfa5f6e7bf40f42a6c26575.s3tc.ctex"
+path.etc2="res://.godot/imported/Breakdance Ready_0.png-4a3d8dcb9cfa5f6e7bf40f42a6c26575.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/characters/Lola/Breakdance Ready_0.png"
-dest_files=["res://.godot/imported/Breakdance Ready_0.png-4a3d8dcb9cfa5f6e7bf40f42a6c26575.s3tc.ctex"]
+dest_files=["res://.godot/imported/Breakdance Ready_0.png-4a3d8dcb9cfa5f6e7bf40f42a6c26575.s3tc.ctex", "res://.godot/imported/Breakdance Ready_0.png-4a3d8dcb9cfa5f6e7bf40f42a6c26575.etc2.ctex"]
 
 [params]
 

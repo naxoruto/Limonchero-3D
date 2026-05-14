@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://3j7eyjhw0eyc"
 path.s3tc="res://.godot/imported/Singing_0.png-a3fbf682996a8ce4c29c7ee80b70b283.s3tc.ctex"
+path.etc2="res://.godot/imported/Singing_0.png-a3fbf682996a8ce4c29c7ee80b70b283.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/characters/Moni/Singing_0.png"
-dest_files=["res://.godot/imported/Singing_0.png-a3fbf682996a8ce4c29c7ee80b70b283.s3tc.ctex"]
+dest_files=["res://.godot/imported/Singing_0.png-a3fbf682996a8ce4c29c7ee80b70b283.s3tc.ctex", "res://.godot/imported/Singing_0.png-a3fbf682996a8ce4c29c7ee80b70b283.etc2.ctex"]
 
 [params]
 

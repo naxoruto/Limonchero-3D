@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://hnauor18p526"
 path.s3tc="res://.godot/imported/weddingdress3dmodel_basecolor.JPEG-55f4bcc2b788a6e283331a4d8b69edf3.s3tc.ctex"
+path.etc2="res://.godot/imported/weddingdress3dmodel_basecolor.JPEG-55f4bcc2b788a6e283331a4d8b69edf3.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/characters/Moni/wedding+dress+3d+model/tripo_convert_c149021f-b85e-4f42-a682-cd1ff80fef00.fbm/weddingdress3dmodel_basecolor.JPEG"
-dest_files=["res://.godot/imported/weddingdress3dmodel_basecolor.JPEG-55f4bcc2b788a6e283331a4d8b69edf3.s3tc.ctex"]
+dest_files=["res://.godot/imported/weddingdress3dmodel_basecolor.JPEG-55f4bcc2b788a6e283331a4d8b69edf3.s3tc.ctex", "res://.godot/imported/weddingdress3dmodel_basecolor.JPEG-55f4bcc2b788a6e283331a4d8b69edf3.etc2.ctex"]
 
 [params]
 
