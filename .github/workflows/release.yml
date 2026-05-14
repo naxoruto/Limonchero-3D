@@ -33,8 +33,8 @@ jobs:
             godot_preset: juego_linux
             game_out: dist/game/limons.x86_64
             backend_name: limonchero-backend
-            artifact_name: limonchero-linux-appimage
-            artifact_path: dist/installer/limonchero-linux-x86_64.AppImage
+            artifact_name: limonchero-linux-deb
+            artifact_path: dist/installer/limonchero-linux-amd64.deb
           - os: macos-latest
             platform: macos
             godot_preset: juego_macos
@@ -123,11 +123,13 @@ jobs:
             "/DOutputBaseFilename=limonchero-setup-win" `
             "tools\installers\windows\limonchero.iss"
 
-      - name: Build Linux AppImage
+      - name: Build Linux DEB
         if: runner.os == 'Linux'
         run: |
-          chmod +x tools/installers/linux/build_appimage.sh
-          tools/installers/linux/build_appimage.sh
+          VERSION="${{ github.ref_name }}"
+          VERSION="${VERSION#v}"
+          chmod +x tools/installers/linux/build_deb.sh
+          VERSION="$VERSION" tools/installers/linux/build_deb.sh
 
       - name: Build macOS DMG
         if: runner.os == 'macOS'

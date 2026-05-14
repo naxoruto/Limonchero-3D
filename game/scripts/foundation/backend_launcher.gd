@@ -1,7 +1,7 @@
 extends Node
 ## BackendLauncher — Autoload. Lanza el backend local y lo mata al cerrar.
 ##
-## Layout esperado (AppImage / export):
+## Layout esperado (release / export):
 ##   <root>/game/<godot.exe|x86_64>
 ##   <root>/backend/limonchero-backend[.exe]
 ##
@@ -130,7 +130,7 @@ func _candidate_paths() -> Array[String]:
 	var bin_name := _platform_bin_name()
 	var exe_dir := OS.get_executable_path().get_base_dir()
 	return [
-		# Layout 1: <root>/game/<exe>  +  <root>/backend/<bin>   (AppImage / squashfs-root)
+		# Layout 1: <root>/game/<exe>  +  <root>/backend/<bin>   (paquete release)
 		exe_dir.get_base_dir().path_join(BACKEND_DIR_NAME).path_join(bin_name),
 		# Layout 2: <root>/<exe>  +  <root>/backend/<bin>
 		exe_dir.path_join(BACKEND_DIR_NAME).path_join(bin_name),

@@ -22,7 +22,7 @@ limons.x86_64
 limons.exe
 limons.app/
 backend/squashfs-root/
-*.AppImage
+*.deb
 
 # Android export artifacts (if used)
 android/
