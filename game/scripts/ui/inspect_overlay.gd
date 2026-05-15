@@ -47,7 +47,13 @@ func _ready() -> void:
 	_add_btn.pressed.connect(_on_add_pressed)
 	_viewport_area.gui_input.connect(_on_viewport_gui_input)
 	_bg.gui_input.connect(_on_bg_gui_input)
+	GameManager.accessibility_font_size_changed.connect(_apply_font_size)
+	_apply_font_size(GameManager.accessibility_font_size)
 	set_process(false)
+
+
+func _apply_font_size(size: int) -> void:
+	_description.add_theme_font_size_override("font_size", size)
 
 
 func is_open() -> bool:
@@ -68,7 +74,7 @@ func show_clue(clue_id: String) -> void:
 
 	_header_title.text = "[%s] %s" % [clue_id, String(clue.get("name", clue_id))]
 	var state: String = String(clue.get("state", GameManager.STATE_UNREVIEWED))
-	_header_state.text = state
+	_header_state.text = "%s %s" % [_state_glyph(state), state]
 	_header_state.modulate = _state_color(state)
 	_description.text = _build_description(clue)
 	_photo.color = _color_for_clue(clue_id)
@@ -128,6 +134,16 @@ func _state_color(state: String) -> Color:
 			return Color(0.416, 0.082, 0.125)
 		_:
 			return Color(0.486, 0.4, 0.235)
+
+
+func _state_glyph(state: String) -> String:
+	match state:
+		GameManager.STATE_GOOD:
+			return "✓"
+		GameManager.STATE_BAD:
+			return "✗"
+		_:
+			return "○"
 
 
 func _color_for_clue(clue_id: String) -> Color:

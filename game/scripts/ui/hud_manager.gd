@@ -10,9 +10,9 @@ signal interaction_prompt_clicked()
 
 var _npc_colors := {
 	"gajito": Color("#8BC34A"),
-	"spud": Color("#6B4423"),
-	"moni": Color("#8B2332"),
-	"gerry": Color("#4A6B30"),
+	"spud": Color("#C99060"),
+	"moni": Color("#E06070"),
+	"gerry": Color("#8BBE58"),
 	"lola": Color("#C4703A"),
 	"barry": Color("#D4C840")
 }
@@ -49,6 +49,19 @@ func _apply_font_size(size: int) -> void:
 
 func _setup_subtitle_panel() -> void:
 	subtitle_panel.visible = false
+	if subtitle_panel.get_node_or_null("Background") == null:
+		var bg := ColorRect.new()
+		bg.name = "Background"
+		bg.color = Color(0, 0, 0, 0.6)
+		bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		bg.anchor_right = 1.0
+		bg.anchor_bottom = 1.0
+		bg.offset_left = -8.0
+		bg.offset_top = -4.0
+		bg.offset_right = 8.0
+		bg.offset_bottom = 4.0
+		subtitle_panel.add_child(bg)
+		subtitle_panel.move_child(bg, 0)
 
 
 # ── Interaction Prompt ────────────────────────────────────────────

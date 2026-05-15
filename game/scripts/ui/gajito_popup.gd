@@ -38,6 +38,12 @@ func _ready() -> void:
 	_dismiss_timer.one_shot = true
 	_dismiss_timer.timeout.connect(_on_dismiss_timeout)
 	add_child(_dismiss_timer)
+	GameManager.accessibility_font_size_changed.connect(_apply_font_size)
+	_apply_font_size(GameManager.accessibility_font_size)
+
+
+func _apply_font_size(size: int) -> void:
+	_body.add_theme_font_size_override("font_size", size - 3)
 
 
 func show_message(text: String, severity: String = "low", duration: float = -1.0) -> void:

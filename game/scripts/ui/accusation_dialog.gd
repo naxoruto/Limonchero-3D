@@ -57,6 +57,15 @@ func _ready() -> void:
 	_intro_quote.text = SPUD_QUOTE
 	_wire_buttons()
 	_build_suggestions()
+	GameManager.accessibility_font_size_changed.connect(_apply_font_size)
+	_apply_font_size(GameManager.accessibility_font_size)
+
+
+func _apply_font_size(size: int) -> void:
+	_intro_quote.add_theme_font_size_override("font_size", size)
+	_confirm_summary.add_theme_font_size_override("font_size", size)
+	for cb in _evidence_checkboxes.values():
+		(cb as CheckBox).add_theme_font_size_override("font_size", size)
 
 
 func is_open() -> bool:
@@ -113,15 +122,30 @@ func _show_step(step: int) -> void:
 	match step:
 		Step.INTRO:
 			_title.text = "ACUSACIÓN FINAL"
+			_intro_continue.grab_focus()
 		Step.EVIDENCE:
 			_title.text = "PRUEBAS — paso 1 de 3"
 			_refresh_evidence_state()
+			var first_cb := _first_enabled_checkbox()
+			if first_cb != null:
+				first_cb.grab_focus()
+			else:
+				_evidence_next.grab_focus()
 		Step.ACCUSED:
 			_title.text = "ACUSADO — paso 2 de 3"
 			_accused_next.disabled = _accused_input.text.strip_edges().is_empty()
+			_accused_input.grab_focus()
 		Step.CONFIRM:
 			_title.text = "CONFIRMAR — paso 3 de 3"
 			_refresh_summary()
+			_confirm_cancel.grab_focus()
+
+
+func _first_enabled_checkbox() -> CheckBox:
+	for cb in _evidence_checkboxes.values():
+		if not (cb as CheckBox).disabled:
+			return cb
+	return null
 
 
 # ── Step transitions ─────────────────────────────────────────────────────────
@@ -174,10 +198,12 @@ func _populate_evidence() -> void:
 		var cb := CheckBox.new()
 		var state: String = String(clue.get("state", ""))
 		var name: String = String(clue.get("name", clue_id))
-		cb.text = "[%s] %s — %s" % [clue_id, name, state]
+		var glyph := "✓" if state == GameManager.STATE_GOOD else ("✗" if state == GameManager.STATE_BAD else "○")
+		cb.text = "[%s] %s — %s %s" % [clue_id, name, glyph, state]
 		cb.disabled = state != GameManager.STATE_GOOD
 		if cb.disabled:
 			cb.modulate = Color(1, 1, 1, 0.4)
+		cb.add_theme_font_size_override("font_size", GameManager.accessibility_font_size)
 		cb.toggled.connect(_on_evidence_toggled.bind(String(clue_id)))
 		_evidence_list.add_child(cb)
 		_evidence_checkboxes[String(clue_id)] = cb

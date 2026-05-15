@@ -35,6 +35,7 @@ const TOTAL_SLOTS := 8
 
 var _is_open: bool = false
 var _blocked: bool = false
+var _name_font_size: int = 11
 
 
 func _ready() -> void:
@@ -42,9 +43,17 @@ func _ready() -> void:
 	visible = false
 	GameManager.clue_added.connect(_on_clue_changed)
 	GameManager.clue_state_changed.connect(_on_clue_state_changed)
+	GameManager.accessibility_font_size_changed.connect(_on_font_size_changed)
+	_name_font_size = clamp(GameManager.accessibility_font_size - 5, 9, 18)
 	_bg.gui_input.connect(_on_bg_gui_input)
 	_accuse_btn.pressed.connect(_on_accuse_pressed)
 	refresh()
+
+
+func _on_font_size_changed(size: int) -> void:
+	_name_font_size = clamp(size - 5, 9, 18)
+	if _is_open:
+		refresh()
 
 
 func is_open() -> bool:
@@ -70,7 +79,20 @@ func open() -> void:
 	_is_open = true
 	visible = true
 	refresh()
+	_focus_first_slot()
 	opened.emit()
+
+
+func _focus_first_slot() -> void:
+	for child in _hechos_grid.get_children():
+		if child is Control and (child as Control).focus_mode == Control.FOCUS_ALL:
+			(child as Control).grab_focus()
+			return
+	for child in _sospechas_grid.get_children():
+		if child is Control and (child as Control).focus_mode == Control.FOCUS_ALL:
+			(child as Control).grab_focus()
+			return
+	_accuse_btn.grab_focus()
 
 
 func close() -> void:
@@ -117,6 +139,7 @@ func _make_slot(clue: Dictionary) -> PanelContainer:
 	slot.custom_minimum_size = Vector2(180, 140)
 	slot.add_theme_stylebox_override("panel", _slot_stylebox(false))
 	slot.mouse_filter = Control.MOUSE_FILTER_STOP
+	slot.focus_mode = Control.FOCUS_ALL
 
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 4)
@@ -138,7 +161,7 @@ func _make_slot(clue: Dictionary) -> PanelContainer:
 
 	var stamp := Label.new()
 	var state: String = clue.get("state", GameManager.STATE_UNREVIEWED)
-	stamp.text = state
+	stamp.text = "%s %s" % [_stamp_glyph(state), state]
 	stamp.add_theme_color_override("font_color", _stamp_color(state))
 	stamp.add_theme_font_size_override("font_size", 10)
 	header.add_child(stamp)
@@ -151,7 +174,7 @@ func _make_slot(clue: Dictionary) -> PanelContainer:
 	var name_label := Label.new()
 	name_label.text = String(clue.get("name", clue.get("id", "?")))
 	name_label.add_theme_color_override("font_color", COLOR_INK)
-	name_label.add_theme_font_size_override("font_size", 11)
+	name_label.add_theme_font_size_override("font_size", _name_font_size)
 	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	name_label.custom_minimum_size = Vector2(160, 0)
 	vbox.add_child(name_label)
@@ -205,6 +228,16 @@ func _stamp_color(state: String) -> Color:
 			return COLOR_STAMP_UNREVIEWED
 
 
+func _stamp_glyph(state: String) -> String:
+	match state:
+		GameManager.STATE_GOOD:
+			return "✓"
+		GameManager.STATE_BAD:
+			return "✗"
+		_:
+			return "○"
+
+
 func _on_clue_changed(_clue_id: String) -> void:
 	if _is_open:
 		refresh()
@@ -218,6 +251,11 @@ func _on_clue_state_changed(_clue_id: String, _state: String) -> void:
 func _on_slot_gui_input(event: InputEvent, clue_id: String) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		inspect_requested.emit(clue_id)
+		return
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_ENTER or event.keycode == KEY_SPACE or event.keycode == KEY_KP_ENTER:
+			inspect_requested.emit(clue_id)
+			get_viewport().set_input_as_handled()
 
 
 func _on_bg_gui_input(event: InputEvent) -> void:

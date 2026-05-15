@@ -180,6 +180,13 @@ func _show_sub(sub: SubPanel) -> void:
 	_main_panel.visible = (sub == SubPanel.MAIN)
 	_settings_panel.visible = (sub == SubPanel.SETTINGS)
 	_exit_panel.visible = (sub == SubPanel.EXIT_CONFIRM)
+	match sub:
+		SubPanel.MAIN:
+			_resume_btn.grab_focus()
+		SubPanel.SETTINGS:
+			_fov_slider.grab_focus()
+		SubPanel.EXIT_CONFIRM:
+			_exit_cancel_btn.grab_focus()
 
 
 # ── Slider handlers ─────────────────────────────────────────────────
@@ -200,6 +207,7 @@ func _on_mouse_changed(value: float) -> void:
 
 func _on_font_changed(value: float) -> void:
 	_settings["font_size"] = int(value)
+	GameManager.set_accessibility_font_size(int(value))
 	_refresh_slider_labels()
 	_save_settings()
 
@@ -233,6 +241,7 @@ func _apply_settings_to_runtime() -> void:
 	_apply_bus_volume("Master", float(_settings["vol_master"]))
 	_apply_bus_volume("SFX", float(_settings["vol_sfx"]))
 	_apply_bus_volume("Mic", float(_settings["vol_mic"]))
+	GameManager.set_accessibility_font_size(int(_settings["font_size"]))
 
 
 func _apply_fov(value: float) -> void:

@@ -67,6 +67,14 @@ func _ready() -> void:
 	_gajito_ack_btn.pressed.connect(_on_gajito_ack_pressed)
 	if gajito_portrait != null:
 		_gajito_portrait_rect.texture = gajito_portrait
+	GameManager.accessibility_font_size_changed.connect(_apply_font_size)
+	_apply_font_size(GameManager.accessibility_font_size)
+
+
+func _apply_font_size(size: int) -> void:
+	_chat_log.add_theme_font_size_override("normal_font_size", size)
+	_correction_label.add_theme_font_size_override("font_size", size)
+	_tip_label.add_theme_font_size_override("font_size", size - 2)
 
 
 func show_panel(npc: Node) -> void:
