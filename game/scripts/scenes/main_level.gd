@@ -10,6 +10,7 @@ const HISTORY_MAX_MESSAGES := 20
 @onready var _pause_menu: CanvasLayer = $PauseMenu
 @onready var _notebook: CanvasLayer = $InventoryNotebook
 @onready var _accusation: CanvasLayer = $AccusationDialog
+@onready var _resolution: CanvasLayer = $CaseResolution
 
 const MAIN_MENU_SCENE := "res://scenes/ui/main_menu.tscn"
 
@@ -234,13 +235,28 @@ func _on_accusation_confirmed(accused: String, evidence: Array) -> void:
 
 
 func _on_case_resolved() -> void:
-	# Stub G4.2. Por ahora log + fade rápido.
-	print("[Accusation] case_resolved — Barry confeso. (G4.2 pantalla pendiente)")
+	var attempt: Dictionary = _last_accusation_attempt()
+	_resolution.show_result(
+		_resolution.Mode.RESOLVED,
+		String(attempt.get("accused", "")),
+		attempt.get("evidence", []),
+	)
 
 
 func _on_case_failed(reason: String) -> void:
-	# Stub G4.2. Por ahora log.
-	print("[Accusation] case_failed: ", reason, " (G4.2 pantalla pendiente)")
+	var attempt: Dictionary = _last_accusation_attempt()
+	_resolution.show_result(
+		_resolution.Mode.FAILED,
+		String(attempt.get("accused", "")),
+		attempt.get("evidence", []),
+		reason,
+	)
+
+
+func _last_accusation_attempt() -> Dictionary:
+	if GameManager.accusation_attempts.is_empty():
+		return {}
+	return GameManager.accusation_attempts[-1]
 
 
 # DEBUG: smoke test pickup. Borrar antes de release.
@@ -268,6 +284,10 @@ func _debug_cycle_last_clue_state() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	# Resolución del caso: cualquier input se ignora salvo el botón "Menú principal".
+	if _resolution.is_open():
+		return
+
 	# Tab toggle del notebook (acción Input "inventory_toggle").
 	if event.is_action_pressed("inventory_toggle"):
 		if _dialogue.is_open() or _pause_menu.is_open() or _accusation.is_open():

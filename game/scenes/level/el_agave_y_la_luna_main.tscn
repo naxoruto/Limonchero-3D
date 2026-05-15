@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="16_pause"]
 [ext_resource type="PackedScene" path="res://scenes/ui/inventory_notebook.tscn" id="17_notebook"]
 [ext_resource type="PackedScene" path="res://scenes/ui/accusation_dialog.tscn" id="18_accusation"]
+[ext_resource type="PackedScene" path="res://scenes/ui/case_resolution.tscn" id="19_resolution"]
 
 [node name="Main" type="Node3D" unique_id=1253217368]
 script = ExtResource("6_script")
@@ -121,6 +122,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.8, 0.5, 1.0)
 [node name="InventoryNotebook" parent="." instance=ExtResource("17_notebook")]
 
 [node name="AccusationDialog" parent="." instance=ExtResource("18_accusation")]
+
+[node name="CaseResolution" parent="." instance=ExtResource("19_resolution")]
 
 [node name="FadeOverlay" type="CanvasLayer" parent="." unique_id=938550197]
 layer = 100
