@@ -35,6 +35,16 @@ func _ready() -> void:
 	_ptt_wave_timer.one_shot = false
 	_ptt_wave_timer.timeout.connect(_on_ptt_wave_tick)
 	add_child(_ptt_wave_timer)
+	GameManager.accessibility_font_size_changed.connect(_apply_font_size)
+	_apply_font_size(GameManager.accessibility_font_size)
+	GameManager.anti_stall_triggered.connect(_on_anti_stall_triggered)
+
+
+func _apply_font_size(size: int) -> void:
+	var npc_text: Label = subtitle_panel.get_node("NPCText")
+	var player_text: Label = subtitle_panel.get_node("PlayerText")
+	npc_text.add_theme_font_size_override("font_size", size)
+	player_text.add_theme_font_size_override("font_size", size)
 
 
 func _setup_subtitle_panel() -> void:
@@ -164,19 +174,27 @@ func show_inventory_notification(clue_name: String) -> void:
 	inventory_notification.visible = false
 
 
-# ── Anti-Stall Hint ───────────────────────────────────────────────
+# ── Anti-Stall Hint (ADR-0011) ────────────────────────────────────
 
-var _hints := {
-	1: "Quizas deberias revisar el guardarropa...",
-	2: "El piso de arriba podria tener respuestas...",
-	3: "Barry Peel. Su reservado. El acuerdo."
+const _HINT_TEXTS := {
+	1: "Limonchero, ¿has revisado todos los rincones del local? Hay más pistas esperándote.",
+	2: "Quizás vale la pena hablar con alguien que aún no hayas interrogado del todo...",
+	3: "El cenicero junto a la barra tiene algo interesante. Y no olvides el guardarropa."
 }
+
+
+func _on_anti_stall_triggered(level_key: String) -> void:
+	# "L1"/"L2"/"L3" → 1/2/3
+	var n := int(level_key.substr(1))
+	show_anti_stall_hint(n)
 
 
 func show_anti_stall_hint(level: int) -> void:
 	if level < 1 or level > 3:
 		return
-	GajitoPopup.show_message(_hints[level], "high")
+	if get_tree().paused:
+		return
+	GajitoPopup.show_message(_HINT_TEXTS[level], "high")
 
 
 # ── Global visibility toggle ──────────────────────────────────────

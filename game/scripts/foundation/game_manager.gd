@@ -7,6 +7,8 @@ signal gate_opened()
 signal session_initialized(session_id: String)
 signal case_failed(reason: String)   # "wrong_accusation" | "insufficient_evidence"
 signal case_resolved()
+signal accessibility_font_size_changed(size: int)
+signal anti_stall_triggered(level: String)  # "L1" | "L2" | "L3"
 
 # ── Clue states ───────────────────────────────────────────────────────────────
 const STATE_GOOD := "BUENA"
@@ -19,6 +21,10 @@ const CONFESSION_CLUES := ["F1", "F2", "F3"]
 const CULPRIT_ID := "barry"
 const ACCUSATION_REASON_WRONG := "wrong_accusation"
 const ACCUSATION_REASON_INSUFFICIENT := "insufficient_evidence"
+
+# ── Accessibility ────────────────────────────────────────────────────────────
+const ACCESSIBILITY_FONT_DEFAULT := 16
+var accessibility_font_size: int = ACCESSIBILITY_FONT_DEFAULT
 
 # ── Session identity ──────────────────────────────────────────────────────────
 var session_id: String = ""
@@ -34,6 +40,15 @@ var npcs_interrogated: Dictionary = {}
 var accusation_attempts: Array = []
 var grammar_errors_count: int = 0
 var anti_stall_triggers: Dictionary = {"L1": 0, "L2": 0, "L3": 0}
+
+# ── Anti-stall timer (ADR-0011) ──────────────────────────────────────────────
+# Thresholds: [L1 from session start, +L2 delta, +L3 delta] → 4/5/7 min cumulative.
+const STALL_THRESHOLDS: Array[float] = [240.0, 60.0, 120.0]
+# DEBUG: reduced thresholds for manual testing. Flip STALL_DEBUG_MODE to true.
+const STALL_THRESHOLDS_DEBUG: Array[float] = [5.0, 3.0, 3.0]
+const STALL_DEBUG_MODE := false
+var _stall_timer: Timer = null
+var _stall_level: int = 0  # 0=armed, 1..3=levels fired
 
 # ── Resolution flags ──────────────────────────────────────────────────────────
 var completed: bool = false
@@ -57,7 +72,39 @@ func initialize_session(p_session_id: String, p_english_level: String) -> void:
 	completed = false
 	correct_accusation = false
 	_session_exported = false
+	_setup_stall_timer()
 	session_initialized.emit(session_id)
+
+
+func _setup_stall_timer() -> void:
+	if _stall_timer == null:
+		_stall_timer = Timer.new()
+		_stall_timer.one_shot = true
+		add_child(_stall_timer)
+		_stall_timer.timeout.connect(_on_stall_timer_timeout)
+	_reset_stall_timer()
+
+
+func _stall_thresholds() -> Array:
+	return STALL_THRESHOLDS_DEBUG if STALL_DEBUG_MODE else STALL_THRESHOLDS
+
+
+func _reset_stall_timer() -> void:
+	if _stall_timer == null:
+		return
+	_stall_level = 0
+	_stall_timer.stop()
+	_stall_timer.start(_stall_thresholds()[0])
+
+
+func _on_stall_timer_timeout() -> void:
+	_stall_level += 1
+	var level_key := "L%d" % _stall_level
+	anti_stall_triggers[level_key] = int(anti_stall_triggers.get(level_key, 0)) + 1
+	anti_stall_triggered.emit(level_key)
+	var thresholds: Array = _stall_thresholds()
+	if _stall_level < thresholds.size():
+		_stall_timer.start(thresholds[_stall_level])
 
 
 # ── Clue API ──────────────────────────────────────────────────────────────────
@@ -80,6 +127,7 @@ func add_clue(clue_id: String, data: Dictionary) -> bool:
 		entry["name"] = clue_id
 	clues[clue_id] = entry
 	clue_added.emit(clue_id)
+	_reset_stall_timer()
 	return true
 
 
@@ -109,6 +157,16 @@ func get_all_clues() -> Dictionary:
 
 func has_clue(clue_id: String) -> bool:
 	return clues.has(clue_id)
+
+
+# ── Accessibility ────────────────────────────────────────────────────────────
+
+func set_accessibility_font_size(size: int) -> void:
+	var clamped: int = clamp(size, 12, 24)
+	if accessibility_font_size == clamped:
+		return
+	accessibility_font_size = clamped
+	accessibility_font_size_changed.emit(clamped)
 
 
 # ── Confession Gate / Accusation ─────────────────────────────────────────────
