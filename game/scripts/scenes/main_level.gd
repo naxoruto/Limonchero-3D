@@ -11,6 +11,7 @@ const HISTORY_MAX_MESSAGES := 20
 @onready var _notebook: CanvasLayer = $InventoryNotebook
 @onready var _accusation: CanvasLayer = $AccusationDialog
 @onready var _resolution: CanvasLayer = $CaseResolution
+@onready var _inspect: CanvasLayer = $InspectOverlay
 
 const MAIN_MENU_SCENE := "res://scenes/ui/main_menu.tscn"
 
@@ -68,6 +69,7 @@ func _ready() -> void:
 	_accusation.accusation_confirmed.connect(_on_accusation_confirmed)
 	GameManager.case_resolved.connect(_on_case_resolved)
 	GameManager.case_failed.connect(_on_case_failed)
+	_inspect.add_to_inventory_requested.connect(_on_inspect_add_to_inventory)
 	set_process_unhandled_input(true)
 
 	for npc in get_tree().get_nodes_in_group("npcs"):
@@ -197,8 +199,13 @@ func _on_notebook_closed() -> void:
 
 
 func _on_inspect_requested(clue_id: String) -> void:
-	# Stub para G3.2 InspectOverlay. Por ahora cierra el notebook y loggea.
-	print("[Inventory] inspect_requested: ", clue_id)
+	_inspect.show_clue(clue_id)
+
+
+func _on_inspect_add_to_inventory(clue_id: String) -> void:
+	# Hook para futuro flujo de pickup desde el mundo. Por ahora no-op porque
+	# si el inspect viene del notebook el clue ya está en inventario.
+	print("[Inspect] add_to_inventory_requested: ", clue_id)
 
 
 func _on_open_notebook_from_pause() -> void:
@@ -290,7 +297,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	# Tab toggle del notebook (acción Input "inventory_toggle").
 	if event.is_action_pressed("inventory_toggle"):
-		if _dialogue.is_open() or _pause_menu.is_open() or _accusation.is_open():
+		if _dialogue.is_open() or _pause_menu.is_open() or _accusation.is_open() or _inspect.is_open():
 			return
 		_notebook.toggle()
 		get_viewport().set_input_as_handled()
@@ -316,6 +323,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.keycode == KEY_ESCAPE:
 			# Durante acusación, ESC es ignorado (cancelación solo por botón).
 			if _accusation.is_open():
+				get_viewport().set_input_as_handled()
+				return
+			# Si inspect abierto, ESC lo cierra.
+			if _inspect.is_open():
+				_inspect.close()
 				get_viewport().set_input_as_handled()
 				return
 			# Si notebook abierto, ESC lo cierra y no abre pausa.
