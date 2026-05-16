@@ -53,6 +53,7 @@ var _stall_level: int = 0  # 0=armed, 1..3=levels fired
 # ── Resolution flags ──────────────────────────────────────────────────────────
 var completed: bool = false
 var correct_accusation: bool = false
+var error_percentage: float = 0.0
 
 # ── Private bookkeeping ───────────────────────────────────────────────────────
 var _session_exported: bool = false
@@ -161,6 +162,10 @@ func has_clue(clue_id: String) -> bool:
 
 # ── Accessibility ────────────────────────────────────────────────────────────
 
+func set_error_percentage(value: float) -> void:
+	error_percentage = clamp(value, 0.0, 100.0)
+
+
 func set_accessibility_font_size(size: int) -> void:
 	var clamped: int = clamp(size, 12, 24)
 	if accessibility_font_size == clamped:
@@ -178,6 +183,22 @@ func is_confession_gate_open() -> bool:
 		if clue.get("state", "") != STATE_GOOD:
 			return false
 	return true
+
+
+func register_interrogation(npc_id: String) -> void:
+	if npc_id.is_empty():
+		return
+	npcs_interrogated[npc_id] = Time.get_unix_time_from_system()
+
+
+func register_grammar_error() -> void:
+	grammar_errors_count += 1
+
+
+func get_clue_state(clue_id: String) -> String:
+	if not clues.has(clue_id):
+		return STATE_UNREVIEWED
+	return clues[clue_id].get("state", STATE_UNREVIEWED)
 
 
 ## Registra el intento de acusación en telemetría. Devuelve true si la acusación
@@ -208,3 +229,35 @@ func register_accusation(accused_id: String, presented_evidence: Array, _is_corr
 	else:
 		case_failed.emit(ACCUSATION_REASON_INSUFFICIENT)
 	return false
+
+
+func export_session_json() -> void:
+	if _session_exported:
+		push_warning("GameManager.export_session_json: session already exported")
+		return
+
+	var duration = Time.get_unix_time_from_system() - session_start_time
+
+	var report = {
+		"session_id": session_id,
+		"english_level": english_level,
+		"duration": duration,
+		"clues": clues,
+		"npcs": npcs_interrogated,
+		"accusations": accusation_attempts,
+		"grammar_errors": grammar_errors_count,
+		"anti_stall_triggers": anti_stall_triggers,
+		"completed": completed,
+		"correct_accusation": correct_accusation,
+		"error_percentage": error_percentage
+	}
+
+	var json_string = JSON.stringify(report, "\t")
+	var file = FileAccess.open("user://session_" + session_id + ".json", FileAccess.WRITE)
+	if file:
+		file.store_string(json_string)
+		file.close()
+		_session_exported = true
+		push_warning("GameManager: Session exported to user://session_" + session_id + ".json")
+	else:
+		push_error("GameManager: Failed to open file for export")

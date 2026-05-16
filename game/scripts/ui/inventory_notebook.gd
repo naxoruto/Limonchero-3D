@@ -114,8 +114,6 @@ func refresh() -> void:
 	var sospechas: Array = []
 	for clue_id in clues:
 		var clue: Dictionary = clues[clue_id]
-		if clue.get("type", "physical") != "physical":
-			continue
 		if clue.get("state", "") == GameManager.STATE_GOOD:
 			hechos.append(clue)
 		else:
@@ -166,10 +164,19 @@ func _make_slot(clue: Dictionary) -> PanelContainer:
 	stamp.add_theme_font_size_override("font_size", 10)
 	header.add_child(stamp)
 
-	var photo := ColorRect.new()
-	photo.custom_minimum_size = Vector2(160, 70)
-	photo.color = Color(0.78, 0.74, 0.6)
-	vbox.add_child(photo)
+	var clue_type: String = clue.get("type", "physical")
+	if clue_type == "testimony":
+		var quote := TextEdit.new()
+		quote.text = String(clue.get("description", ""))
+		quote.editable = false
+		quote.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
+		quote.custom_minimum_size = Vector2(160, 60)
+		quote.add_theme_color_override("font_color", COLOR_INK)
+		quote.add_theme_font_size_override("font_size", 10)
+		quote.add_theme_stylebox_override("normal", _quote_stylebox())
+		vbox.add_child(quote)
+	else:
+		vbox.add_child(_make_physical_placeholder())
 
 	var name_label := Label.new()
 	name_label.text = String(clue.get("name", clue.get("id", "?")))
@@ -218,6 +225,53 @@ func _slot_stylebox(empty: bool) -> StyleBoxFlat:
 	return sb
 
 
+func _quote_stylebox() -> StyleBoxFlat:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.941, 0.929, 0.878, 0.5)
+	sb.set_border_width_left(3)
+	sb.border_color = Color(0.627, 0.565, 0.439, 0.6)
+	sb.content_margin_left = 6
+	sb.content_margin_top = 2
+	sb.content_margin_right = 4
+	sb.content_margin_bottom = 2
+	return sb
+
+
+func _make_physical_placeholder() -> PanelContainer:
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(160, 70)
+	panel.add_theme_stylebox_override("panel", _photo_stylebox())
+	var vbox := VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 2)
+	panel.add_child(vbox)
+	var icon := Label.new()
+	icon.text = "📷"
+	icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	icon.add_theme_color_override("font_color", COLOR_INK)
+	icon.add_theme_font_size_override("font_size", 22)
+	vbox.add_child(icon)
+	var caption := Label.new()
+	caption.text = "EVIDENCIA FÍSICA"
+	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	caption.add_theme_color_override("font_color", COLOR_EMPTY_BORDER)
+	caption.add_theme_font_size_override("font_size", 9)
+	vbox.add_child(caption)
+	return panel
+
+
+func _photo_stylebox() -> StyleBoxFlat:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.78, 0.74, 0.6, 0.7)
+	sb.set_border_width_all(1)
+	sb.border_color = COLOR_INK
+	sb.content_margin_left = 4
+	sb.content_margin_top = 4
+	sb.content_margin_right = 4
+	sb.content_margin_bottom = 4
+	return sb
+
+
 func _stamp_color(state: String) -> Color:
 	match state:
 		GameManager.STATE_GOOD:
@@ -249,13 +303,31 @@ func _on_clue_state_changed(_clue_id: String, _state: String) -> void:
 
 
 func _on_slot_gui_input(event: InputEvent, clue_id: String) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		inspect_requested.emit(clue_id)
-		return
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			inspect_requested.emit(clue_id)
+			return
+		if event.button_index == MOUSE_BUTTON_RIGHT:
+			_cycle_clue_state(clue_id)
+			return
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_ENTER or event.keycode == KEY_SPACE or event.keycode == KEY_KP_ENTER:
 			inspect_requested.emit(clue_id)
 			get_viewport().set_input_as_handled()
+
+
+func _cycle_clue_state(clue_id: String) -> void:
+	var current := GameManager.get_clue_state(clue_id)
+	var next_state: String
+	match current:
+		GameManager.STATE_GOOD:
+			next_state = GameManager.STATE_BAD
+		GameManager.STATE_BAD:
+			next_state = GameManager.STATE_UNREVIEWED
+		_:
+			next_state = GameManager.STATE_GOOD
+	GameManager.set_clue_state(clue_id, next_state)
+	GajitoPopup.show_message("%s marcado %s manualmente." % [clue_id, next_state], "low")
 
 
 func _on_bg_gui_input(event: InputEvent) -> void:

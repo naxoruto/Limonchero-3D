@@ -6,6 +6,7 @@ signal stt_completed(transcript: String)
 signal stt_failed(error: String)
 signal npc_response_ready(npc_id: String, text: String)
 signal npc_request_failed(npc_id: String, error: String)
+signal npc_evidence_response_ready(npc_id: String, clue_id: String, raw_text: String, cleaned_text: String)
 signal gajito_evaluation_ready(passed: bool, score: float, correction: String, tip: String, translation_es: String)
 signal gajito_evaluation_failed(error: String)
 signal health_check_done(ok: bool)
@@ -27,6 +28,7 @@ var _npc_req: HTTPRequest = null
 var _gajito_req: HTTPRequest = null
 var _health_req: HTTPRequest = null
 var _pending_npc_id: String = ""
+var _pending_evidence_clue_id: String = ""
 var _pending_gajito_transcript: String = ""
 
 # Guardamos el resultado del ultimo STT para usarlo en Gajito
@@ -86,13 +88,38 @@ func request_stt(wav_bytes: PackedByteArray) -> void:
 		stt_failed.emit("HTTPRequest error: %d" % err)
 
 
-## POST /npc/{npc_id} — body JSON {npc_id, history, message}.
+## POST /npc/{npc_id} — body JSON {npc_id, history, message, presented_evidence}.
 func request_npc(npc_id: String, message: String, history: Array) -> void:
 	_pending_npc_id = npc_id
 	var payload := {
 		"npc_id": npc_id,
 		"history": history,
 		"message": message,
+	}
+	var body := JSON.stringify(payload)
+	var headers := ["Content-Type: application/json"]
+	var url := "%s/npc/%s" % [_base_url, npc_id]
+	var err := _npc_req.request(url, headers, HTTPClient.METHOD_POST, body)
+	if err != OK:
+		npc_request_failed.emit(npc_id, "HTTPRequest error: %d" % err)
+
+
+## POST /npc/{npc_id} — con pista presentada por el jugador.
+## clue_data debe incluir: id, name, type, description.
+func request_npc_with_evidence(npc_id: String, clue_data: Dictionary, history: Array) -> void:
+	_pending_npc_id = npc_id
+	_pending_evidence_clue_id = String(clue_data.get("id", ""))
+	var evidence := {
+		"clue_id": String(clue_data.get("id", "")),
+		"clue_name": String(clue_data.get("name", clue_data.get("id", ""))),
+		"clue_type": String(clue_data.get("type", "physical")),
+		"clue_description": String(clue_data.get("description", "")),
+	}
+	var payload := {
+		"npc_id": npc_id,
+		"history": history,
+		"message": "[EVIDENCE_PRESENTED:%s]" % evidence["clue_id"],
+		"presented_evidence": evidence,
 	}
 	var body := JSON.stringify(payload)
 	var headers := ["Content-Type: application/json"]
@@ -185,7 +212,9 @@ func _on_stt_completed(result: int, code: int, _headers: PackedStringArray, body
 
 func _on_npc_completed(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	var npc_id := _pending_npc_id
+	var evidence_clue_id := _pending_evidence_clue_id
 	_pending_npc_id = ""
+	_pending_evidence_clue_id = ""
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200:
 		npc_request_failed.emit(npc_id, "NPC HTTP %d (result %d)" % [code, result])
 		return
@@ -193,7 +222,12 @@ func _on_npc_completed(result: int, code: int, _headers: PackedStringArray, body
 	if parsed == null or not parsed.has("response"):
 		npc_request_failed.emit(npc_id, "Respuesta NPC invalida")
 		return
-	npc_response_ready.emit(npc_id, parsed["response"])
+	var raw_text: String = parsed["response"]
+	if evidence_clue_id.is_empty():
+		npc_response_ready.emit(npc_id, raw_text)
+	else:
+		var cleaned := _strip_reaction_tags(raw_text)
+		npc_evidence_response_ready.emit(npc_id, evidence_clue_id, raw_text, cleaned)
 
 
 func _on_gajito_completed(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
@@ -231,3 +265,43 @@ func _build_multipart_wav(wav_bytes: PackedByteArray, boundary: String) -> Packe
 	body.append_array(wav_bytes)
 	body.append_array(tail.to_utf8_buffer())
 	return body
+
+
+## Elimina tags de reacción (formato nuevo [RECOGNIZE] y legado <recognize/>).
+func _strip_reaction_tags(text: String) -> String:
+	var out := text
+	# Nuevo formato: brackets, case-insensitive.
+	var regex := RegEx.new()
+	regex.compile("(?i)\\[(RECOGNIZE|DENY|EVADE|CONFESS)\\]")
+	out = regex.sub(out, "", true)
+	# Legado: tags XML por si algún prompt viejo los emite.
+	out = out.replace("<recognize/>", "")
+	out = out.replace("<deny/>", "")
+	out = out.replace("<evade/>", "")
+	out = out.replace("<confess/>", "")
+	return out.strip_edges()
+
+
+## Analiza la respuesta del NPC buscando el tag de reacción.
+## Retorna "recognize", "deny", "evade", "confess", o "ambiguous".
+func parse_npc_reaction(raw_text: String) -> String:
+	var upper := raw_text.to_upper()
+	# Formato nuevo (preferido).
+	if "[RECOGNIZE]" in upper:
+		return "recognize"
+	if "[CONFESS]" in upper:
+		return "confess"
+	if "[DENY]" in upper:
+		return "deny"
+	if "[EVADE]" in upper:
+		return "evade"
+	# Legado XML.
+	if "<recognize/>" in raw_text:
+		return "recognize"
+	if "<confess/>" in raw_text:
+		return "confess"
+	if "<deny/>" in raw_text:
+		return "deny"
+	if "<evade/>" in raw_text:
+		return "evade"
+	return "ambiguous"

@@ -14,6 +14,7 @@ extends CanvasLayer
 signal opened()
 signal closed()
 signal add_to_inventory_requested(clue_id: String)
+signal clue_validated(clue_id: String)
 
 const ZOOM_MIN := 0.5
 const ZOOM_MAX := 2.5
@@ -30,8 +31,10 @@ const PULSE_HZ := 0.5
 @onready var _photo: ColorRect = $Frame/VBox/ViewportArea/Pivot/Photo
 @onready var _pivot: Control = $Frame/VBox/ViewportArea/Pivot
 @onready var _description: Label = $Frame/VBox/Description
+@onready var _action_container: Control = $Frame/VBox/Actions
 @onready var _add_btn: Button = $Frame/VBox/Actions/AddBtn
 
+var _validate_btn: Button = null
 var _is_open: bool = false
 var _current_clue_id: String = ""
 var _dragging: bool = false
@@ -49,7 +52,17 @@ func _ready() -> void:
 	_bg.gui_input.connect(_on_bg_gui_input)
 	GameManager.accessibility_font_size_changed.connect(_apply_font_size)
 	_apply_font_size(GameManager.accessibility_font_size)
+	_setup_validate_button()
 	set_process(false)
+
+
+func _setup_validate_button() -> void:
+	_validate_btn = Button.new()
+	_validate_btn.name = "ValidateBtn"
+	_validate_btn.text = "Validar"
+	_validate_btn.visible = false
+	_validate_btn.pressed.connect(_on_validate_pressed)
+	_action_container.add_child(_validate_btn)
 
 
 func _apply_font_size(size: int) -> void:
@@ -84,6 +97,8 @@ func show_clue(clue_id: String) -> void:
 	var in_inv := GameManager.has_clue(clue_id)
 	_add_btn.disabled = in_inv
 	_add_btn.text = "Ya en inventario" if in_inv else "Añadir al inventario"
+
+	_validate_btn.visible = in_inv and state == GameManager.STATE_UNREVIEWED
 
 	visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -182,3 +197,22 @@ func _on_add_pressed() -> void:
 	if _current_clue_id.is_empty():
 		return
 	add_to_inventory_requested.emit(_current_clue_id)
+
+
+func _on_validate_pressed() -> void:
+	if _current_clue_id.is_empty():
+		return
+	GameManager.set_clue_state(_current_clue_id, GameManager.STATE_GOOD)
+	_update_state_display()
+	_validate_btn.visible = false
+	clue_validated.emit(_current_clue_id)
+
+
+func _update_state_display() -> void:
+	var clue := GameManager.get_clue(_current_clue_id)
+	if clue.is_empty():
+		return
+	var state: String = String(clue.get("state", GameManager.STATE_UNREVIEWED))
+	_header_state.text = "%s %s" % [_state_glyph(state), state]
+	_header_state.modulate = _state_color(state)
+

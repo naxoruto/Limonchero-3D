@@ -47,6 +47,8 @@ func _ready() -> void:
 	_dialogue.text_confirmed.connect(_on_text_confirmed)
 	_dialogue.retry_from_text.connect(_on_retry_from_text)
 	_dialogue.gajito_correction_acknowledged.connect(_on_gajito_correction_acknowledged)
+	_dialogue.clue_presentation_requested.connect(_on_clue_presentation_requested)
+	_dialogue.testimony_capture_requested.connect(_on_testimony_capture_requested)
 	LLMClient.gajito_evaluation_ready.connect(_on_gajito_evaluation_ready)
 	LLMClient.gajito_evaluation_failed.connect(_on_gajito_evaluation_failed)
 	VoiceManager.audio_captured.connect(_on_audio_captured)
@@ -54,6 +56,7 @@ func _ready() -> void:
 	LLMClient.stt_failed.connect(_on_stt_failed)
 	LLMClient.npc_response_ready.connect(_on_npc_response_ready)
 	LLMClient.npc_request_failed.connect(_on_npc_request_failed)
+	LLMClient.npc_evidence_response_ready.connect(_on_npc_evidence_response_ready)
 	_fade.color = Color(0, 0, 0, 0)
 
 	_pause_menu.bind_player(_player)
@@ -70,6 +73,7 @@ func _ready() -> void:
 	GameManager.case_resolved.connect(_on_case_resolved)
 	GameManager.case_failed.connect(_on_case_failed)
 	_inspect.add_to_inventory_requested.connect(_on_inspect_add_to_inventory)
+	_inspect.clue_validated.connect(_on_clue_validated)
 	set_process_unhandled_input(true)
 
 	for npc in get_tree().get_nodes_in_group("npcs"):
@@ -152,6 +156,43 @@ func _on_retry_from_text() -> void:
 	_pending_player_text = ""
 
 
+func _on_clue_presentation_requested(clue_id: String) -> void:
+	if _active_npc == null:
+		return
+	var clue := GameManager.get_clue(clue_id)
+	if clue.is_empty():
+		return
+	var name := String(clue.get("name", clue_id))
+	_dialogue.add_player_message("[Muestras: %s — %s]" % [clue_id, name])
+	var history := _get_history(_active_npc.npc_id)
+	LLMClient.request_npc_with_evidence(_active_npc.npc_id, clue, history)
+
+
+func _on_testimony_capture_requested(text: String, npc_id: String) -> void:
+	var testimony_id := _next_testimony_id()
+	var npc_name: String = _active_npc.npc_name if _active_npc != null and "npc_name" in _active_npc else npc_id.capitalize()
+	var data := {
+		"name": "Declaracion de %s" % npc_name,
+		"type": "testimony",
+		"state": GameManager.STATE_UNREVIEWED,
+		"description": "\"%s\"" % text,
+		"source_npc": npc_id,
+	}
+	if GameManager.add_clue(testimony_id, data):
+		_dialogue.add_system_message("[Testimonio capturado: %s]" % testimony_id)
+		GajitoPopup.show_message("Declaracion de %s anadida como %s." % [npc_name, testimony_id], "low")
+		HUDManager.show_inventory_notification(testimony_id)
+	else:
+		print("[EvidenceInterrogation] No se pudo capturar testimonio %s" % testimony_id)
+
+
+var _testimony_counter: int = 0
+
+func _next_testimony_id() -> String:
+	_testimony_counter += 1
+	return "T%d" % _testimony_counter
+
+
 func _on_gajito_evaluation_ready(passed: bool, _score: float, correction: String, tip: String, translation_es: String) -> void:
 	if _active_npc == null:
 		return
@@ -208,6 +249,12 @@ func _on_inspect_add_to_inventory(clue_id: String) -> void:
 	print("[Inspect] add_to_inventory_requested: ", clue_id)
 
 
+func _on_clue_validated(clue_id: String) -> void:
+	var clue := GameManager.get_clue(clue_id)
+	var name := String(clue.get("name", clue_id))
+	GajitoPopup.show_message("Buena deduccion, Limonchero. '%s' ya es un hecho." % name, "low")
+
+
 func _on_open_notebook_from_pause() -> void:
 	_pause_menu.close()
 	_notebook.open()
@@ -242,6 +289,7 @@ func _on_accusation_confirmed(accused: String, evidence: Array) -> void:
 
 
 func _on_case_resolved() -> void:
+	GameManager.export_session_json()
 	var attempt: Dictionary = _last_accusation_attempt()
 	_resolution.show_result(
 		_resolution.Mode.RESOLVED,
@@ -251,6 +299,7 @@ func _on_case_resolved() -> void:
 
 
 func _on_case_failed(reason: String) -> void:
+	GameManager.export_session_json()
 	var attempt: Dictionary = _last_accusation_attempt()
 	_resolution.show_result(
 		_resolution.Mode.FAILED,
@@ -304,6 +353,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	if event is InputEventKey and event.pressed and not event.echo:
+		# DEBUG: imprime coord global del jugador + yaw. Borrar antes de release.
+		if event.keycode == KEY_M:
+			var p: Vector3 = _player.global_position
+			var yaw_deg: float = rad_to_deg(_player.global_rotation.y)
+			print("[POS] x=%.2f y=%.2f z=%.2f  yaw=%.1f°" % [p.x, p.y, p.z, yaw_deg])
+			get_viewport().set_input_as_handled()
+			return
 		# DEBUG: smoke test GajitoPopup. Borrar antes de release.
 		if event.keycode == KEY_F9:
 			GajitoPopup.show_message("Prueba LOW: buen ingles, intenta mas natural.", "low")
@@ -364,6 +420,16 @@ func _on_npc_response_ready(npc_id: String, text: String) -> void:
 
 func _on_npc_request_failed(_npc_id: String, error: String) -> void:
 	_dialogue.add_npc_message("[color=red][Error: %s][/color]" % error)
+
+
+func _on_npc_evidence_response_ready(npc_id: String, clue_id: String, raw_text: String, cleaned_text: String) -> void:
+	print("[EvidenceInterrogation] response NPC=%s clue=%s raw_len=%d cleaned_len=%d cleaned=%s" % [
+		npc_id, clue_id, raw_text.length(), cleaned_text.length(), cleaned_text.left(120)
+	])
+	if cleaned_text.strip_edges().is_empty():
+		cleaned_text = "..."
+	_dialogue.add_npc_message(cleaned_text)
+	_apply_evidence_stamp(npc_id, clue_id, raw_text)
 
 
 func _on_focus_label_changed(label: String) -> void:
@@ -428,3 +494,85 @@ func _get_history(npc_id: String) -> Array:
 func _trim_history(history: Array) -> void:
 	while history.size() > HISTORY_MAX_MESSAGES:
 		history.remove_at(0)
+
+
+# ── Evidence Interrogation — Auto-stamp ──────────────────────────────────────
+
+const RECOGNITION_TABLE := {
+	"moni": {"F3": "recognize_good", "F4": "self_confess_red"},
+	"lola": {"F5": "self_confess_red"},
+	"spud": {"F4": "dismiss_red", "F5": "dismiss_red"},
+	"barry": {"F1": "recognize_good", "F2": "recognize_good", "F3": "recognize_good"},
+	"gerry": {},
+}
+
+const STAMP_MESSAGES := {
+	"recognize_good": "confirmo la pista %s. Marcada BUENA.",
+	"self_confess_red": "con su reaccion, la pista %s queda descartada. Marcada MALA.",
+	"dismiss_red": "descarta la pista %s. Marcada MALA.",
+}
+
+
+func _apply_evidence_stamp(npc_id: String, clue_id: String, raw_text: String) -> void:
+	var reaction := LLMClient.parse_npc_reaction(raw_text)
+	print("[EvidenceInterrogation] NPC=%s clue=%s reaction=%s raw=%s" % [npc_id, clue_id, reaction, raw_text.left(100)])
+
+	if reaction == "ambiguous":
+		reaction = _guess_reaction_from_text(raw_text, npc_id, clue_id)
+
+	if reaction == "ambiguous":
+		reaction = _expected_reaction(npc_id, clue_id)
+		if reaction != "ambiguous":
+			print("[EvidenceInterrogation] Fallback: using expected reaction '%s' for %s+%s" % [reaction, npc_id, clue_id])
+
+	if reaction == "ambiguous":
+		return
+
+	var rule: String = RECOGNITION_TABLE.get(npc_id.to_lower(), {}).get(clue_id, "none")
+	print("[EvidenceInterrogation] rule=%s for NPC=%s clue=%s" % [rule, npc_id, clue_id])
+	if rule == "none":
+		return
+
+	var npc_name: String = _active_npc.npc_name if _active_npc != null and "npc_name" in _active_npc else npc_id.capitalize()
+
+	match [rule, reaction]:
+		["recognize_good", "recognize"]:
+			GameManager.set_clue_state(clue_id, GameManager.STATE_GOOD)
+			GajitoPopup.show_message("%s %s" % [npc_name, STAMP_MESSAGES["recognize_good"] % clue_id], "low")
+			_dialogue.add_system_message("[%s → %s BUENA]" % [npc_name, clue_id])
+		["self_confess_red", "confess"], ["dismiss_red", "deny"]:
+			GameManager.set_clue_state(clue_id, GameManager.STATE_BAD)
+			GajitoPopup.show_message("%s %s" % [npc_name, STAMP_MESSAGES["self_confess_red"] % clue_id], "low")
+			_dialogue.add_system_message("[%s → %s MALA]" % [npc_name, clue_id])
+		["self_confess_red", "recognize"]:
+			GameManager.set_clue_state(clue_id, GameManager.STATE_BAD)
+			GajitoPopup.show_message("%s %s" % [npc_name, STAMP_MESSAGES["self_confess_red"] % clue_id], "low")
+			_dialogue.add_system_message("[%s → %s MALA]" % [npc_name, clue_id])
+		_:
+			pass
+
+
+func _guess_reaction_from_text(text: String, _npc_id: String, _clue_id: String) -> String:
+	var lower := text.to_lower()
+	if lower.contains("recognize") or lower.contains("that's mine") or lower.contains("i know this") or lower.contains("i'd know it"):
+		return "recognize"
+	if lower.contains("confess") or lower.contains("i did it") or lower.contains("i killed") or lower.contains("that's... mine"):
+		return "confess"
+	if lower.contains("deny") or lower.contains("not mine") or lower.contains("wasn't me") or lower.contains("never seen"):
+		return "deny"
+	if lower.contains("evade") or lower.contains("i don't know") or lower.contains("can't say"):
+		return "evade"
+	return "ambiguous"
+
+
+func _expected_reaction(npc_id: String, clue_id: String) -> String:
+	var rule: String = RECOGNITION_TABLE.get(npc_id.to_lower(), {}).get(clue_id, "none")
+	match rule:
+		"recognize_good":
+			return "recognize"
+		"self_confess_red":
+			return "confess"
+		"dismiss_red":
+			return "deny"
+		_:
+			return "ambiguous"

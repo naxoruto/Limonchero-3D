@@ -5,17 +5,43 @@
 [ext_resource type="Script" uid="uid://cuc10ne1r3o0x" path="res://scripts/scenes/main_level.gd" id="6_script"]
 [ext_resource type="Script" uid="uid://dp6lrtxx4eorl" path="res://scripts/core/interaction_system.gd" id="7_interaction"]
 [ext_resource type="PackedScene" path="res://scenes/ui/dialogue.tscn" id="9_dialogue"]
-[ext_resource type="Script" path="res://scripts/interactables/npc_character.gd" id="10_npc_char"]
+[ext_resource type="Script" uid="uid://btrso0iwvqar" path="res://scripts/interactables/npc_character.gd" id="10_npc_char"]
 [ext_resource type="PackedScene" uid="uid://cxxp66t3jsxye" path="res://assets/characters/Moni/animation scene/Singing.fbx" id="11_moni_model"]
 [ext_resource type="PackedScene" uid="uid://crmvut8enq0ge" path="res://assets/characters/Moni/animation idle/Dwarf Idle.fbx" id="12_moni_talk"]
 [ext_resource type="PackedScene" uid="uid://bnckdyc4wqlnn" path="res://assets/characters/Spud/animation idle/Salute.fbx" id="13_spud_idle"]
 [ext_resource type="PackedScene" uid="uid://bt6kgqmty1em5" path="res://assets/characters/Spud/animation scene/Thoughtful Head Shake.fbx" id="14_spud_talk"]
 [ext_resource type="PackedScene" path="res://scenes/companions/gajito.tscn" id="15_gajito"]
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="16_pause"]
-[ext_resource type="PackedScene" path="res://scenes/ui/inventory_notebook.tscn" id="17_notebook"]
-[ext_resource type="PackedScene" path="res://scenes/ui/accusation_dialog.tscn" id="18_accusation"]
-[ext_resource type="PackedScene" path="res://scenes/ui/case_resolution.tscn" id="19_resolution"]
-[ext_resource type="PackedScene" path="res://scenes/ui/inspect_overlay.tscn" id="20_inspect"]
+[ext_resource type="PackedScene" uid="uid://mx4hc00bkcli" path="res://scenes/ui/inventory_notebook.tscn" id="17_notebook"]
+[ext_resource type="PackedScene" uid="uid://bbgl7h436xpd8" path="res://scenes/ui/accusation_dialog.tscn" id="18_accusation"]
+[ext_resource type="PackedScene" uid="uid://78k0knatp7w2" path="res://scenes/ui/case_resolution.tscn" id="19_resolution"]
+[ext_resource type="PackedScene" uid="uid://b7emn3dtcb2db" path="res://scenes/ui/inspect_overlay.tscn" id="20_inspect"]
+[ext_resource type="PackedScene" path="res://assets/characters/Barry/animation idle/Standing W_Briefcase Idle.fbx" id="21_barry_idle"]
+[ext_resource type="PackedScene" path="res://assets/characters/Barry/animation scene/Offensive Idle.fbx" id="22_barry_talk"]
+[ext_resource type="PackedScene" path="res://assets/characters/Gerry/animation idle/Orc Idle.fbx" id="23_gerry_idle"]
+[ext_resource type="PackedScene" path="res://assets/characters/Gerry/animation scene/Bicep Curl.fbx" id="24_gerry_talk"]
+[ext_resource type="PackedScene" path="res://assets/characters/Lola/animation idle/Waving.fbx" id="25_lola_idle"]
+[ext_resource type="PackedScene" path="res://assets/characters/Lola/animation scene/Dwarf Idle.fbx" id="26_lola_talk"]
+[ext_resource type="PackedScene" path="res://assets/characters/Cornelius/Receiving Cpr.fbx" id="27_cornelius_body"]
+[ext_resource type="Script" path="res://scripts/interactables/static_corpse.gd" id="28_corpse_script"]
+[ext_resource type="Script" path="res://scripts/interactables/simple_interactable.gd" id="29_clue_script"]
+[ext_resource type="PackedScene" path="res://assets/models/clues/f1/Meshy_AI_Contrato_de_fideicomi_0515072844_texture_fbx/Meshy_AI_Contrato_de_fideicomi_0515072844_texture.fbx" id="30_f1_model"]
+[ext_resource type="PackedScene" path="res://assets/models/clues/f2/Meshy_AI_Ancient_Golden_Key_0515071358_texture_fbx/Meshy_AI_Ancient_Golden_Key_0515071358_texture.fbx" id="31_f2_model"]
+[ext_resource type="PackedScene" path="res://assets/models/clues/f3/uploads_files_4798450_Lighter04_v2.fbx" id="32_f3_model"]
+[ext_resource type="PackedScene" path="res://assets/models/clues/f4/leather+suitcase+3d+model/tripo_convert_b8c33e1a-caf1-4cb0-b0e4-f2eb60d97002.fbx" id="33_f4_model"]
+[ext_resource type="PackedScene" path="res://assets/models/clues/f5/Meshy_AI_Aged_Parchment_0515064912_texture_fbx/Meshy_AI_Aged_Parchment_0515064912_texture.fbx" id="34_f5_model"]
+
+[sub_resource type="BoxShape3D" id="BoxShape_clue_med"]
+size = Vector3(0.6, 0.4, 0.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape_clue_small"]
+size = Vector3(0.4, 0.1, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape_clue_tiny"]
+size = Vector3(0.2, 0.2, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape_f3"]
+size = Vector3(0.5, 0.5, 0.5)
 
 [node name="Main" type="Node3D" unique_id=1253217368]
 script = ExtResource("6_script")
@@ -42,6 +68,13 @@ light_energy = 2.0
 shadow_enabled = true
 omni_range = 10.0
 
+[node name="Luz_Bano" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.49, 2.5, -1.2)
+light_color = Color(0.92, 0.95, 1, 1)
+light_energy = 1.2
+shadow_enabled = true
+omni_range = 5.0
+
 [node name="Luz_Pasillo_1" type="OmniLight3D" parent="." unique_id=1361614179]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 4, -15.1)
 light_color = Color(1, 0.839, 0.666, 1)
@@ -58,11 +91,11 @@ light_color = Color(1, 0.839, 0.666, 1)
 omni_range = 8.0
 
 [node name="Luz_Oficina" type="OmniLight3D" parent="." unique_id=1461606353]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0.5, -13.2)
-light_color = Color(0.666, 0.8, 1, 1)
-light_energy = 1.5
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2.8, -13.2)
+light_color = Color(0.85, 0.78, 0.55, 1)
+light_energy = 2.5
 shadow_enabled = true
-omni_range = 8.0
+omni_range = 10.0
 
 [node name="Luz_Sala_Reuniones" type="OmniLight3D" parent="." unique_id=275267056]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5, 4, -8.2)
@@ -92,7 +125,7 @@ spot_range = 12.0
 spot_angle = 35.0
 
 [node name="Moni" type="Node3D" parent="." unique_id=2114186461]
-transform = Transform3D(1.7, 0, 0, 0, 1.7, 0, 0, 0, 1.7, 9.0, 0.4, -12.25)
+transform = Transform3D(1.7, 0, 0, 0, 1.7, 0, 0, 0, 1.7, 9, 0.4, -12.25)
 script = ExtResource("10_npc_char")
 npc_name = "Moni Grana Fert"
 npc_id = "moni"
@@ -103,7 +136,7 @@ talking_scene = ExtResource("12_moni_talk")
 cam_offset_x = 0.8
 
 [node name="Spud" type="Node3D" parent="." unique_id=1845221764]
-transform = Transform3D(0, 0, -1.7, 0, 1.7, 0, 1.7, 0, 0, 11.0, 0.0, 1.5)
+transform = Transform3D(0, 0, -1.7, 0, 1.7, 0, 1.7, 0, 0, 11, 0, 1.5)
 script = ExtResource("10_npc_char")
 npc_name = "Commissioner Spud"
 npc_id = "spud"
@@ -111,22 +144,152 @@ character_folder = "res://assets/characters/Spud/"
 model_scene = ExtResource("13_spud_idle")
 idle_scene = ExtResource("13_spud_idle")
 talking_scene = ExtResource("14_spud_talk")
-cam_offset_x = 0.4
 
-[node name="Gajito" parent="." instance=ExtResource("15_gajito")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.8, 0.5, 1.0)
+[node name="Barry" type="Node3D" parent="."]
+transform = Transform3D(1.9, 0, 0, 0, 1.9, 0, 0, 0, 1.9, 20.88, 0, -8.62)
+script = ExtResource("10_npc_char")
+npc_name = "Barry Peel"
+npc_id = "barry"
+character_folder = "res://assets/characters/Barry/"
+model_scene = ExtResource("21_barry_idle")
+idle_scene = ExtResource("21_barry_idle")
+talking_scene = ExtResource("22_barry_talk")
+
+[node name="Gerry" type="Node3D" parent="."]
+transform = Transform3D(0, 0, 2.3, 0, 2.3, 0, -2.3, 0, 0, 4, 0, -4)
+script = ExtResource("10_npc_char")
+npc_name = "Gerald Broccolini"
+npc_id = "gerry"
+character_folder = "res://assets/characters/Gerry/"
+model_scene = ExtResource("23_gerry_idle")
+idle_scene = ExtResource("23_gerry_idle")
+talking_scene = ExtResource("24_gerry_talk")
+
+[node name="Lola" type="Node3D" parent="."]
+transform = Transform3D(1.0607, 0, -1.0607, 0, 1.5, 0, 1.0607, 0, 1.0607, 14, 0, -3)
+script = ExtResource("10_npc_char")
+npc_name = "Dolores Persimmon"
+npc_id = "lola"
+character_folder = "res://assets/characters/Lola/"
+model_scene = ExtResource("25_lola_idle")
+idle_scene = ExtResource("25_lola_idle")
+talking_scene = ExtResource("26_lola_talk")
+
+[node name="CorneliusBody" parent="." instance=ExtResource("27_cornelius_body")]
+transform = Transform3D(1.9, 0, 0, 0, 1.9, 0, 0, 0, 1.9, 22, 0, -13.2)
+script = ExtResource("28_corpse_script")
+
+[node name="F1_Fideicomiso" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.88, 0.05, -8.62)
+script = ExtResource("29_clue_script")
+interaction_label = "Examinar documento (E)"
+clue_id = "F1"
+clue_name = "Acuerdo del Fideicomiso"
+clue_description = "Documento firmado por Cornelius dejando el club a Barry. Línea de Barry sin firmar."
+clue_type = "physical"
+clue_implies = "Barry"
+initial_state = "SIN_REVISAR"
+gajito_hint = "Un acuerdo del fideicomiso. Cornelius le iba a dejar el club a Barry."
+
+[node name="Model" parent="F1_Fideicomiso" instance=ExtResource("30_f1_model")]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="F1_Fideicomiso"]
+shape = SubResource("BoxShape_clue_small")
+
+[node name="F2_LlaveMaestra" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 1, 3.5)
+script = ExtResource("29_clue_script")
+interaction_label = "Revisar abrigo #14 (E)"
+clue_id = "F2"
+clue_name = "Llave Maestra"
+clue_description = "Llave maestra de la oficina de Cornelius. Estaba en el bolsillo del abrigo #14 de Barry."
+clue_type = "physical"
+clue_implies = "Barry"
+initial_state = "SIN_REVISAR"
+gajito_hint = "Encontramos algo en el bolsillo del abrigo #14. Es una llave maestra."
+
+[node name="Model" parent="F2_LlaveMaestra" instance=ExtResource("31_f2_model")]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="F2_LlaveMaestra"]
+shape = SubResource("BoxShape_clue_tiny")
+
+[node name="F3_Encendedor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0, -14)
+script = ExtResource("29_clue_script")
+interaction_label = "Recoger encendedor (E)"
+clue_id = "F3"
+clue_name = "Encendedor de Oro"
+clue_description = "Encendedor de oro hallado junto al escritorio. Dueño desconocido — mostrar a alguien que lo reconozca."
+clue_type = "physical"
+clue_implies = "?"
+initial_state = "SIN_REVISAR"
+gajito_hint = "Un encendedor de oro. Caro. Habrá que mostrárselo a alguien que pueda reconocerlo."
+
+[node name="Model" parent="F3_Encendedor" instance=ExtResource("32_f3_model")]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 0)
+
+[node name="Halo" type="OmniLight3D" parent="F3_Encendedor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+light_color = Color(1.0, 0.84, 0.2, 1)
+light_energy = 1.5
+omni_range = 1.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="F3_Encendedor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+shape = SubResource("BoxShape_f3")
+
+[node name="F4_MaletaMoni" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.3, -13)
+script = ExtResource("29_clue_script")
+interaction_label = "Examinar maleta (E)"
+clue_id = "F4"
+clue_name = "Maleta de Moni"
+clue_description = "Maleta escondida tras los sacos de harina. Contiene ropa y una receta — plan de escape de Moni, no crimen."
+clue_type = "physical"
+clue_implies = "Moni"
+initial_state = "MALA"
+gajito_hint = "Una maleta escondida. Es de Moni. No es nuestra pista — está planeando irse, no matar."
+
+[node name="Model" parent="F4_MaletaMoni" instance=ExtResource("33_f4_model")]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="F4_MaletaMoni"]
+shape = SubResource("BoxShape_clue_med")
+
+[node name="F5_SobreQuemado" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.49, 0.05, -1.2)
+script = ExtResource("29_clue_script")
+interaction_label = "Examinar sobre (E)"
+clue_id = "F5"
+clue_name = "Sobre Quemado"
+clue_description = "Sobre quemado en el baño. Restos de documentos de demanda civil contra Lola — no relacionado con el crimen."
+clue_type = "physical"
+clue_implies = "Lola"
+initial_state = "MALA"
+gajito_hint = "Un sobre quemado. Documentos de demanda contra Lola. Nada que ver con el asesinato."
+
+[node name="Model" parent="F5_SobreQuemado" instance=ExtResource("34_f5_model")]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="F5_SobreQuemado"]
+shape = SubResource("BoxShape_clue_small")
+
+[node name="Gajito" parent="." unique_id=281203722 instance=ExtResource("15_gajito")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.8, 0.5, 1)
 
 [node name="DialogueUI" parent="." unique_id=1274670137 instance=ExtResource("9_dialogue")]
 
-[node name="PauseMenu" parent="." instance=ExtResource("16_pause")]
+[node name="PauseMenu" parent="." unique_id=686021217 instance=ExtResource("16_pause")]
 
-[node name="InventoryNotebook" parent="." instance=ExtResource("17_notebook")]
+[node name="InventoryNotebook" parent="." unique_id=308151477 instance=ExtResource("17_notebook")]
 
-[node name="AccusationDialog" parent="." instance=ExtResource("18_accusation")]
+[node name="AccusationDialog" parent="." unique_id=1861871425 instance=ExtResource("18_accusation")]
 
-[node name="CaseResolution" parent="." instance=ExtResource("19_resolution")]
+[node name="CaseResolution" parent="." unique_id=2062507337 instance=ExtResource("19_resolution")]
 
-[node name="InspectOverlay" parent="." instance=ExtResource("20_inspect")]
+[node name="InspectOverlay" parent="." unique_id=1456403872 instance=ExtResource("20_inspect")]
 
 [node name="FadeOverlay" type="CanvasLayer" parent="." unique_id=938550197]
 layer = 100
