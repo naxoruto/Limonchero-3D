@@ -17,8 +17,8 @@ signal canceled()
 signal accusation_confirmed(accused: String, evidence: Array)
 
 const MAX_EVIDENCE := 3
-const NPC_SUGGESTIONS := ["moni", "gerry", "lola", "barry", "spud"]
-const SPUD_QUOTE := "Spud: \"Alright, detective. Who did it, and what's your evidence?\""
+const NPC_SUGGESTIONS := ["moni", "gerry", "lola", "barry", "papolicia"]
+const SPUD_QUOTE := "Papolicia: \"Alright, detective. Who did it, and what's your evidence?\""
 
 enum Step { INTRO, EVIDENCE, ACCUSED, CONFIRM }
 

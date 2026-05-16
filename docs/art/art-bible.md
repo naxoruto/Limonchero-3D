@@ -135,7 +135,7 @@ El estilo low-poly facetado es una declaración estética, no un límite técnic
 
 **Carácter de iluminación:**
 - Temperatura: 2200K–2500K (ámbar muy cálido, casi cobrizo). El ciclo cierra con la misma luz del inicio, pero ahora se siente más pesada
-- Contraste: Máximo del juego. Spud iluminado desde abajo, Barry en sombra casi total hasta que confiesa
+- Contraste: Máximo del juego. Papolicia iluminado desde abajo, Barry en sombra casi total hasta que confiesa
 - Dirección: La única luz dura del juego. Sin difusión. Las sombras tienen bordes
 
 **Descriptores atmosféricos:**
@@ -197,7 +197,7 @@ El estilo low-poly facetado es una declaración estética, no un límite técnic
 |---|---|---|---|
 | Limonchero | Limón amarillo | Elipsoide alargado vertical | Alto, delgado, eje vertical fuerte. El fedora extiende el eje sin romperlo |
 | Gajito | Key lime | Esfera achatada | Bajo, redondeado, compacto. La silueta "cabe dentro" de la de Limonchero |
-| Commissioner Spud | Papa | Elipsoide irregular con base plana | Bajo, ancho, estable. Comunica "inamovible" |
+| Commissioner Papolicia | Papa | Elipsoide irregular con base plana | Bajo, ancho, estable. Comunica "inamovible" |
 | Barry Peel | Plátano | Arco cóncavo elongado | La curvatura define la postura — se inclina ligeramente, nunca completamente recto |
 | Moni Graná Fert | Granada | Esfera con corona geométrica | Redonda pero con puntos angulares en la corona — tensión entre suavidad y filo |
 | Gerry Broccolini | Brócoli | Masa triangular con cabeza ramificada | Ancho en hombros, cabeza que se expande hacia arriba — triángulo invertido |
@@ -288,7 +288,7 @@ Estos colores están anclados en los hex codes establecidos en las secciones 5�
 
 **¿Qué comunica el rojo?** (`#8B2332`) — Moni Graná Fert. Secreto activo. Algo que ya pasó y no puede deshacerse. Solo un elemento rojo saturado por zona: si hay más de uno en el campo visual, algo está mal con esa lectura.
 
-**¿Qué comunica el dorado?** (`#D4A030`) — Autoridad institucional y su corrupción. Las lámparas de Spud son doradas. El encendedor de Barry es dorado — un objeto de autoridad personal en manos del culpable. El dorado no es bueno ni malo: es el color de las instituciones que el noir examina.
+**¿Qué comunica el dorado?** (`#D4A030`) — Autoridad institucional y su corrupción. Las lámparas de Papolicia son doradas. El encendedor de Barry es dorado — un objeto de autoridad personal en manos del culpable. El dorado no es bueno ni malo: es el color de las instituciones que el noir examina.
 
 **¿Qué comunica el blanco?** — No existe blanco puro en el juego. Existe solo en la UI (`#F5F0E8` — blanco cálido) y como rim light de descubrimiento de pistas (`#E8F0F8`). La ausencia de blanco puro en el mundo es una declaración: en El Agave y La Luna, nada es completamente inocente.
 
@@ -364,7 +364,7 @@ Un jugador en primera persona debe identificar el rol narrativo de un personaje 
 |---|---|---|---|
 | Protagonista (Limonchero) | Vertical, capas superpuestas (fedora + gabardina) | La gabardina ensancha los hombros; la fedora alarga la vertical | Silueta compacta o sin sombrero |
 | Asistente (Gajito) | Vertical delgado, sin capas pesadas | Más pequeño que el protagonista, energía hacia arriba | Hacerlo igual de alto o más ancho |
-| Autoridad (Spud) | Horizontal, bloque macizo | Hombros anchos, cuello corto, poca vertical | Silueta esbelta o elegante |
+| Autoridad (Papolicia) | Horizontal, bloque macizo | Hombros anchos, cuello corto, poca vertical | Silueta esbelta o elegante |
 | Culpable (Barry) | Limpio, contenido, sin elementos que rompan el contorno | Traje que no cuelga ni se mueve — sin asperezas | Silueta caótica, ropa arrugada |
 | Sospechosos inocentes | Variable por personaje, pero con un **elemento disruptivo** visible | Un fedora torcido, un vestido de vuelo, una postura encorvada | Siluetas genéricas intercambiables entre sí |
 
@@ -374,7 +374,7 @@ La altura comunica poder e importancia narrativa de forma inmediata en primera p
 
 ```
 Gerry Broccolini     ████████████  125%  (el más alto — presencia física intimidante)
-Commissioner Spud    ███████████   115%  (macizo, casi igual de alto que Gerry)
+Commissioner Papolicia    ███████████   115%  (macizo, casi igual de alto que Gerry)
 Barry Peel           ██████████    105%  (porte impecable, muy cerca de la referencia)
 Limonchero           █████████     100%  (referencia base)
 Lola Persimmon       ████████       90%  (adulta, compacta, sin carácter intimidante)
@@ -409,7 +409,7 @@ Esta proporción es el **nivel 0**. Las variaciones son delta sobre este baselin
 - Efecto narrativo: la cabeza grande comunica pensamiento, inmadurez física, energía mental sobre corporal
 - La cabeza de key lime es más pequeña y redondeada que la del limón — mantener esa diferencia de volumen
 
-**Autoridad (Commissioner Spud) — expansión horizontal, compresión vertical**
+**Autoridad (Commissioner Papolicia) — expansión horizontal, compresión vertical**
 - Cabeza: ~22% de la altura total (1/4.5 — proporcionalmente más pequeña, aplastada por el peso del cuerpo)
 - Torso: +30% de anchura respecto a Limonchero
 - Cuello: prácticamente inexistente — la cabeza descansa sobre los hombros
@@ -448,7 +448,7 @@ La fruta no es solo el color de piel. Es la geometría base del cuerpo, la textu
 - **Energía del diseño**: donde Limonchero tiene líneas horizontales (gabardina, ala plana del fedora), Gajito tiene líneas verticales — ropa ajustada, postura hacia adelante, menos masa horizontal
 - **Sin fedora**: Gajito no lleva fedora. El sombrero es un marcador de jerarquía en este mundo — solo los detectives experimentados lo llevan
 
-#### 5.3.3 Commissioner Wallace Spud — Papa (patata)
+#### 5.3.3 Commissioner Wallace Papolicia — Papa (patata)
 
 - **Forma base del cuerpo**: la papa es un tubérculo ovalado e irregular — torso amorfo, asimétrico por diseño (un hombro ligeramente más alto que el otro, panza descentrada), como si la geometría del cuerpo recordara una papa cavada del suelo. Nunca perfectamente simétrico: la asimetría es su firma
 - **Color de piel**: marrón tierra `#6B4423` aprox., con variación tonal en las facetas — zonas más claras `#8A5A30` en las partes altas (hombros, frente) y más oscuras `#4A2E18` en las bajas (barbilla, bajo la panza). Cáscara mate, nunca brillante. Paleta terrosa que lo separa tonalmente de todos los demás personajes (Moni-granate, Gerry-verde, Lola-naranja, Barry-amarillo)
@@ -467,7 +467,7 @@ La fruta no es solo el color de piel. Es la geometría base del cuerpo, la textu
 #### 5.3.5 Moni Graná Fert — Granada
 
 - **Forma base del cuerpo**: la granada es globosa y coronada. El cuerpo de Moni tiene una silueta redondeada en el torso que se extiende hacia arriba en una **corona dentada de 5–6 puntas** (los sépalos secos de la granada) que reemplaza la función del cabello. La corona es el elemento no negociable — es su firma de silueta desde 3 metros
-- **Color de piel**: rojo granada profundo, `#8B2332` aprox. Cáscara mate con facetas más oscuras en las zonas de sombra. En escena de club con iluminación de neón, este rojo se lee como contundente — es el único personaje con rojo saturado en la piel (Spud es marrón tierra, Lola naranja apagado). Solo compite con su propio vestido granate, que es intencional: Moni se lee como una sola masa roja a distancia
+- **Color de piel**: rojo granada profundo, `#8B2332` aprox. Cáscara mate con facetas más oscuras en las zonas de sombra. En escena de club con iluminación de neón, este rojo se lee como contundente — es el único personaje con rojo saturado en la piel (Papolicia es marrón tierra, Lola naranja apagado). Solo compite con su propio vestido granate, que es intencional: Moni se lee como una sola masa roja a distancia
 - **Detalle de las semillas**: en zonas del torso y los brazos, pequeñas facetas rubí `#C8102E` asoman entre grietas de la cáscara — no muchas, ~6 a 8 puntos visibles por vista. Son el segundo marcador frutal después de la corona. En low-poly: mini-polígonos saturados embebidos en planos de cáscara
 - **Forma de la cabeza**: más redonda y coronada que cualquier otro personaje — la granada es vertical. La cabeza de Moni es casi esférica con la corona dentada arriba, lo que la hace leer claramente distinta de la silueta de Lola (caqui) aunque ambas tengan coronas
 - **Vestido granate**: el único vestido largo femenino de la cast. Corte bajo en el escote, caída angular larga. Color `#A0202F` — cercano a la piel pero más saturado y vivo, para que la figura se lea como "una sola masa roja" a distancia y el detalle del vestido solo aparezca de cerca. Es la lectura "Femme Fatale" desde el primer frame
@@ -563,7 +563,7 @@ No todos los personajes tienen el mismo rango expresivo. Esto es intencional y d
 | Personaje | Rango Expresivo | Justificación Narrativa |
 |---|---|---|
 | Gajito | Alto — cejas móviles, boca activa | Su nerviosismo requiere que el rostro traicione lo que siente |
-| Commissioner Spud | Medio-alto — ceño prominente, boca tensa | La impaciencia se lee en cada plano facial |
+| Commissioner Papolicia | Medio-alto — ceño prominente, boca tensa | La impaciencia se lee en cada plano facial |
 | Moni Graná Fert | Bajo-medio — sonrisa lenta calculada, ojos en media apertura constante | La femme fatale controla cada gesto; la calma es el arma |
 | Lola Persimmon | Medio — animada pero no extrema | La cooperación excesiva se lee en rapidez del gesto, no en exageración |
 | Gerry Broccolini | Muy bajo — casi sin expresión | Monosilábico en todo, incluyendo la cara |
@@ -590,7 +590,7 @@ Muchas frutas tienen tallo. El tallo en la cabeza rompe cualquier sombrero conve
 
 **Solución A — Ranura Dorsal** (para sombreros sólidos como el fedora): la copa tiene una ranura en la parte posterior que permite al tallo salir sin deformar el sombrero. La ranura es parte del diseño, no un arreglo — es un detalle de moda noir-frutícola. Limonchero usa esta solución (verificable en el concept sheet: el cabello verde sale por la parte trasera del fedora).
 
-**Solución B — Corona Abierta** (para gorras y tocados): sombreros con corona abierta o ajustable. Funciona para personajes con cabeza redondeada irregular como Spud.
+**Solución B — Corona Abierta** (para gorras y tocados): sombreros con corona abierta o ajustable. Funciona para personajes con cabeza redondeada irregular como Papolicia.
 
 **Solución C — Sin Sombrero**: para personajes cuya masa superior hace imposible cualquier sombrero convencional. El fedora de Gerry es humorístico precisamente porque no puede resolverse bien — se hunde en la copa arbórea.
 
@@ -626,7 +626,7 @@ Las manos de fruta son masas geométricas, no dedos individuales.
 - Pañuelo de bolsillo blanco: único punto de blanco en toda su figura — punto focal durante el interrogatorio
 - Botones: polígonos esféricos simples, 4–6 polígonos cada uno
 
-**Uniforme de Spud (comisionado)**:
+**Uniforme de Papolicia (comisionado)**:
 - Azul oscuro, hombreras geométricas
 - Galones dorados en mangas: strips de color en textura flat, no geometría separada
 - Botones frontales bajo tensión visible — los planos de la chaqueta se abren alrededor de la panza
@@ -665,7 +665,7 @@ Estos elementos se preservan hasta LOD 1. Solo pueden eliminarse en LOD 2.
 | Limonchero | Fedora + gabardina | Amarillo-verdoso | Cabello verde | Camiseta con gato |
 | Gajito | Altura baja, cabeza grande | Verde lima brillante | Sin sombrero | Ropa ajustada |
 | Barry Peel | Traje limpio, porte recto | Amarillo uniforme | Pañuelo blanco | Manchas en mano |
-| Commissioner Spud | Masa amorfa asimétrica | Marrón tierra | Uniforme azul oscuro | Ojos de papa (brotes) + galones dorados |
+| Commissioner Papolicia | Masa amorfa asimétrica | Marrón tierra | Uniforme azul oscuro | Ojos de papa (brotes) + galones dorados |
 | Moni Graná Fert | Figura en A + corona dentada | Granate profundo | Vestido granate completo | Corona + semillas rubí asomando |
 | Gerry Broccolini | Masa arbórea superior | Verde oscuro | Fedora hundido | Manos en bolsillos |
 | Lola Persimmon | Oval compacta, postura erguida | Naranja-marrón | Traje estructurado | Corona de caqui en pelo |
@@ -688,7 +688,7 @@ Para mantenerse dentro del presupuesto de draw calls (<100 por frame):
 
 - **Atlas A — Asistente**: Gajito (siempre presente junto al jugador)
 - **Atlas B — Sospechosos**: Moni + Gerry + Lola (raramente en frame simultáneo completo)
-- **Atlas C — Autoridad y Culpable**: Spud + Barry (interacciones clave de alta calidad)
+- **Atlas C — Autoridad y Culpable**: Papolicia + Barry (interacciones clave de alta calidad)
 - **Textura de manchas de Barry**: archivo separado por su naturaleza dinámica — no incluir en atlas general
 
 ---
@@ -976,7 +976,7 @@ La paleta de escenarios está diseñada para maximizar la legibilidad de cada pe
 | Moni Graná Fert | Granate `#8B2332` | Ámbar de mesa `#D4903A` (lámpara de mesa) | La lámpara hace rim light, no compite en matiz |
 | Gerry Broccolini | Verde brócoli `#4A7A2A` | Estanterías retroiluminadas ámbar | El ámbar crea rim light que separa su silueta verde del fondo oscuro |
 | Lola Persimmon | Naranja-marrón caqui `#C8703A` | Mesa centro-sur, luz de sala | Su tono cálido se separa de las sillas más frías |
-| Commissioner Spud | Marrón-tierra papa `#C8A050` | Tiles hexagonales `#1E1810` (suelo vestíbulo) | Contraste alto con el suelo oscuro |
+| Commissioner Papolicia | Marrón-tierra papa `#C8A050` | Tiles hexagonales `#1E1810` (suelo vestíbulo) | Contraste alto con el suelo oscuro |
 
 ---
 
@@ -998,7 +998,7 @@ En un juego noir, la iluminación no ilumina el espacio — **define qué existe
 **L2 — Candelabro asimétrico (Zona 1)**
 - Color: `#F5DFA0` (dorado pálido)
 - Temperatura: 2400K (muy cálido)
-- Comportamiento: Luz puntual principal del vestíbulo. Asimétrica — cuelga ligeramente desplazada del centro hacia el norte, creando un lado del vestíbulo más iluminado (el de Commissioner Spud) y uno más sombrío (el de los abrigos).
+- Comportamiento: Luz puntual principal del vestíbulo. Asimétrica — cuelga ligeramente desplazada del centro hacia el norte, creando un lado del vestíbulo más iluminado (el de Commissioner Papolicia) y uno más sombrío (el de los abrigos).
 - Intensidad: 1.2
 - Sombras: Sí, medium resolution. Las barras del candelabro crean patrón de sombra geométrica en el techo de lata prensada.
 - En Blender: Point Light con falloff cuadrático estándar. Agregar geometry del candelabro como emisor secundario (Emission 0.4) para que sea visible como fuente.
@@ -1098,7 +1098,7 @@ La barra de caoba ocupa 7m de la pared oeste. El panelado detrás de la barra ll
 
 El reservado de Barry (NW) es una alcoba recesada 0.6m en la pared noroeste. El papel tapiz geométrico `#2E4A1E` de esta alcoba es único en el club — verde cazador con patrón de rombos. Esta diferencia del entorno general es un marcador de estatus: los reservados tienen personalización que el espacio común no tiene.
 
-**Flujo visual desde el centro de la pista de baile:** Al girar 360°, el jugador ve en secuencia: escenario (luz más cálida y alta), pared este con mesas y Moni, pared sur con salida, barra oeste con Gerry, arco norte hacia vestíbulo con Spud. Todos los NPCs claves son visibles sin moverse. Este diseño es una regla de arte: **cada adición al salón debe respetar la línea de visión a los NPCs desde el centro de la pista.**
+**Flujo visual desde el centro de la pista de baile:** Al girar 360°, el jugador ve en secuencia: escenario (luz más cálida y alta), pared este con mesas y Moni, pared sur con salida, barra oeste con Gerry, arco norte hacia vestíbulo con Papolicia. Todos los NPCs claves son visibles sin moverse. Este diseño es una regla de arte: **cada adición al salón debe respetar la línea de visión a los NPCs desde el centro de la pista.**
 
 ---
 
@@ -1398,7 +1398,7 @@ Los subtítulos son el canal principal de comunicación NPC → jugador en PC. A
 | Personaje | Color de nombre | Hex |
 |-----------|---|---|
 | Gajito | Verde lima | `#8BC34A` |
-| Commissioner Spud | Marrón tierra | `#6B4423` |
+| Commissioner Papolicia | Marrón tierra | `#6B4423` |
 | Moni Graná Fert | Granate | `#8B2332` |
 | Gerry Broccolini | Verde oscuro | `#4A6B30` |
 | Lola Persimmon | Naranja-marrón | `#C4703A` |

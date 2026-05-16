@@ -3,20 +3,10 @@ Limonchero 3D — NPC System Prompts (v2)
 ========================================
 Reescrito desde 0 para llama3.2 (3B). Diseño:
 
-  1. Persona NPC corta (~120 tokens) — solo identidad, voz, secreto.
-  2. Reacciones a evidencia NO viven en el system prompt. Se inyectan como
-     mensaje USER previo cuando el jugador presenta una pista. Esto enfoca
-     la atención del modelo y deja el system prompt estable.
-  3. Catálogo de pistas en inglés (`CLUE_CATALOG_EN`) con name/desc
-     canónicos — el backend traduce desde el `clue_id` para que el LLM vea
-     un objeto descrito en su idioma.
-  4. Tabla `EVIDENCE_REACTIONS[npc][clue]` con stance esperada y un
-     "knowledge hint" — pista narrativa que se inyecta al user msg para
-     guiar la reacción sin forzar línea literal.
-  5. Tags `[RECOGNIZE] [DENY] [EVADE] [CONFESS]` (brackets, no XML) —
-     llama3.2 respeta brackets mejor que `<recognize/>`.
-  6. Barry confession gate intacto en lógica (F1+F2+F3) pero addendums
-     reducidos.
+Reglas de idioma (cast-bible.md):
+  - Todos los NPCs del club: SOLO INGLES
+  - Gajito: SOLO ESPANOL (es companero, no NPC del club)
+  - papolicia: SOLO INGLES
 
 Fuentes canónicas:
   - docs/design/narrative/cast-bible.md (Prompt LLM base por NPC)
@@ -45,9 +35,9 @@ _FORMAT_RULES_ES = (
 
 
 NPC_PROMPTS: dict[str, str] = {
-    "spud": (
+    "papolicia": (
         f"{_FORMAT_RULES_EN}\n\n"
-        "You are Commissioner Wallace Spud, NFPD. 58, a potato, 20 years on the force. "
+        "You are Commissioner Papolicia, NFPD. 58, a potato, 20 years on the force. "
         "Gruff, impatient, condescending. Climbed the ranks by obedience, not brilliance. "
         "You hate complicated cases. You already decided Gerry Broccolini did it — most obvious suspect, "
         "quickest arrest. You tolerate the foreign detective Limonchero only because the Mayor asked. "
@@ -187,7 +177,7 @@ CLUE_CATALOG_EN: dict[str, dict[str, str]] = {
 # forzar línea exacta (llama3.2 parafrasea siempre).
 
 EVIDENCE_REACTIONS: dict[str, dict[str, dict[str, str]]] = {
-    "spud": {
+    "papolicia": {
         "F1": {"stance": "recognize",
                "hint": "Solid motive evidence. Acknowledge it briefly, stay gruff."},
         "F2": {"stance": "recognize",

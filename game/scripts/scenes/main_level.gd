@@ -501,7 +501,7 @@ func _trim_history(history: Array) -> void:
 const RECOGNITION_TABLE := {
 	"moni": {"F3": "recognize_good", "F4": "self_confess_red"},
 	"lola": {"F5": "self_confess_red"},
-	"spud": {"F4": "dismiss_red", "F5": "dismiss_red"},
+	"papolicia": {"F4": "dismiss_red", "F5": "dismiss_red"},
 	"barry": {"F1": "recognize_good", "F2": "recognize_good", "F3": "recognize_good"},
 	"gerry": {},
 }

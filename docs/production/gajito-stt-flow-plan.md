@@ -161,7 +161,7 @@ moni:
   - id: ask_about_barry
     text: "Pregunta directo por Barry Peel."
     invalidates_when: ["asked_barry"]
-spud:
+papolicia:
   - id: ...
 gerry:
   - id: ...

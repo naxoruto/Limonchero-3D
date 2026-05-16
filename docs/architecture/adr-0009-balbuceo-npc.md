@@ -67,7 +67,7 @@ res://assets/audio/babble/
   gerry/
     babble_01.ogg
     babble_02.ogg
-  spud/
+  papolicia/
     babble_01.ogg
     babble_02.ogg
 ```

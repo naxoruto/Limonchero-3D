@@ -30,10 +30,10 @@ Dos tracks. Jazz noir instrumental. Sin letra.
   - Freesound.org — tags: `jazz noir instrumental loop`
 
 ### `assets/audio/music/intro_briefing.ogg`
-- **Uso:** Escena de apertura (Barry habla) + briefing de Spud
+- **Uso:** Escena de apertura (Barry habla) + briefing de Papolicia
 - **Estilo:** Mismo jazz pero con más tensión — cuerdas o piano staccato
 - **Duración:** 60-90 segundos (no necesita loop)
-- **Nivel:** -8 dB (más bajo que ambient — Spud debe sentirse sobre la música)
+- **Nivel:** -8 dB (más bajo que ambient — Papolicia debe sentirse sobre la música)
 
 ---
 
@@ -89,7 +89,7 @@ Cada clip: 1-3 segundos, loop mientras aparece texto del NPC. Estilo Animal Cros
 
 | NPC | Archivo | Personalidad | Técnica |
 |-----|---------|-------------|---------|
-| Commissioner Spud | `babble_spud.ogg` | Grave, seco, interrumpe | Voz masculina grabada / Freesound "deep male voice" → pitch -4 semitones → corte abrupto al final |
+| Commissioner Papolicia | `babble_papolicia.ogg` | Grave, seco, interrumpe | Voz masculina grabada / Freesound "deep male voice" → pitch -4 semitones → corte abrupto al final |
 | Moni Graná Fert | `babble_moni.ogg` | Suave, cadencioso, pausa larga | Voz femenina suave → reverb corto (0.3s) → pitch +2 → fade lento |
 | Gerry Broccolini | `babble_gerry.ogg` | Monosilábico, gruñido | Grunt masculino corto → bass boost +6dB → pitch -6 → clip muy corto (~0.8s) |
 | Dolores "Lola" Persimmon | `babble_lola.ogg` | Parlanchín, nervioso, rápido | Voz femenina → speed x1.3 → ligero pitch +1 → sin pausa entre loops |

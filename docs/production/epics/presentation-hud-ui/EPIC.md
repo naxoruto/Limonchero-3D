@@ -27,7 +27,7 @@ Tres capas de interfaz (GDD §8.2):
 | ADR-0017 | **HUD System** — Central autoload, SubtitlePanel (dual-channel typewriter), PTTIndicator (IDLE/RECORDING/PROCESSING), InteractionPrompt, GajitoPopup (layer 15), accesibilidad FOV/font | LOW |
 | ADR-0015 | **Inventory Module** — CanvasLayer grid 4×2, 8 slots, color-coded states (BUENA/MALA/SIN_REVISAR), Tab toggle | LOW |
 | ADR-0016 | **Gajito Module** — Popup CanvasLayer layer 15, bottom-left, auto-dismiss 5s, priority logic | LOW |
-| ADR-0014 | **NPC Dialogue** — Accusation tree UI con Spud, evidence checkboxes, suspect name | LOW |
+| ADR-0014 | **NPC Dialogue** — Accusation tree UI con Papolicia, evidence checkboxes, suspect name | LOW |
 | ADR-0013 | **Interaction System** — HUD prompt label, inspect overlay CanvasLayer, cursor handling | LOW |
 | ADR-0010 | **Diegetic Board** — SubViewport → ViewportTexture → Sprite3D para diálogo NPC en pared | LOW |
 | ADR-0008 | **Confession Gate** — Drive accusation UI outcomes (case_resolved / case_failed screens) | LOW |

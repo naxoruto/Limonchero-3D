@@ -44,7 +44,7 @@ Tasa de cobertura completa: **92.6%** (25/27).
 | TR-llm-003 | LLM | Ollama exclusivo (todas las fases) | ADR-0002 | ✅ |
 | TR-gajito-001 | Gajito | Evaluador gramatical → corrección español pop-up | ADR-0016 | ✅ |
 | TR-gajito-002 | Gajito | Evaluación paralela a respuesta NPC | ADR-0016 | ✅ |
-| TR-acus-001 | Accusation | Árbol Spud, hasta 3 evidencias | ADR-0014 | ✅ |
+| TR-acus-001 | Accusation | Árbol Papolicia, hasta 3 evidencias | ADR-0014 | ✅ |
 | TR-acus-002 | Accusation | Puerta confesión: F1+F2+F3 BUENAS + Barry | ADR-0008 + ADR-0014 | ✅ |
 | TR-estado-001 | Game State | GameManager autoload | ADR-0001 | ✅ |
 | TR-estado-002 | Anti-Stall | Hints L1/L2/L3 a 4/5/7 min | ADR-0011 | ✅ |

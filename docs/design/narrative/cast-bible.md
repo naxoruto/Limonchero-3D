@@ -181,7 +181,7 @@ If pressed about the financial records, you redirect calmly: "Everything is in o
 
 ## Autoridad
 
-### Commissioner Wallace Spud
+### Commissioner Wallace Papolicia
 **Fruta:** Papa (patata)
 **Edad:** 58 años
 **Idioma:** Solo inglés
@@ -191,9 +191,9 @@ Veinte años en la fuerza. Ascendió por obediencia, no por brillantez. Detesta 
 
 **Función narrativa — dos capas:**
 
-1. **Tutor (inicio del juego, una sola vez):** Recibe al jugador en la puerta del club. Le hace un resumen seco del caso, le entrega la **primera evidencia** (el *Informe Preliminar del NFPD* — evidencia escrita que describe la escena: puerta cerrada desde dentro, ventana lateral abierta, hora aproximada, lista de los cuatro sospechosos presentes) y le indica cómo marcarla en la libreta VR como "útil" o "descartable". Gajito completa la explicación de la mecánica al oído del jugador en español. Terminada la entrega, Spud se aparta y deja al detective trabajar.
+1. **Tutor (inicio del juego, una sola vez):** Recibe al jugador en la puerta del club. Le hace un resumen seco del caso, le entrega la **primera evidencia** (el *Informe Preliminar del NFPD* — evidencia escrita que describe la escena: puerta cerrada desde dentro, ventana lateral abierta, hora aproximada, lista de los cuatro sospechosos presentes) y le indica cómo marcarla en la libreta VR como "útil" o "descartable". Gajito completa la explicación de la mecánica al oído del jugador en español. Terminada la entrega, Papolicia se aparta y deja al detective trabajar.
 
-2. **Presión del reloj (resto del juego):** Cada vez que el jugador vuelve a hablar con él, recuerda que tiene hasta la medianoche para presentar un acusado antes de que Spud cierre el caso por su cuenta. Si el jugador acusa a alguien incorrecto, Spud acepta feliz — y el caso termina mal.
+2. **Presión del reloj (resto del juego):** Cada vez que el jugador vuelve a hablar con él, recuerda que tiene hasta la medianoche para presentar un acusado antes de que Papolicia cierre el caso por su cuenta. Si el jugador acusa a alguien incorrecto, Papolicia acepta feliz — y el caso termina mal.
 
 **Frase característica:**
 *"Son, I don't care where you're from or how many cases you've cracked south of the border. In my city, we close cases before sunrise."*
@@ -203,7 +203,7 @@ Veinte años en la fuerza. Ascendió por obediencia, no por brillantez. Detesta 
 
 **Prompt LLM base:**
 ```
-You are Commissioner Spud. You speak ONLY IN ENGLISH. You are impatient and condescending.
+You are Commissioner Papolicia. You speak ONLY IN ENGLISH. You are impatient and condescending.
 You think Gerry did it. You want a quick arrest. You tolerate Limonchero only because
 the Mayor asked you to. If presented with a suspect and evidence, you accept without much scrutiny.
 If presented with no suspect by midnight, you arrest Gerry yourself.
@@ -242,18 +242,18 @@ El jugador debe clasificar cada evidencia como **útil (buena)** o **descartable
 
 | # | Evidencia | De quién | Cómo se obtiene | Status | Implica a |
 |---|---|---|---|---|---|
-| T1 | *Informe Preliminar del NFPD* — puerta cerrada desde dentro, ventana lateral abierta, 4 sospechosos en el edificio | Commissioner Spud (tutorial) | Entregado automáticamente al inicio | ✅ **Buena** (contextual — descarta intrusión externa) | Restringe el círculo a los 4 NPCs del club |
+| T1 | *Informe Preliminar del NFPD* — puerta cerrada desde dentro, ventana lateral abierta, 4 sospechosos en el edificio | Commissioner Papolicia (tutorial) | Entregado automáticamente al inicio | ✅ **Buena** (contextual — descarta intrusión externa) | Restringe el círculo a los 4 NPCs del club |
 | T2 | Testimonio: "traje amarillo" subiendo las escaleras ~22:00 | Moni Graná Fert | Preguntar por movimientos cerca del piso superior | ✅ **Buena** | Barry (único NPC con traje amarillo) |
 | T3 | Admisión reticente: "Maybe" — alguien pudo entrar por la puerta trasera mientras Gerry estaba ausente | Gerry Broccolini | Preguntarle directamente por la puerta trasera, sin presionar el motivo de su ausencia | ✅ **Buena** | Barry (tuvo oportunidad de acceso externo) |
 | T4 | Testimonio: "abrigo oscuro" saliendo de la cocina | Moni Graná Fert | Preguntar por movimientos sospechosos en general | ❌ **Mala** (red herring) | Apunta falsamente a Gerry/Lola |
-| T5 | Rumor reiterado por Spud: Gerry "trabajó para gente peor" en el pasado | Commissioner Spud (si se vuelve a hablar con él) | Preguntarle por sus sospechas | ❌ **Mala** (sesgo de autoridad) | Gerry (Spud quiere cerrar el caso rápido) |
+| T5 | Rumor reiterado por Papolicia: Gerry "trabajó para gente peor" en el pasado | Commissioner Papolicia (si se vuelve a hablar con él) | Preguntarle por sus sospechas | ❌ **Mala** (sesgo de autoridad) | Gerry (Papolicia quiere cerrar el caso rápido) |
 
 ### Reglas de resolución
 
 - **Acusación correcta (Barry)** exige tener F1 + F2 + F3 marcadas como "buenas".
 - T1 habilita el juego (sin ella no arranca la investigación).
 - T2 + T3 son refuerzos testimoniales — útiles pero no suficientes solas.
-- F4, F5, T4, T5 pueden ser marcadas como "buenas" por error; esto no bloquea, pero si el jugador presenta una acusación basada en evidencias malas, Spud acepta y el caso termina mal.
+- F4, F5, T4, T5 pueden ser marcadas como "buenas" por error; esto no bloquea, pero si el jugador presenta una acusación basada en evidencias malas, Papolicia acepta y el caso termina mal.
 
 ---
 
@@ -262,5 +262,5 @@ El jugador debe clasificar cada evidencia como **útil (buena)** o **descartable
 - Todos los NPCs hablan **solo en inglés** durante el juego
 - Limonchero y Gajito se comunican **solo en español**
 - Barry nunca confiesa sin las tres pruebas simultáneas: acuerdo del fideicomiso + llave maestra + encendedor de oro (identificado por Moni)
-- El jugador puede fallar acusando al sospechoso equivocado — Spud lo acepta y el caso cierra mal
+- El jugador puede fallar acusando al sospechoso equivocado — Papolicia lo acepta y el caso cierra mal
 - Gajito puede ser ignorado — el jugador puede avanzar sin consultarlo

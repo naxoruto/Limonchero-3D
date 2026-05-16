@@ -54,7 +54,7 @@ full body front and side view, character turnaround sheet
 
 ---
 
-### Commissioner Wallace Spud
+### Commissioner Wallace Papolicia
 *Autoridad. Papa/patata. Impaciente y condescendiente.*
 
 ```

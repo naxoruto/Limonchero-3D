@@ -46,7 +46,7 @@ Extraído de GDD v0.3 + CLAUDE.md | **27 requisitos**
 | TR-llm-003 | Cliente LLM | Ollama + llama3.2 para todas las fases (ADR-0002 — Ollama exclusivo) | Fundación |
 | TR-gajito-001 | Gajito | Evaluador gramatical: texto jugador → LLM → corrección español en pop-up | Característica/IA |
 | TR-gajito-002 | Gajito | Evaluación en paralelo a la respuesta del NPC | Característica |
-| TR-acus-001 | Acusación | Árbol de diálogo con Comisario Spud, hasta 3 pruebas | Característica |
+| TR-acus-001 | Acusación | Árbol de diálogo con Comisario Papolicia, hasta 3 pruebas | Característica |
 | TR-acus-002 | Acusación | Puerta de confesión: F1+F2+F3 BUENAS simultáneas + Barry nombrado | Característica |
 | TR-estado-001 | Estado de Juego | GameManager autoload: estado de pistas, progreso, flags | Fundación |
 | TR-estado-002 | Estado de Juego | Anti-estancamiento L1/L2/L3: pistas a los 4/5/7 min sin evidencia nueva | Característica |
@@ -136,7 +136,7 @@ Extraído de GDD v0.3 + CLAUDE.md | **27 requisitos**
 | **Evidencias/Inventario** | 8 slots, tipos, estados | `get_inventory()`, `has_clue()`, señal `inventory_changed` | GameManager | `Resource` / Dictionary |
 | **Diálogo NPC** | Historial de conversación por NPC | señal `npc_response_ready(npc_id, text)`, señal `babble_trigger(npc_id)` | Cliente LLM, GameManager, Voz/PTT | `Node`, `Timer` |
 | **Asistente Gajito** | Evaluación gramatical | señal `correction_ready(text)` | Cliente LLM | `Node` |
-| **Acusación/Final** | Árbol de diálogo Spud, lógica de acusación | señal `case_resolved(correct: bool)` | GameManager | `Node` |
+| **Acusación/Final** | Árbol de diálogo Papolicia, lógica de acusación | señal `case_resolved(correct: bool)` | GameManager | `Node` |
 | **Anti-Estancamiento** | Temporizadores L1(4min)/L2(5min)/L3(7min) | señal `hint_trigger(level: int)` | GameManager (señal `clue_added` → reinicio) | `Timer` |
 | **Nivel de Inglés** | Nivel seleccionado por el jugador | — (almacenado en GameManager) | — | — |
 | **Tablón Diegético** | Representación 3D del inventario en la pared | — | Evidencias/Inventario | `Node3D`, `Sprite3D` / `SubViewport` |
@@ -263,7 +263,7 @@ NPC responde con línea clave
 ### Ruta de Acusación
 
 ```
-Jugador habla con Comisario Spud → Acusación/Final se activa
+Jugador habla con Comisario Papolicia → Acusación/Final se activa
   → Jugador selecciona evidencias + nombra sospechoso
   → Acusación: GameManager.is_confession_gate_open()
       Si F1+F2+F3 BUENAS + Barry nombrado → emite case_resolved(correct=true)
@@ -312,7 +312,7 @@ GameManager.export_session_json()
    d. Anti-Estancamiento inicia Temporizador L1 (4 min)
    e. HUD conecta señales de Diálogo NPC, Gajito, Voz/PTT
    f. GameManager.session_start_time = Time.get_unix_time_from_system()
-7. Comisario Spud dispara briefing tutorial automáticamente
+7. Comisario Papolicia dispara briefing tutorial automáticamente
 ```
 
 **Restricción crítica:** el backend FastAPI debe estar corriendo antes de que el jugador pueda iniciar. El juego lo verifica en el menú principal — no se asume disponible.
@@ -448,7 +448,7 @@ signal inventory_changed()
     "F5": {"state": "unchecked", "timestamp": 0.0}
   },
   "npcs_interrogated": {
-    "barry": 3, "moni": 2, "gerry": 1, "lola": 1, "spud": 1
+    "barry": 3, "moni": 2, "gerry": 1, "lola": 1, "papolicia": 1
   },
   "accusation_attempts": [
     {"suspect": "moni", "evidence": ["F3"], "correct": false, "timestamp": 601.2},

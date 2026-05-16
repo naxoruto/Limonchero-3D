@@ -154,7 +154,7 @@ Referencia: **L.A. Noire notebook** + **The Last of Us craft menu**
 Referencia: **Phoenix Wright: Ace Attorney** — Presentar evidencias
 - Checkboxes de evidencias seleccionables
 - Confirmación antes de presentar
-- Feedback inmediato del juez/Spud
+- Feedback inmediato del juez/Papolicia
 
 ---
 

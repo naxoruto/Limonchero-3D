@@ -89,7 +89,7 @@ Cada sesión:
 **Tareas:**
 - Abrigo #14: separado ~5cm del gancho anterior, etiqueta de latón `M06` visible
 - Cenicero de vidrio centrado sobre el mostrador (cubre el talón)
-- Candelabro asimétrico desplazado hacia el norte (lado Spud)
+- Candelabro asimétrico desplazado hacia el norte (lado Papolicia)
 **Verificación:** Screenshot cenital del mostrador — cenicero cubre el talón, abrigo #14 distinguible del resto por separación.  
 **Guardar:** `z1_props_v1.blend`
 

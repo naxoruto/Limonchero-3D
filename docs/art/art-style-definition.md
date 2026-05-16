@@ -47,7 +47,7 @@ Flat shading. Sin smooth shading. Cada cara del mesh debe verse intencionada.
 |-----------|-------|----------------|---------------|
 | Limonchero | Limón amarillo | Elipsoide alargado vertical | Fedora + gabardina obligatorios |
 | Gajito | Key lime | Esfera achatada, compacta | Más pequeño y bajo que Limonchero |
-| Commissioner Spud | Papa | Elipsoide irregular, base plana | Ancho, bajo, asimétrico — un hombro más alto |
+| Commissioner Papolicia | Papa | Elipsoide irregular, base plana | Ancho, bajo, asimétrico — un hombro más alto |
 | Barry Peel | Plátano | Arco cóncavo elongado | Traje impecable, sin arrugas, silueta contenida |
 | Moni Graná Fert | Granada | Esfera + corona geométrica angular | La corona identifica a Moni incluso en deuteranopia |
 | Gerry Broccolini | Brócoli | Triángulo invertido, cabeza ramificada | Ancho en hombros, cabeza que expande hacia arriba |
@@ -63,7 +63,7 @@ Flat shading. Sin smooth shading. Cada cara del mesh debe verse intencionada.
 |------|--------|
 | Personaje principal (Limonchero, Barry) | ~1200–1800 tris |
 | NPC secundario (Gerry, Lola) | ~800–1200 tris |
-| NPC minor (Gajito, Spud) | ~600–1000 tris |
+| NPC minor (Gajito, Papolicia) | ~600–1000 tris |
 | Prop interactuable (pista física) | ~200–400 tris |
 | Mobiliario (mesa, silla) | ~100–300 tris |
 | Crowd siluetas (fondo) | ~50–80 tris — `MultiMeshInstance3D` obligatorio |

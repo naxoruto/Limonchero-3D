@@ -38,7 +38,7 @@
 | TR-llm-003 | Foundation | LLM Client | Ollama exclusive | ADR-0002 | ✅ | Resolved — Ollama-only canonical |
 | TR-gajito-001 | Feature | Gajito | Grammar evaluator pop-up | ADR-0016 | ✅ | |
 | TR-gajito-002 | Feature | Gajito | Parallel evaluation | ADR-0016 | ✅ | |
-| TR-acus-001 | Feature | Accusation | Spud tree, 3 evidences | ADR-0014 | ✅ | |
+| TR-acus-001 | Feature | Accusation | Papolicia tree, 3 evidences | ADR-0014 | ✅ | |
 | TR-acus-002 | Feature | Accusation | Confession gate | ADR-0008, ADR-0014 | ✅ | |
 | TR-estado-001 | Foundation | Game State | GameManager autoload | ADR-0001 | ✅ | |
 | TR-estado-002 | Foundation | Game State | Anti-stall L1/L2/L3 timers | ADR-0011 | ✅ | New in v2 |

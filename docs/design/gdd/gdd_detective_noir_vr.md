@@ -55,7 +55,7 @@ Explorar escenario → Encontrar pistas → Interrogar sospechosos (voz) → For
 | Interrogatorio por voz | Hablar con NPCs usando micrófono (PTT); el NPC responde en **texto** vía LLM acompañado de balbuceo característico | 🔴 Alta |
 | Menú contextual en NPCs | Presionar X cerca de un NPC despliega: Interrogar / Examinar | 🔴 Alta |
 | Inventario de pistas | Sistema para revisar pistas físicas y testimonios recolectados (tecla Tab) | 🟡 Media |
-| Acusación final | Presentar hasta 3 pruebas a Commissioner Spud en árbol de diálogo y nombrar al culpable | 🔴 Alta |
+| Acusación final | Presentar hasta 3 pruebas a Commissioner Papolicia en árbol de diálogo y nombrar al culpable | 🔴 Alta |
 | Asistente de inglés | Gajito evalúa el inglés del jugador (STT) y corrige errores en español vía pop-up | 🟡 Media |
 
 ### 2.3. Controles PC
@@ -134,7 +134,7 @@ Ciudad ficticia estadounidense de estilo años 50 — noches lluviosas, jazz, ne
 
 ---
 
-#### NPC Autoridad: Commissioner Wallace Spud
+#### NPC Autoridad: Commissioner Wallace Papolicia
 | Campo | Valor |
 |-------|-------|
 | Fruta | Papa (patata) |
@@ -142,7 +142,7 @@ Ciudad ficticia estadounidense de estilo años 50 — noches lluviosas, jazz, ne
 | Personalidad | Impaciente, condescendiente. Ya tiene un sospechoso en mente (Gerry). Quiere cerrar el caso antes de medianoche. En el tutorial inicial es ligeramente más paciente — entrega el informe y se aparta. |
 | Idioma | Solo inglés |
 | Frase de tutorial | *"Detective. Crime scene's upstairs, door locked from inside, window cracked open. Here — preliminary report, everything we got. Four suspects, all still in the building. My money's on the bouncer, but that's your problem now. Midnight. Clock's ticking."* |
-| Prompt base LLM | `You are Commissioner Spud. You speak ONLY IN ENGLISH. You are impatient and condescending. You want a quick arrest. If presented with a suspect and evidence, you accept. If no suspect by midnight, you arrest Gerry yourself. In the opening tutorial scene only, you are slightly more patient — you hand over the preliminary report and walk away without coaching.` |
+| Prompt base LLM | `You are Commissioner Papolicia. You speak ONLY IN ENGLISH. You are impatient and condescending. You want a quick arrest. If presented with a suspect and evidence, you accept. If no suspect by midnight, you arrest Gerry yourself. In the opening tutorial scene only, you are slightly more patient — you hand over the preliminary report and walk away without coaching.` |
 
 ---
 
@@ -260,7 +260,7 @@ Ciudad ficticia estadounidense de estilo años 50 — noches lluviosas, jazz, ne
 #### Zona 1: Vestíbulo / Entrada
 - **Propósito:** Zona de entrada, presenta el ambiente del club y la noche de la gala.
 - **Elementos interactuables:** Guardarropa con lista de invitados (el nombre de Barry Peel marcado — llegó a las 9:15 PM). Espejo del guardarropa orienta al jugador hacia el salón.
-- **NPCs presentes:** **Commissioner Wallace Spud** (cerca de la entrada, da el briefing tutorial, entrega el Informe Preliminar del NFPD, y recibe la acusación final).
+- **NPCs presentes:** **Commissioner Wallace Papolicia** (cerca de la entrada, da el briefing tutorial, entrega el Informe Preliminar del NFPD, y recibe la acusación final).
 - **Ambiente:** Lluvia en los ventanales, música jazz desde el salón, neón verde aceituna filtrándose por la puerta.
 
 #### Zona 2: Salón Principal / Barra
@@ -422,7 +422,7 @@ Los NPCs no tienen voz sintetizada. Cada uno tiene un **clip de balbuceo corto**
 
 | NPC | Estilo de balbuceo | Tono | Velocidad |
 |-----|-------------------|------|-----------|
-| Commissioner Spud | Grave, seco, interrumpe frases | Bajo | Rápida, impaciente |
+| Commissioner Papolicia | Grave, seco, interrumpe frases | Bajo | Rápida, impaciente |
 | Moni Graná Fert | Suave, cadencioso, pausas largas | Medio-alto | Lenta, deliberada |
 | Gerald "Gerry" Broccolini | Monosilábico, gruñidos cortos | Muy bajo | Muy lenta |
 | Dolores "Lola" Persimmon | Parlanchín, tono de secretaria eficiente | Medio | Rápida, nerviosa |
@@ -485,7 +485,7 @@ Los NPCs no tienen voz sintetizada. Cada uno tiene un **clip de balbuceo corto**
 | **Menú de pausa** | ESC | Fondo del juego desaturado al 60% con desenfoque. Panel central de cuero oscuro `#1A1208` con opciones: Continuar, Revisar notas (abre notebook), Configuración, Salir al menú principal. Jazz al 15% volumen. |
 | **Configuración** | Desde pausa | Slider FOV (70–110°), tamaño fuente subtítulos (12–24pt), volumen master/voice/ambiente, sensibilidad mouse. Persiste vía ConfigFile. |
 | **Overlay de inspección** | E sobre pista en inventario | Objeto centrado en pantalla, fondo oscurecido. Nombre + descripción. Botones: "Añadir al inventario", "Cerrar" (ESC). Cursor liberado. |
-| **Árbol de acusación** | Diálogo con Spud | Al presentar caso: checkboxes para seleccionar hasta 3 evidencias, campo de texto para nombre del acusado. Botón "Acusar". |
+| **Árbol de acusación** | Diálogo con Papolicia | Al presentar caso: checkboxes para seleccionar hasta 3 evidencias, campo de texto para nombre del acusado. Botón "Acusar". |
 | **Pantalla de resolución** | Post-acusación | Caso resuelto (BUENA): sello verde, resumen del caso, session_id. Caso fallido: sello MALA, explicación. Botón "Volver al menú". |
 
 ### 8.4. Colores de Identidad por Personaje
@@ -493,7 +493,7 @@ Los NPCs no tienen voz sintetizada. Cada uno tiene un **clip de balbuceo corto**
 | Personaje | Color de nombre | Hex |
 |-----------|----------------|-----|
 | Gajito | Verde lima | `#8BC34A` |
-| Commissioner Spud | Marrón tierra | `#6B4423` |
+| Commissioner Papolicia | Marrón tierra | `#6B4423` |
 | Moni Graná Fert | Granate | `#8B2332` |
 | Gerry Broccolini | Verde oscuro | `#4A6B30` |
 | Lola Persimmon | Naranja-marrón | `#C4703A` |
@@ -542,7 +542,7 @@ Los NPCs no tienen voz sintetizada. Cada uno tiene un **clip de balbuceo corto**
 | RF-03 | El jugador puede hablar con NPCs usando su voz (micrófono PC, PTT con tecla V o LB) | 🔴 Alta |
 | RF-04 | Los NPCs responden en **inglés** con personalidad única vía LLM, mostrando el texto en subtítulos HUD | 🔴 Alta |
 | RF-05 | El asistente Gajito evalúa el inglés del jugador (STT) y corrige errores gramaticales en español vía pop-up | 🔴 Alta |
-| RF-06 | El jugador puede acusar a un sospechoso ante Commissioner Spud presentando hasta 3 pruebas en árbol de diálogo | 🔴 Alta |
+| RF-06 | El jugador puede acusar a un sospechoso ante Commissioner Papolicia presentando hasta 3 pruebas en árbol de diálogo | 🔴 Alta |
 | RF-07 | Existe un asistente LLM (Gajito) para ayuda con aprendizaje de inglés contextual | 🟡 Media |
 | RF-08 | El jugador posee un inventario de pistas accesible con Tab, que distingue pistas físicas de testimonios | 🟡 Media |
 | RF-09 | Se muestran subtítulos de la conversación en dos canales (NPC / jugador) | 🟡 Media |

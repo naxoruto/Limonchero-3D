@@ -86,7 +86,7 @@ Prompts base desde GDD §3.3 — copiar EXACTO:
 
 | NPC | System prompt |
 |-----|--------------|
-| Commissioner Spud | `You are Commissioner Spud. ONLY IN ENGLISH. Impatient and condescending. Want quick arrest. Accept evidence if correct suspect presented.` |
+| Commissioner Papolicia | `You are Commissioner Papolicia. ONLY IN ENGLISH. Impatient and condescending. Want quick arrest. Accept evidence if correct suspect presented.` |
 | Moni Graná Fert | `You are Moni Graná Fert. ONLY IN ENGLISH. Femme fatale — magnetic, deflects hard questions with flirtation. Deny conflict with Cornelius.` |
 | Gerry Broccolini | `You are Gerry Broccolini. ONLY IN ENGLISH. Answer in one or two words when possible. Claim you were in the bathroom. Never explain the 22 missing minutes.` |
 | Lola Persimmon | `You are Lola Persimmon. ONLY IN ENGLISH. Helpful and detailed. Precise about your evening except 9:47–10:12 PM. Never mention documents or lawsuit.` |
@@ -174,7 +174,7 @@ Prompts base desde GDD §3.3 — copiar EXACTO:
 - [ ] `assets/audio/music/ambient_jazz_loop.ogg` — jazz noir, 3-5 min, loop seamless
   - Fuente sugerida: Incompetech (Kevin MacLeod), YouTube Audio Library, Freesound.org
   - Tags búsqueda: "noir jazz instrumental", "1950s detective", "jazz piano saxophone"
-- [ ] `assets/audio/music/intro_briefing.ogg` — tono urgente/presión para escena con Spud
+- [ ] `assets/audio/music/intro_briefing.ogg` — tono urgente/presión para escena con Papolicia
 
 ### SFX (`assets/audio/sfx/`)
 - [ ] `footsteps_marble.ogg` — pasos en tiles del vestíbulo
@@ -195,7 +195,7 @@ Prompts base desde GDD §3.3 — copiar EXACTO:
 
 | NPC | Archivo | Descripción | Técnica |
 |-----|---------|-------------|---------|
-| Commissioner Spud | `babble_spud.ogg` | Grave, seco, interrumpe | Voz masculina grave + pitch -4 semitones |
+| Commissioner Papolicia | `babble_papolicia.ogg` | Grave, seco, interrumpe | Voz masculina grave + pitch -4 semitones |
 | Moni Graná Fert | `babble_moni.ogg` | Suave, cadencioso, pausa larga | Voz femenina + reverb corto + pitch +2 |
 | Gerry Broccolini | `babble_gerry.ogg` | Monosilábico, gruñido | Grunt masculino + bass boost + pitch -6 |
 | Lola Persimmon | `babble_lola.ogg` | Parlanchín, nervioso | Voz femenina rápida + speed x1.3 |
@@ -238,7 +238,7 @@ Prompts base desde GDD §3.3 — copiar EXACTO:
 ### Smoke Test (critical path)
 - [ ] Juego carga → menú principal visible
 - [ ] Cargar nivel → El Agave y La Luna renderiza ≥ 60 FPS
-- [ ] Spud da briefing al inicio
+- [ ] Papolicia da briefing al inicio
 - [ ] Jugador puede moverse WASD + mouse en todas las zonas
 - [ ] Press E en pista → pickup → aparece en inventario (Tab)
 - [ ] Press E en NPC → menú "Interrogar / Examinar"
