@@ -11,7 +11,7 @@ signal interaction_prompt_clicked()
 
 var _npc_colors := {
 	"gajito": Color("#8BC34A"),
-	"spud": Color("#6B4423"),
+	"papolicia": Color("#6B4423"),
 	"moni": Color("#8B2332"),
 	"gerry": Color("#4A6B30"),
 	"lola": Color("#C4703A"),

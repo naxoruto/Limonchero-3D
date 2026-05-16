@@ -1,8 +1,8 @@
-# UX Spec: Accusation Tree (Spud Dialogue)
+# UX Spec: Accusation Tree (Papolicia Dialogue)
 
 > **GDD:** §8.3.3 | **ADR:** ADR-0014 | **TR-ID:** TR-ui-005  
 > **Prioridad:** Sprint 4 | **Story:** presentation-hud-ui/108  
-> **Estado:** Sistema overlay (diálogo scripteado con Commissioner Spud)
+> **Estado:** Sistema overlay (diálogo scripteado con Commissioner Papolicia)
 
 ## Layout
 
@@ -11,7 +11,7 @@
 │                                              │
 │   ┌──────────────────────────────────────┐   │
 │   │                                        │
-│   │   Commissioner Spud                   │
+│   │   Commissioner Papolicia                   │
 │   │   ─────────────────────               │   │
 │   │                                        │   │
 │   │   "Alright detective. You've had      │   │
@@ -44,8 +44,8 @@
 
 ## Elementos
 
-### Diálogo de Spud
-- **NPC:** Commissioner Spud (marrón tierra `#6B4423`)
+### Diálogo de Papolicia
+- **NPC:** Commissioner Papolicia (marrón tierra `#6B4423`)
 - **Texto:** Diálogo scripteado (no LLM). Misma línea siempre.
 - **Formato:** Typewriter 0.03s/car, nombre en color identidad, texto blanco
 
@@ -73,18 +73,18 @@
 
 | Paso | Descripción | UI |
 |------|-------------|-----|
-| **1. Spud pregunta** | Línea de apertura | Diálogo de Spud + botón "Presentar caso" |
+| **1. Papolicia pregunta** | Línea de apertura | Diálogo de Papolicia + botón "Presentar caso" |
 | **2. Seleccionar evidencias** | Jugador elige hasta 3 | Checkboxes con pistas BUENA |
 | **3. Nombrar acusado** | Jugador escribe nombre | Campo de texto |
 | **4. Confirmar** | Revisar selección | Resumen + botones "Acusar" / "Cancelar" |
-| **5. Veredicto** | Spud evalúa | Transición a CaseResolution |
+| **5. Veredicto** | Papolicia evalúa | Transición a CaseResolution |
 
 ## Flujo
 
 ```
-Jugador habla con Spud (E) estando en Zona 1
+Jugador habla con Papolicia (E) estando en Zona 1
   → Diálogo scripteado inicia
-  → Spud: línea de apertura
+  → Papolicia: línea de apertura
 
 Jugador click "Presentar caso"
   → Mostrar checkboxes con evidencias BUENA
@@ -101,7 +101,7 @@ Jugador click "Sí, acusar"
       → TransitionScene.play() (fade out)
       → CaseResolution.show(resolved=true)
   → Si false:
-      → Spud: "That's not the right answer, detective. Try again."
+      → Papolicia: "That's not the right answer, detective. Try again."
       → Volver al paso 1 (sin penalización, intentos contados en telemetría)
 ```
 
@@ -118,10 +118,10 @@ Jugador click "Sí, acusar"
 
 ## Reglas de Visibilidad
 
-- Solo accesible en Zona 1 (Vestíbulo) hablando con Spud
+- Solo accesible en Zona 1 (Vestíbulo) hablando con Papolicia
 - No se puede abrir pausa durante la acusación (Art Bible §2.4)
 - No se puede abrir inventario durante la acusación
-- Si el jugador se aleja de Spud → diálogo se cancela, vuelve al paso 1
+- Si el jugador se aleja de Papolicia → diálogo se cancela, vuelve al paso 1
 - Intentos fallidos se cuentan en telemetría (`accusation_attempts` — ADR-0007)
 
 ## Cursor
@@ -137,7 +137,7 @@ Jugador click "Sí, acusar"
 - Evidencias tienen nombre + código (F1, F2...) para identificación no-cromática
 - Máximo 3 selecciones evita errores de juicio
 - Confirmación antes de acusar evita accidentes
-- Feedback de Spud en caso incorrecto (no solo pantalla de fallo)
+- Feedback de Papolicia en caso incorrecto (no solo pantalla de fallo)
 
 ## Assets Necesarios
 

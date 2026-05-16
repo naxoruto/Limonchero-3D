@@ -19,7 +19,7 @@ Summary: El creative-director confirmó que la fantasía del jugador ("proceso e
 
 **Resueltos en esta sesión (10 de 12 bloqueantes):**
 - Gate de acusación: ahora permite acusar en cualquier momento; acusar sin evidencia → final malo B1
-- Barry's opening line: bloqueado a "siempre antes de Spud"
+- Barry's opening line: bloqueado a "siempre antes de Papolicia"
 - T2 de Moni: ungated (funciona como lead, no como confirmación)
 - CP-03: corregido a "estado 1, hold 3s"
 - Softlock libreta: definida mecánica de descarte de slots

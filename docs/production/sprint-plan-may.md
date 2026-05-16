@@ -81,7 +81,7 @@ POST /npc/{npc_id}
 ```
 
 **Criterios de aceptación:**
-- [ ] Endpoint acepta los 6 NPC IDs: `spud`, `moni`, `gerry`, `lola`, `barry`, `gajito`
+- [ ] Endpoint acepta los 6 NPC IDs: `papolicia`, `moni`, `gerry`, `lola`, `barry`, `gajito`
 - [ ] Cada NPC usa su system prompt canónico (desde `art/npc-llm-prompts.md` o hardcoded en `backend/npc_prompts.py`)
 - [ ] Historial de conversación incluido en el contexto enviado a Ollama
 - [ ] Timeout de 8 segundos (retorna `{"error": "timeout"}` si supera)
@@ -94,7 +94,7 @@ POST /npc/{npc_id}
 
 | npc_id | Idioma respuesta | Condición especial |
 |--------|-----------------|-------------------|
-| `spud` | English only | Más paciente en escena tutorial inicial |
+| `papolicia` | English only | Más paciente en escena tutorial inicial |
 | `moni` | English only | Deflectar con coqueteo en preguntas difíciles |
 | `gerry` | English only | Respuestas de 1-2 palabras |
 | `lola` | English only | Nunca mencionar documentos ni demanda |

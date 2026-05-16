@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bt6kgqmty1em5"
-path="res://.godot/imported/Thoughtful Head Shake.fbx-297e7421f9428c3e9ec31e2f941e34e3.scn"
+uid="uid://bnckdyc4wqlnn"
+path="res://.godot/imported/Salute.fbx-0781b055f5630f430d9bcb8d4ee6cb05.scn"
 
 [deps]
 
-source_file="res://assets/characters/Spud/animation scene/Thoughtful Head Shake.fbx"
-dest_files=["res://.godot/imported/Thoughtful Head Shake.fbx-297e7421f9428c3e9ec31e2f941e34e3.scn"]
+source_file="res://assets/characters/Papolicia/animation idle/Salute.fbx"
+dest_files=["res://.godot/imported/Salute.fbx-0781b055f5630f430d9bcb8d4ee6cb05.scn"]
 
 [params]
 

@@ -29,7 +29,7 @@
 - [ ] `show_player_subtitle(text: String)` — muestra texto completo
 - [ ] `clear_subtitles()` — fade out 0.3s
 - [ ] Máx 2 líneas por canal, 50 caracteres por línea
-- [ ] Colores de NPC del Art Bible §7.3.2: Gajito `#8BC34A`, Spud `#6B4423`, Moni `#8B2332`, Gerry `#4A6B30`, Lola `#C4703A`, Barry `#D4C840`
+- [ ] Colores de NPC del Art Bible §7.3.2: Gajito `#8BC34A`, Papolicia `#6B4423`, Moni `#8B2332`, Gerry `#4A6B30`, Lola `#C4703A`, Barry `#D4C840`
 
 ## Implementation Notes
 
@@ -47,7 +47,7 @@ func show_player_subtitle(text: String) -> void:
 
 var _npc_colors = {
     "gajito": Color("#8BC34A"),
-    "spud": Color("#6B4423"),
+    "papolicia": Color("#6B4423"),
     "moni": Color("#8B2332"),
     "gerry": Color("#4A6B30"),
     "lola": Color("#C4703A"),

@@ -3,8 +3,8 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cu46rsjdi0wn0"
-path.s3tc="res://.godot/imported/Thoughtful Head Shake_0.png-95668efd4c4f456b618b77c5d6a772bd.s3tc.ctex"
-path.etc2="res://.godot/imported/Thoughtful Head Shake_0.png-95668efd4c4f456b618b77c5d6a772bd.etc2.ctex"
+path.s3tc="res://.godot/imported/Thoughtful Head Shake_0.png-f09711e4ca11d421320aecdec036d208.s3tc.ctex"
+path.etc2="res://.godot/imported/Thoughtful Head Shake_0.png-f09711e4ca11d421320aecdec036d208.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -15,8 +15,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://assets/characters/Spud/animation scene/Thoughtful Head Shake_0.png"
-dest_files=["res://.godot/imported/Thoughtful Head Shake_0.png-95668efd4c4f456b618b77c5d6a772bd.s3tc.ctex", "res://.godot/imported/Thoughtful Head Shake_0.png-95668efd4c4f456b618b77c5d6a772bd.etc2.ctex"]
+source_file="res://assets/characters/Papolicia/animation scene/Thoughtful Head Shake_0.png"
+dest_files=["res://.godot/imported/Thoughtful Head Shake_0.png-f09711e4ca11d421320aecdec036d208.s3tc.ctex", "res://.godot/imported/Thoughtful Head Shake_0.png-f09711e4ca11d421320aecdec036d208.etc2.ctex"]
 
 [params]
 

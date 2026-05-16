@@ -206,7 +206,7 @@ Defensa E3                                                                      
 │  │  / ENTRADA  │───►│  ESCENA DEL  │───►│  INTERROGATORIO    │  │
 │  │             │    │  CRIMEN      │    │                    │  │
 │  │[Commissioner│    │ [Pista 1-5+] │    │ ┌──┐┌──┐┌──┐┌──┐  │  │
-│  │   Spud]     │    │ [Gajito]  │    │ │S1││S2││S3││S4│  │  │
+│  │   Papolicia]     │    │ [Gajito]  │    │ │S1││S2││S3││S4│  │  │
 │  │             │    │ [Ambiente]   │    │ └──┘└──┘└──┘└──┘  │  │
 │  └─────────────┘    └──────────────┘    └────────────────────┘  │
 │         │                                         │              │
@@ -266,8 +266,8 @@ graph LR
 		UC2["Recoger pista"]
 		UC3["Revisar inventario de pistas"]
 		UC4["Interrogar sospechoso por voz"]
-		UC5["Acusar sospechoso ante Commissioner Spud"]
-		UC6["Recibir briefing del Commissioner Spud ⚑ precondición"]
+		UC5["Acusar sospechoso ante Commissioner Papolicia"]
+		UC6["Recibir briefing del Commissioner Papolicia ⚑ precondición"]
 		UC7["Gajito: evaluar inglés y apoyar investigación (automático)"]
 		UC8["Navegar entre escenarios"]
 	end
@@ -357,7 +357,7 @@ sequenceDiagram
 	participant B as Backend
 	participant L as LLM
 
-	J->>U: Se acerca al Commissioner Spud
+	J->>U: Se acerca al Commissioner Papolicia
 	U->>U: Activar modo acusación
 	J->>U: Habla: "Creo que el culpable es [Sospechoso X] porque..."
 	U->>B: POST /transcribe {audio}

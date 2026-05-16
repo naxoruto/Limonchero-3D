@@ -76,7 +76,7 @@ El proyecto es un trabajo académico que requiere análisis de uso durante las p
     "moni": 3,
     "lola": 2,
     "gerry": 1,
-    "spud": 1
+    "papolicia": 1
   },
   "grammar_errors_count": 4,
   "anti_stall_triggers": {

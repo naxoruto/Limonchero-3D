@@ -89,7 +89,7 @@ The optimal path (F1+F2+F3 GOOD → accuse Barry) skips all NPC interrogation, t
 F4/F5 status doesn't affect the good ending gate (level doc §5.1: `F1+F2+F3 GOOD se comprueba primero`). The "detective's discernment" skill is only tested on the three objectively-incriminating items.
 
 ⚠️ **The game is a procedural drama, not a mystery — undocumented expectation**
-Barry's opening line is a confession (cast-bible `Eco narrativo`), delivered before Spud's briefing (level doc Zona 2 `Frase de apertura`). Level doc §2: `Barry Peel es culpable desde el primer momento`. Players expecting a whodunit will feel misled. This structural choice isn't documented for users, testers, or marketing.
+Barry's opening line is a confession (cast-bible `Eco narrativo`), delivered before Papolicia's briefing (level doc Zona 2 `Frase de apertura`). Level doc §2: `Barry Peel es culpable desde el primer momento`. Players expecting a whodunit will feel misled. This structural choice isn't documented for users, testers, or marketing.
 
 ⚠️ **Language mechanic creates ludonarrative dissonance**
 The player mechanically speaks English to NPCs via STT. Limonchero's character fiction: `No habla ni una palabra de inglés` (cast-bible §Limonchero). Gajito is fictionally the translator, but technically the player bypasses him.
@@ -103,14 +103,14 @@ The Noir Atmosphere pillar has no governing art direction framework. Level doc c
 ⚠️ **Difficulty curve: F2 chain is the only cognitively demanding puzzle, and the anti-stall system auto-solves it at L3**
 `el_agave_y_la_luna.md` §5.5 L3: `"Revisa su abrigo. El guardarropa tiene un número."` — this directly solves the 5-step chain.
 
-⚠️ **Hardcoded gate produces outcomes the LLM-driven Spud is not prompted to express**
-Player accuses wrong suspect → gate evaluates → produces B2/B3/B4 → Spud's LLM prompt says "you accept without much scrutiny" → Spud says generic acceptance text. LLM response won't reflect the specific ending's narrative.
+⚠️ **Hardcoded gate produces outcomes the LLM-driven Papolicia is not prompted to express**
+Player accuses wrong suspect → gate evaluates → produces B2/B3/B4 → Papolicia's LLM prompt says "you accept without much scrutiny" → Papolicia says generic acceptance text. LLM response won't reflect the specific ending's narrative.
 
 ---
 
 ### Cross-System Scenario Issues
 
-**Scenarios walked:** 5 — (1) F3 acquisition → Moni identification, (2) F2 chain during anti-stall, (3) Barry confrontation, (4) Spud accusation, (5) Zone 6 early visit
+**Scenarios walked:** 5 — (1) F3 acquisition → Moni identification, (2) F2 chain during anti-stall, (3) Barry confrontation, (4) Papolicia accusation, (5) Zone 6 early visit
 
 #### Blockers
 
@@ -124,7 +124,7 @@ Level doc §5.4 says NPCs receive inventory state in system prompt. Moni's actua
 Level doc §6: `F1 and F4 are physical objects recoverable; F3 and F5 require re-scan` — but F3 was migrated from UV-scan to press-X in v1.1. Preceding sentence says `not re-acquirable if already picked up`. **Cannot determine if discarded F3 respawns or is permanently lost.**
 
 🔴 **S4: B1 ending is logically contradictory** — Narrative/Gate boundary
-Level doc §5.1: player names Barry with insufficient evidence → `Spud acepta → final malo B1 (Barry queda libre, caso cerrado)`. Spud accepts the accusation yet Barry goes free. No narrative framing explains this. **Reads as a bug, not an intended ending.**
+Level doc §5.1: player names Barry with insufficient evidence → `Papolicia acepta → final malo B1 (Barry queda libre, caso cerrado)`. Papolicia accepts the accusation yet Barry goes free. No narrative framing explains this. **Reads as a bug, not an intended ending.**
 
 🔴 **S4: GDD R6 vs level doc F5 — same evidence, opposite classification**
 GDD §3.4 lists burned documents as real clue (🟡 Media). Level doc §5.1 and cast-bible classify same evidence as red herring (Mala). **The game cannot ship with both classifications.**
@@ -146,8 +146,8 @@ Player actively reading NPC response gets timed as "stalled."
 ⚠️ **S3: Discarding GOOD-stamped F1 from inventory may be irreversible softlock**
 Level doc §6 says F1 is "recoverable if still in the world" — but standard pickup consumes the object. Ambiguous whether object persists in world after pickup.
 
-⚠️ **S4: LLM-driven Spud not informed of gate's specific ending**
-Spud always says some variant of acceptance regardless of which B-ending triggers. Player sees Spud accept, then receives ending card contradicting what he just said.
+⚠️ **S4: LLM-driven Papolicia not informed of gate's specific ending**
+Papolicia always says some variant of acceptance regardless of which B-ending triggers. Player sees Papolicia accept, then receives ending card contradicting what he just said.
 
 ⚠️ **S5: T1 (Informe Preliminar, delivered at start) may permanently prevent Zone 6 early-access gate**
 Gate checks `ninguna pista en la libreta` — T1 is always present. The intended distinction between "physical clue" and "testimonial evidence" for this check is undocumented.

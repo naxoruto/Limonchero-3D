@@ -94,7 +94,7 @@ entities:
       - design/gdd/gdd_detective_noir_vr.md
       - design/levels/el_agave_y_la_luna.md
 
-  - name: Commissioner Wallace Spud
+  - name: Commissioner Wallace Papolicia
     type: character
     source: design/narrative/cast-bible.md
     attributes:
@@ -195,7 +195,7 @@ items:
     type: evidence_testimony
     source: design/levels/el_agave_y_la_luna.md
     attributes:
-      de_quien: Commissioner Spud (tutorial)
+      de_quien: Commissioner Papolicia (tutorial)
       como_se_obtiene: entregado automáticamente al inicio
       status: BUENA (contextual)
       efecto: habilita la investigación; descarta intrusión externa

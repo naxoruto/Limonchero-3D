@@ -399,7 +399,7 @@ api_decisions:
     notes: >
       Script: res://scripts/feature/npc_dialogue_manager.gd.
       Historial: {npc_id: Array[{role, content}]} truncado a 10 turnos.
-      Árbol de acusación (Spud): scripted, no LLM. Valida via GameManager.is_confession_gate_open().
+      Árbol de acusación (Papolicia): scripted, no LLM. Valida via GameManager.is_confession_gate_open().
       Testimonio: flag backend testimony_clue_id (prioritario) o TESTIMONY_TRIGGERS keyword-match (fallback).
 
   - name: inventory_hud

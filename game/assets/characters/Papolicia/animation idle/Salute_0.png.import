@@ -3,8 +3,8 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://djc6ev7vqlff3"
-path.s3tc="res://.godot/imported/Salute_0.png-ebf50faf9b19d0b438150c856a2a505b.s3tc.ctex"
-path.etc2="res://.godot/imported/Salute_0.png-ebf50faf9b19d0b438150c856a2a505b.etc2.ctex"
+path.s3tc="res://.godot/imported/Salute_0.png-b1718dd6b2ad7d3197b7d75999288e55.s3tc.ctex"
+path.etc2="res://.godot/imported/Salute_0.png-b1718dd6b2ad7d3197b7d75999288e55.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -15,8 +15,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://assets/characters/Spud/animation idle/Salute_0.png"
-dest_files=["res://.godot/imported/Salute_0.png-ebf50faf9b19d0b438150c856a2a505b.s3tc.ctex", "res://.godot/imported/Salute_0.png-ebf50faf9b19d0b438150c856a2a505b.etc2.ctex"]
+source_file="res://assets/characters/Papolicia/animation idle/Salute_0.png"
+dest_files=["res://.godot/imported/Salute_0.png-b1718dd6b2ad7d3197b7d75999288e55.s3tc.ctex", "res://.godot/imported/Salute_0.png-b1718dd6b2ad7d3197b7d75999288e55.etc2.ctex"]
 
 [params]
 

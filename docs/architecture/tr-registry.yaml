@@ -174,7 +174,7 @@ requirements:
   - id: TR-acus-001
     system: Accusation
     requirement: >
-      Dialogue tree with Commissioner Spud, up to 3 evidence items presented.
+      Dialogue tree with Commissioner Papolicia, up to 3 evidence items presented.
     gdd: gdd/gdd_detective_noir_vr.md
     domain: Feature
     layer: Feature

@@ -31,14 +31,14 @@ Propuesto
 ## Contexto
 
 ### Problema
-No existe un ADR que documente dónde vive el historial de conversación por NPC, cómo se ensambla el prompt que recibe el backend, cómo se gestiona el timeout de 8 s, ni cómo funciona el árbol de acusación con Commissioner Spud. Sin esta decisión, la integración LLM y el flujo crítico de acusación no tienen contrato implementable.
+No existe un ADR que documente dónde vive el historial de conversación por NPC, cómo se ensambla el prompt que recibe el backend, cómo se gestiona el timeout de 8 s, ni cómo funciona el árbol de acusación con Commissioner Papolicia. Sin esta decisión, la integración LLM y el flujo crítico de acusación no tienen contrato implementable.
 
 ### Restricciones
 - 5 NPCs con system prompts únicos (definidos en cast-bible.md); el historial por NPC debe persistir durante toda la sesión.
 - Timeout LLM: 8 segundos (CLAUDE.md). Pasado ese tiempo → respuesta de fallback.
 - `english_level` del jugador condiciona el system prompt vía sufijo en backend (ADR-0006) — no se modifica aquí, se envía como campo en el JSON del request.
 - Toda telemetría de interrogatorio/acusación va a GameManager (ADR-0001) — no a NPCDialogueManager.
-- El árbol de acusación con Spud es **lógica scripted**, no LLM — el caso ya tiene culpable hardcodeado (ADR-0008).
+- El árbol de acusación con Papolicia es **lógica scripted**, no LLM — el caso ya tiene culpable hardcodeado (ADR-0008).
 - La confesión solo se desbloquea cuando `GameManager.is_confession_gate_open()` retorna true.
 - Max historial: 10 turnos por NPC (20 mensajes = 10 user + 10 assistant) para no exceder el contexto de Ollama.
 
@@ -49,7 +49,7 @@ No existe un ADR que documente dónde vive el historial de conversación por NPC
 - Timeout 8 s → emitir `npc_response_ready(npc_id, fallback_text)` con texto predefinido
 - Al recibir respuesta → emitir `npc_response_ready(npc_id, response_text)`
 - Detectar claves de testimonio en el texto NPC → emitir `testimony_available(clue_id)` para prompt "¿Agregar como evidencia?"
-- Árbol de acusación (solo Spud): selección de hasta 3 pistas + nombre del sospechoso → validar puerta → case_resolved o case_failed
+- Árbol de acusación (solo Papolicia): selección de hasta 3 pistas + nombre del sospechoso → validar puerta → case_resolved o case_failed
 - Registrar cada interrogatorio en `GameManager.register_interrogation(npc_id)`
 - Registrar cada intento de acusación en `GameManager.register_accusation(suspect, evidence, correct)`
 
@@ -57,7 +57,7 @@ No existe un ADR que documente dónde vive el historial de conversación por NPC
 
 ## Decisión
 
-`NPCDialogueManager` es un autoload en Foundation layer. Gestiona el historial de conversación de los 5 NPCs y enruta peticiones al backend vía `LLMClient` (autoload de ADR-0003). Para Commissioner Spud, detecta cuándo el jugador activa la acusación y abre un árbol de diálogo scripted en lugar de llamar al LLM.
+`NPCDialogueManager` es un autoload en Foundation layer. Gestiona el historial de conversación de los 5 NPCs y enruta peticiones al backend vía `LLMClient` (autoload de ADR-0003). Para Commissioner Papolicia, detecta cuándo el jugador activa la acusación y abre un árbol de diálogo scripted en lugar de llamar al LLM.
 
 El flujo de testimonio ("¿Agregar como evidencia?") se activa cuando el backend retorna un flag `testimony_clue_id` en la respuesta JSON — el backend detecta palabras clave en su propia respuesta y lo inyecta. Si no hay flag, `NPCDialogueManager` también mantiene un diccionario local de `TESTIMONY_TRIGGERS` por npc_id que hace matching simple sobre el texto de respuesta como fallback.
 
@@ -69,7 +69,7 @@ ADR-0013 InteractionSystem
         │
         ▼
 NPCDialogueManager (autoload)
-  ├── Si npc_id == "spud" y jugador elige "Acusar" → AccusationTree
+  ├── Si npc_id == "papolicia" y jugador elige "Acusar" → AccusationTree
   │     ├── Mostrar UI selección de pistas (hasta 3)
   │     ├── Mostrar campo nombre sospechoso
   │     ├── GameManager.is_confession_gate_open() ?
@@ -107,7 +107,7 @@ const LLM_TIMEOUT_SEC: float = 8.0
 
 # Textos de fallback si LLM no responde (uno por NPC)
 const FALLBACK_TEXTS: Dictionary = {
-    "spud":  "...",                                        # Spud espera
+    "papolicia":  "...",                                        # Papolicia espera
     "lola":  "I need a moment, detective.",
     "moni":  "Ask me later, darling.",
     "gerry": "Give me a second.",
@@ -139,7 +139,7 @@ func start_interrogation(npc_id: String, player_message: String) -> void
     # Registra turno, arma request, llama LLMClient, inicia timer timeout
 
 func open_accusation_tree() -> void
-    # Solo válido si npc_id == "spud"; ignorado si _accusation_open == true
+    # Solo válido si npc_id == "papolicia"; ignorado si _accusation_open == true
 
 func submit_accusation(suspect: String, evidence: Array) -> void
     # Evalúa puerta, emite accusation_result, llama GameManager.register_accusation()
@@ -151,7 +151,7 @@ func clear_history(npc_id: String) -> void
     # No llamar en sesión normal — solo para tests
 ```
 
-### Árbol de Acusación (Commissioner Spud — scripted)
+### Árbol de Acusación (Commissioner Papolicia — scripted)
 
 ```
 AccusationTree (escena CanvasLayer)
@@ -202,7 +202,7 @@ AccusationTree (escena CanvasLayer)
 
 ### Riesgos
 - **Riesgo**: `_pending_npc_id` no se limpia si el HTTPRequest falla sin timeout. **Mitigación**: `LLMClient` siempre emite señal (response o timeout) — nunca silencia errores. Conectar también a `request_failed` de HTTPRequest.
-- **Riesgo**: Jugador abre acusación con Spud antes de tener F1+F2+F3. `case_failed` es irreversible. **Mitigación**: Esto es por diseño del GDD. AccusationTree puede mostrar un aviso visual "Evidencia incompleta" antes de confirmar, sin bloquear la acción — el jugador elige.
+- **Riesgo**: Jugador abre acusación con Papolicia antes de tener F1+F2+F3. `case_failed` es irreversible. **Mitigación**: Esto es por diseño del GDD. AccusationTree puede mostrar un aviso visual "Evidencia incompleta" antes de confirmar, sin bloquear la acción — el jugador elige.
 - **Riesgo**: Historial crece más de MAX_HISTORY_TURNS si el jugador interroga extensamente. **Mitigación**: `start_interrogation()` trunca `_histories[npc_id]` al insertar si `len > MAX_HISTORY_TURNS * 2` — elimina los dos mensajes más antiguos (mantiene system context implícito en el backend).
 - **Riesgo**: `TESTIMONY_TRIGGERS` matching produce falsos positivos en respuestas LLM creativas. **Mitigación**: Priorizar el flag `testimony_clue_id` del backend; el matching local es solo fallback. Ajustar keywords en playtest.
 
@@ -213,7 +213,7 @@ AccusationTree (escena CanvasLayer)
 | Sistema GDD | Requisito | Cómo lo aborda este ADR |
 |-------------|-----------|------------------------|
 | gdd_detective_noir_vr.md / TR-npc-001 | 5 NPCs con system prompts únicos e historial de conversación por sesión | `_histories[npc_id]` en NPCDialogueManager; system prompts definidos en backend (no en Godot) |
-| gdd_detective_noir_vr.md / TR-acus-001 | Árbol de diálogo con Commissioner Spud, hasta 3 pistas presentadas | `AccusationTree` scripted — `submit_accusation(suspect, evidence[0..3])` |
+| gdd_detective_noir_vr.md / TR-acus-001 | Árbol de diálogo con Commissioner Papolicia, hasta 3 pistas presentadas | `AccusationTree` scripted — `submit_accusation(suspect, evidence[0..3])` |
 | gdd_detective_noir_vr.md / TR-acus-002 | Puerta de confesión: F1+F2+F3 GOOD + Barry Peel nombrado | `GameManager.is_confession_gate_open()` llamado en `submit_accusation()` (ADR-0008) |
 | gdd_detective_noir_vr.md / TR-interact-003 | Prompt "¿Agregar como evidencia?" durante diálogo NPC | Señal `testimony_available(clue_id)` → UI overlay → `GameManager.add_clue(clue_id)` |
 | CLAUDE.md / llm_timeout | 8 segundos por respuesta NPC | `LLM_TIMEOUT_SEC = 8.0`; timer en `start_interrogation()` emite fallback si se agota |

@@ -41,7 +41,7 @@
 | TR-llm-003 | LLM | Dev = Ollama, Demo = GPT-4o-mini / Gemini Flash | ADR-0002 (rejects demo path — conflict) | ⚠️ Conflict — GDD revision flag |
 | TR-gajito-001 | Gajito | Grammar evaluator → Spanish correction pop-up | ADR-0003 (/grammar endpoint only) | ⚠️ Partial (no Gajito module ADR) |
 | TR-gajito-002 | Gajito | Evaluation in parallel to NPC response | — | ❌ GAP |
-| TR-acus-001 | Accusation | Spud dialogue tree, up to 3 evidences | ADR-0008 (logic only; UI tree absent) | ⚠️ Partial |
+| TR-acus-001 | Accusation | Papolicia dialogue tree, up to 3 evidences | ADR-0008 (logic only; UI tree absent) | ⚠️ Partial |
 | TR-acus-002 | Accusation | Confession gate: F1+F2+F3 GOOD + Barry named | ADR-0008 | ✅ (state-value conflict) |
 | TR-estado-001 | Game State | GameManager autoload: clues, progress, flags | ADR-0001 | ✅ |
 | TR-estado-002 | Game State | Anti-stall L1/L2/L3 at 4/5/7 min without new evidence | — | ❌ GAP |
@@ -186,19 +186,19 @@ Also test `OS.kill()` on Linux (should work cross-platform in Godot 4.6).
 
 | Source | IDs used |
 |--------|---------|
-| CLAUDE.md / architecture.md | `barry, moni, gerry, lola, spud` |
+| CLAUDE.md / architecture.md | `barry, moni, gerry, lola, papolicia` |
 | ADR-0007 npc_interrogation_counts | `barry_peel, moni_salazar, lola_vidal, barman, portero` |
 | ADR-0009 audio paths | `barry_peel/, moni_salazar/, lola_vidal/, barman/, portero/` |
-| entities.yaml | Moni **Graná Fert** (not Salazar), Dolores **Persimmon** (not Vidal), Gerald Broccolini = Gerry, Wallace Spud |
+| entities.yaml | Moni **Graná Fert** (not Salazar), Dolores **Persimmon** (not Vidal), Gerald Broccolini = Gerry, Wallace Papolicia |
 
 **Problems:**
 1. `moni_salazar` and `lola_vidal` are **wrong surnames** — Moni's last name is Graná Fert, Lola's is Persimmon.
 2. `barman` / `portero` are roles, not NPC IDs. The barman NPC does not appear in the cast bible as an interrogable character; Gerry (Broccolini) is Security, not portero.
-3. Canonical IDs in CLAUDE.md (`barry, moni, gerry, lola, spud`) are the project standard.
+3. Canonical IDs in CLAUDE.md (`barry, moni, gerry, lola, papolicia`) are the project standard.
 
 **Impact:** ADR-0009 audio asset paths will point to wrong directories. ADR-0007 telemetry cannot be cross-referenced with cast bible.
 
-**Resolution:** Adopt `barry, moni, gerry, lola, spud` as canonical NPC IDs project-wide. Update ADR-0007 + ADR-0009 examples. Confirm cast: is there a 5th interrogable NPC beyond barry/moni/gerry/lola/spud? (Cast bible has Cornelius Maize as victim, not interrogable.)
+**Resolution:** Adopt `barry, moni, gerry, lola, papolicia` as canonical NPC IDs project-wide. Update ADR-0007 + ADR-0009 examples. Confirm cast: is there a 5th interrogable NPC beyond barry/moni/gerry/lola/papolicia? (Cast bible has Cornelius Maize as victim, not interrogable.)
 
 ---
 
@@ -306,7 +306,7 @@ Presentation layer:
 | P1 | ADR-0011 Anti-Stall System | Timer L1/L2/L3, hint payload, reset on clue_added | TR-estado-002 |
 | P1 | ADR-0012 Player Controller | CharacterBody3D, WASD/mouse, sprint, gamepad binding | TR-jugador-001/002 |
 | P1 | ADR-0013 Interaction System | RayCast3D, contextual menu, pickup, inspection overlay | TR-interact-001/002/003 |
-| P2 | ADR-0014 NPC Dialogue Module | History mgmt, prompt assembly, Spud accusation tree | TR-npc-001, TR-acus-001 |
+| P2 | ADR-0014 NPC Dialogue Module | History mgmt, prompt assembly, Papolicia accusation tree | TR-npc-001, TR-acus-001 |
 | P2 | ADR-0015 Inventory Module | 8 slots, types, Tab HUD view, state display | TR-pista-001/002 |
 | P2 | ADR-0016 Gajito Module | Parallel request, pop-up timing, error accumulation | TR-gajito-001/002 |
 | P3 | ADR-0017 HUD System | 2-channel subtitles, PTT indicator, FOV slider, sub-size | TR-ui-001/002 |

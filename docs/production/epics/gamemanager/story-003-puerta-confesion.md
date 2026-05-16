@@ -59,7 +59,7 @@ El módulo Acusación/Final llama `is_confession_gate_open(suspect)` para resolv
 
 - Story 002: `set_clue_state()` que pone F1/F2/F3 en `"good"` (prerequisito)
 - Story 004: `register_accusation()` — registra el intento independientemente del resultado de la puerta
-- El árbol de diálogo de acusación con Commissioner Spud — pertenece a la épica Feature: Acusación/Final
+- El árbol de diálogo de acusación con Commissioner Papolicia — pertenece a la épica Feature: Acusación/Final
 
 ---
 
