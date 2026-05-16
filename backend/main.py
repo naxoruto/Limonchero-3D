@@ -21,6 +21,7 @@ import logging
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 
 import ollama
 import uvicorn
@@ -29,12 +30,38 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 import config
+import re
 from npc_prompts import (
     NPC_PROMPTS,
+    EVIDENCE_REACTIONS,
     check_barry_confession_gate,
+    build_evidence_user_message,
     BARRY_LOCKED_ADDENDUM,
     BARRY_UNLOCKED_ADDENDUM,
 )
+
+_TAG_RE = re.compile(r"\[(RECOGNIZE|DENY|EVADE|CONFESS)\]", re.IGNORECASE)
+
+_STANCE_FALLBACK = {
+    "recognize": "I know this. Worth a closer look.",
+    "deny":      "Means nothing to me, detective.",
+    "evade":     "Hard to say. Could be anything.",
+    "confess":   "Alright. You got me.",
+}
+
+
+def _force_canonical_tag(text: str, stance: str) -> str:
+    """
+    Strip any reaction tag the LLM emitted and append the canonical one.
+    Stance is the deterministic ground truth from EVIDENCE_REACTIONS.
+    If the LLM produced no prose (only the tag, or empty), fall back to a
+    short stance-appropriate line so the dialogue UI always has something
+    to show.
+    """
+    cleaned = _TAG_RE.sub("", text).strip()
+    if not cleaned:
+        cleaned = _STANCE_FALLBACK.get(stance.lower(), "...")
+    return f"{cleaned}\n[{stance.upper()}]"
 
 # ── Logging ─────────────────────────────────────────────
 logging.basicConfig(
@@ -198,6 +225,14 @@ async def health():
 #  STORY 003 — NPC Dialogue Proxy
 # ═══════════════════════════════════════════════════════
 
+class EvidenceContext(BaseModel):
+    """Context for evidence presented during dialogue."""
+    clue_id: str
+    clue_name: str
+    clue_type: str = "physical"
+    clue_description: str = ""
+
+
 class NPCRequest(BaseModel):
     """Request body for /npc/{npc_id}."""
     npc_id: str = Field(..., description="NPC identifier (e.g. 'barry', 'spud')")
@@ -206,6 +241,10 @@ class NPCRequest(BaseModel):
         description="Conversation history: list of {role, content} dicts.",
     )
     message: str = Field(..., description="Player's current message to the NPC.")
+    presented_evidence: Optional[EvidenceContext] = Field(
+        default=None,
+        description="Evidence the player is presenting to the NPC.",
+    )
 
 
 class NPCResponse(BaseModel):
@@ -222,6 +261,10 @@ async def npc_dialogue(npc_id: str, body: NPCRequest):
     CRITICAL (Barry confession gate):
       Barry only confesses if F1 + F2 + F3 evidence markers are present
       in the conversation history.
+
+    Evidence Interrogation (Story 202):
+      If presented_evidence is provided, inject evidence context into the
+      system prompt and instruct the NPC to end with a reaction tag.
     """
     npc_key = npc_id.lower().strip()
 
@@ -231,12 +274,35 @@ async def npc_dialogue(npc_id: str, body: NPCRequest):
             detail=f"NPC '{npc_id}' not found. Valid NPCs: {list(NPC_PROMPTS.keys())}",
         )
 
-    # Build system prompt
+    # Build system prompt (persona only — evidence instructions live in user msg)
     system_prompt = NPC_PROMPTS[npc_key]
 
-    # Barry confession gate — append lock/unlock addendum
+    # Determine the user message — evidence presentation rebuilds it entirely.
+    is_evidence = body.presented_evidence is not None
+    if is_evidence:
+        ev = body.presented_evidence
+        user_message = build_evidence_user_message(npc_key, ev.clue_id)
+        if user_message is None:
+            # Unknown clue_id — fall back to a minimal generic prompt.
+            logger.warning("Unknown clue_id '%s' for NPC '%s' — using generic prompt",
+                           ev.clue_id, npc_key)
+            user_message = (
+                f"The detective shows you an item: {ev.clue_name}. "
+                f"{ev.clue_description}\n\n"
+                "React in 1-2 sentences in your own voice. End with EXACTLY ONE tag on "
+                "its own line: [RECOGNIZE] [DENY] [EVADE] [CONFESS]."
+            )
+        # History stays as-is — but inject the evidence marker for Barry's gate.
+        history_with_marker = list(body.history) + [
+            {"role": "user", "content": f"[EVIDENCE_PRESENTED:{ev.clue_id}]"}
+        ]
+    else:
+        user_message = body.message
+        history_with_marker = list(body.history)
+
+    # Barry confession gate — append lock/unlock addendum based on history markers.
     if npc_key == "barry":
-        all_messages = body.history + [{"role": "user", "content": body.message}]
+        all_messages = history_with_marker + [{"role": "user", "content": user_message}]
         if check_barry_confession_gate(all_messages):
             system_prompt += BARRY_UNLOCKED_ADDENDUM
             logger.info("🔓 Barry confession gate UNLOCKED")
@@ -244,25 +310,49 @@ async def npc_dialogue(npc_id: str, body: NPCRequest):
             system_prompt += BARRY_LOCKED_ADDENDUM
             logger.info("🔒 Barry confession gate LOCKED")
 
-    # Build Ollama messages
+    # Build Ollama messages.
+    # Evidence path: skip free-form history to keep model focused on reaction.
     messages = [{"role": "system", "content": system_prompt}]
-    for msg in body.history:
-        messages.append({
-            "role": msg.get("role", "user"),
-            "content": msg.get("content", ""),
-        })
-    messages.append({"role": "user", "content": body.message})
+    if not is_evidence:
+        for msg in body.history:
+            messages.append({
+                "role": msg.get("role", "user"),
+                "content": msg.get("content", ""),
+            })
+    messages.append({"role": "user", "content": user_message})
 
-    # Call Ollama
+    # Call Ollama. Evidence: low temp, short reply (force tag). Chat: normal.
     try:
-        logger.info("💬 NPC '%s' — sending %d messages to Ollama", npc_key, len(messages))
+        logger.info("💬 NPC '%s' — sending %d messages to Ollama (evidence=%s)",
+                    npc_key, len(messages), is_evidence)
+        if is_evidence:
+            ollama_options = {"num_predict": 100, "temperature": 0.2}
+        else:
+            ollama_options = {"num_predict": 256, "temperature": 0.7}
         result = ollama.chat(
             model=config.OLLAMA_MODEL,
             messages=messages,
-            options={"num_predict": 256},  # keep responses concise for game flow
+            options=ollama_options,
         )
         response_text = result["message"]["content"]
         logger.info("💬 NPC '%s' responded (%d chars)", npc_key, len(response_text))
+
+        # Evidence path: override LLM tag with canonical stance for reliability.
+        # llama3.2 (3B) frequently picks the wrong tag; the (npc, clue) -> stance
+        # mapping is deterministic per design, so trust it.
+        if is_evidence:
+            stance = (
+                EVIDENCE_REACTIONS
+                .get(npc_key, {})
+                .get(body.presented_evidence.clue_id, {})
+                .get("stance")
+            )
+            if stance:
+                original_text = response_text
+                response_text = _force_canonical_tag(response_text, stance)
+                logger.info("🏷️  Forced canonical tag [%s] for %s+%s (was: %r)",
+                            stance.upper(), npc_key, body.presented_evidence.clue_id,
+                            original_text[-40:])
     except Exception as e:
         logger.error("Ollama error for NPC '%s': %s", npc_key, e)
         raise HTTPException(
