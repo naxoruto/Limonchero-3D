@@ -9,20 +9,29 @@ extends Node
 
 signal backend_started(pid: int)
 signal backend_failed(reason: String)
+## Emitida cuando el usuario confirma que quiere salir (diálogo de confirmación).
+signal quit_confirmed
 
 const BACKEND_DIR_NAME := "backend"
 const LINUX_BIN := "limonchero-backend"
 const WINDOWS_BIN := "limonchero-backend.exe"
 const LOG_FILE_NAME := "backend.log"
 const SKIP_LAUNCH_ENV := "LIMONCHERO_SKIP_BACKEND_LAUNCH"
+const BACKEND_SHUTDOWN_URL := "http://127.0.0.1:8000/shutdown"
 
 var _pid: int = -1
 var _binary_path: String = ""
 var _log_path: String = ""
 
+## Diálogo de confirmación de salida (shared, creado una sola vez).
+var _exit_dialog: ConfirmationDialog = null
+## Flag para evitar reentrar en la lógica de cierre.
+var _quit_pending: bool = false
+
 
 func _ready() -> void:
 	get_tree().auto_accept_quit = false
+	_create_exit_dialog()
 	if OS.has_feature("editor"):
 		print("[BackendLauncher] Editor mode — backend externo asumido.")
 		return
@@ -34,8 +43,85 @@ func _ready() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
-		stop()
-		get_tree().quit()
+		# No cerrar directamente — mostrar diálogo de confirmación.
+		if _quit_pending:
+			return
+		request_quit_confirmation()
+
+
+func request_quit_confirmation() -> void:
+	"""Muestra el diálogo de confirmación de salida."""
+	if _quit_pending:
+		return
+	if _exit_dialog == null:
+		_create_exit_dialog()
+	if not _exit_dialog.visible:
+		_exit_dialog.popup_centered()
+
+
+func _create_exit_dialog() -> void:
+	_exit_dialog = ConfirmationDialog.new()
+	_exit_dialog.title = "Salir del juego"
+	_exit_dialog.dialog_text = "¿Estás seguro de que quieres salir del juego?\nSe detendrá el servidor del backend automáticamente."
+	_exit_dialog.ok_button_text = "Sí, salir"
+	_exit_dialog.cancel_button_text = "No, volver"
+	_exit_dialog.min_size = Vector2(400, 150)
+	_exit_dialog.confirmed.connect(_on_quit_confirmed)
+	_exit_dialog.canceled.connect(_on_quit_canceled)
+	# Asegurar que aparece encima de todo.
+	_exit_dialog.always_on_top = true
+	add_child(_exit_dialog)
+
+
+func _on_quit_confirmed() -> void:
+	_quit_pending = true
+	quit_confirmed.emit()
+	_shutdown_and_quit()
+
+
+func _on_quit_canceled() -> void:
+	# No hacer nada — el jugador decidió quedarse.
+	pass
+
+
+func _shutdown_and_quit() -> void:
+	"""Detiene el backend (HTTP + kill process) y cierra el juego."""
+	# 1. Intentar shutdown graceful via HTTP.
+	_request_backend_shutdown()
+	# 2. Kill the process directly (backup).
+	stop()
+	# 3. Intentar matar por nombre del ejecutable (para el caso de .exe en Windows
+	#    o backend corriendo manualmente por consola).
+	_kill_backend_by_name()
+	# 4. Esperar un frame para que el HTTP request se envíe.
+	await get_tree().create_timer(0.3).timeout
+	get_tree().quit()
+
+
+func _request_backend_shutdown() -> void:
+	"""Envía POST /shutdown al backend para un cierre graceful."""
+	var http := HTTPRequest.new()
+	add_child(http)
+	http.timeout = 2.0
+	var headers := ["Content-Type: application/json"]
+	var err := http.request(BACKEND_SHUTDOWN_URL, headers, HTTPClient.METHOD_POST, "{}")
+	if err != OK:
+		print("[BackendLauncher] HTTP shutdown request failed (err=%d)" % err)
+
+
+func _kill_backend_by_name() -> void:
+	"""Mata el proceso del backend buscando por nombre del ejecutable.
+	Funciona tanto en Windows (taskkill) como en Linux (pkill)."""
+	if OS.has_feature("windows"):
+		# Windows: taskkill /F /IM limonchero-backend.exe
+		var args := ["/F", "/IM", WINDOWS_BIN]
+		print("[BackendLauncher] taskkill %s" % " ".join(args))
+		OS.create_process("taskkill", args, false)
+	else:
+		# Linux/macOS: pkill -f limonchero-backend
+		var args := ["-f", LINUX_BIN]
+		print("[BackendLauncher] pkill %s" % " ".join(args))
+		OS.create_process("pkill", args, false)
 
 
 func launch() -> bool:

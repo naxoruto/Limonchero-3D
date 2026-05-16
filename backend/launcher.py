@@ -1,6 +1,6 @@
 """
 Limonchero 3D — Bootstrapper
-Ensures Ollama + models + Whisper are available, then starts the backend.
+Ensures Ollama + models + Whisper + TTS are available, then starts the backend.
 """
 
 import os
@@ -258,6 +258,62 @@ def _check_ollama_hardware(ollama_cmd: str) -> None:
         pass
 
 
+def _ensure_tts_available() -> None:
+    """Verify that at least one TTS engine is available for the /tts endpoint.
+
+    Priority:
+      1. edge-tts — Microsoft Edge neural TTS (natural voices, requires internet).
+      2. pyttsx3 — uses Windows SAPI5 natively (no extra install), wraps espeak on Linux.
+      3. espeak-ng / espeak — standalone CLI, common on Linux.
+
+    On Windows, pyttsx3 always works (SAPI5 is built-in) as offline fallback.
+    """
+    # 1. Try edge-tts (preferred — natural sounding neural voices)
+    try:
+        import edge_tts
+        _log("TTS engine: edge-tts OK (neural voices)")
+        return
+    except ImportError:
+        _log("TTS: edge-tts not installed")
+
+    # 2. Try pyttsx3 (offline fallback — bundled via requirements.txt / PyInstaller)
+    try:
+        import pyttsx3
+        engine = pyttsx3.init()
+        _log("TTS engine: pyttsx3 OK (offline fallback)")
+        del engine
+        return
+    except Exception as exc:
+        _log(f"TTS: pyttsx3 not available ({exc})")
+
+    # 3. Try espeak-ng / espeak CLI
+    for cmd in ["espeak-ng", "espeak"]:
+        if _command_exists(cmd):
+            _log(f"TTS engine: {cmd} OK")
+            return
+
+    # 4. On Linux, try to install espeak-ng automatically
+    if not _is_windows():
+        _log("TTS: No engine found. Attempting to install espeak-ng...")
+        try:
+            subprocess.run(
+                ["sudo", "apt-get", "install", "-y", "espeak-ng"],
+                check=True,
+                capture_output=True,
+            )
+            if _command_exists("espeak-ng"):
+                _log("TTS engine: espeak-ng installed successfully.")
+                return
+        except Exception as exc:
+            _log(f"TTS: Auto-install failed ({exc})")
+
+    # 5. Not critical — warn but don't block startup
+    _log(
+        "⚠️  TTS: No engine available. The /tts endpoint will fail. "
+        "Install edge-tts or pyttsx3."
+    )
+
+
 def main() -> None:
     _setup_log_file()
     # Forzamos CPU para evitar errores de librerías CUDA (cublas64) faltantes en otros PCs
@@ -271,6 +327,8 @@ def main() -> None:
 
     if config.WHISPER_AUTO_DOWNLOAD:
         _ensure_whisper_model(config)
+
+    _ensure_tts_available()
 
     import uvicorn
     uvicorn.run(

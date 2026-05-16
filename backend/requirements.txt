@@ -3,6 +3,8 @@ uvicorn[standard]
 httpx
 ollama
 faster-whisper
+pyttsx3
+edge-tts
 pytest
 pytest-asyncio
 python-multipart

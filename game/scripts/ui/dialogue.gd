@@ -45,6 +45,7 @@ signal testimony_capture_requested(text: String, npc_id: String)
 @onready var _correction_label: Label = $GajitoPanel/GajitoHBox/GajitoVBox/CorrectionLabel
 @onready var _tip_label: Label = $GajitoPanel/GajitoHBox/GajitoVBox/TipLabel
 @onready var _gajito_ack_btn: Button = $GajitoPanel/GajitoHBox/GajitoVBox/ButtonRow/GajitoAckBtn
+@onready var _word_buttons_row: HBoxContainer = $GajitoPanel/GajitoHBox/GajitoVBox/WordButtonsRow
 
 const STATE_IDLE := "idle"
 const STATE_RECORDING := "recording"
@@ -68,6 +69,15 @@ var _capture_timer: Timer = null
 var _last_npc_text: String = ""
 var _last_npc_id: String = ""
 
+## Texto de corrección actual para TTS.
+var _current_correction_text: String = ""
+## Cache de audio TTS por palabra: { "word" : PackedByteArray }
+var _tts_cache: Dictionary = {}
+## Palabra actualmente esperando TTS.
+var _tts_pending_word: String = ""
+## Referencia al botón que disparó el TTS (para restaurar su texto).
+var _tts_pending_btn: Button = null
+
 
 func _ready() -> void:
 	set_process(false)
@@ -83,6 +93,9 @@ func _ready() -> void:
 	_apply_font_size(GameManager.accessibility_font_size)
 	_setup_evidence_picker()
 	_setup_capture_prompt()
+	# Conectar señales de TTS para reproducir audio de pronunciación.
+	LLMClient.tts_audio_ready.connect(_on_tts_audio_ready)
+	LLMClient.tts_failed.connect(_on_tts_failed)
 
 
 func _apply_font_size(size: int) -> void:
@@ -168,6 +181,13 @@ func show_gajito_correction(correction: String, tip: String) -> void:
 	_correction_label.text = correction
 	_tip_label.text = tip
 	_tip_label.visible = not tip.is_empty()
+	# Guardar el texto de corrección para TTS.
+	_current_correction_text = correction
+	_tts_cache.clear()
+	_tts_pending_word = ""
+	_tts_pending_btn = null
+	# Crear botones dinámicos de pronunciación por palabra.
+	_populate_word_buttons(correction)
 	_gajito_correction.visible = true
 	set_status("Inténtalo de nuevo")
 
@@ -284,7 +304,110 @@ func _on_text_confirm_pressed() -> void:
 
 func _on_gajito_ack_pressed() -> void:
 	gajito_correction_acknowledged.emit()
+	_current_correction_text = ""
+	_tts_cache.clear()
+	_tts_pending_word = ""
+	_tts_pending_btn = null
+	_clear_word_buttons()
 	_enter_idle()
+
+
+## ── Word pronunciation buttons (dinámicos) ───────────────────────────────
+
+## Extrae las palabras del texto de corrección y crea un botón por cada una.
+func _populate_word_buttons(correction: String) -> void:
+	_clear_word_buttons()
+	var words := _extract_bad_words(correction)
+	if words.is_empty():
+		# Corrección general (no hay palabras individuales). Botón único para escuchar todo.
+		var btn := _create_word_btn("🔊 Escuchar", correction)
+		_word_buttons_row.add_child(btn)
+	else:
+		# Un label introductorio.
+		var lbl := Label.new()
+		lbl.text = "🔊 Escuchar:"
+		lbl.add_theme_font_size_override("font_size", 13)
+		lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.65, 1))
+		_word_buttons_row.add_child(lbl)
+		for word in words:
+			var btn := _create_word_btn(word, word)
+			_word_buttons_row.add_child(btn)
+	_word_buttons_row.visible = true
+
+
+func _create_word_btn(label: String, tts_text: String) -> Button:
+	var btn := Button.new()
+	btn.text = label
+	btn.custom_minimum_size = Vector2(0, 30)
+	# Guardar el texto TTS en metadata.
+	btn.set_meta("tts_text", tts_text)
+	btn.set_meta("original_label", label)
+	btn.pressed.connect(_on_word_btn_pressed.bind(btn))
+	return btn
+
+
+func _clear_word_buttons() -> void:
+	for child in _word_buttons_row.get_children():
+		child.queue_free()
+	_word_buttons_row.visible = false
+
+
+## Extrae las palabras individuales del texto de corrección.
+## Formato esperado: "Pronunciaste mal algunas palabras: word1, word2, word3"
+func _extract_bad_words(correction: String) -> PackedStringArray:
+	var result := PackedStringArray()
+	if not correction.contains(":"):
+		return result
+	var after_colon := correction.substr(correction.find(":") + 1).strip_edges()
+	if after_colon.is_empty():
+		return result
+	# Separar por comas.
+	var parts := after_colon.split(",")
+	for part in parts:
+		var word := part.strip_edges()
+		if not word.is_empty():
+			result.append(word)
+	return result
+
+
+func _on_word_btn_pressed(btn: Button) -> void:
+	"""Solicita TTS de la palabra asociada al botón."""
+	var tts_text: String = btn.get_meta("tts_text", "")
+	if tts_text.is_empty():
+		return
+	# Si ya tenemos el audio cacheado, reproducir directamente.
+	if _tts_cache.has(tts_text):
+		LLMClient.play_tts_audio(_tts_cache[tts_text])
+		return
+	# Solicitar TTS al backend.
+	_tts_pending_word = tts_text
+	_tts_pending_btn = btn
+	btn.text = "⏳..."
+	btn.disabled = true
+	LLMClient.request_tts(tts_text)
+
+
+func _on_tts_audio_ready(wav_bytes: PackedByteArray) -> void:
+	"""Callback cuando el audio TTS está listo."""
+	if not _tts_pending_word.is_empty():
+		_tts_cache[_tts_pending_word] = wav_bytes
+	if _tts_pending_btn != null and is_instance_valid(_tts_pending_btn):
+		_tts_pending_btn.text = String(_tts_pending_btn.get_meta("original_label", "🔊"))
+		_tts_pending_btn.disabled = false
+	_tts_pending_word = ""
+	_tts_pending_btn = null
+	# Reproducir inmediatamente.
+	LLMClient.play_tts_audio(wav_bytes)
+
+
+func _on_tts_failed(error: String) -> void:
+	"""Callback cuando el TTS falla."""
+	push_warning("TTS falló: %s" % error)
+	if _tts_pending_btn != null and is_instance_valid(_tts_pending_btn):
+		_tts_pending_btn.text = String(_tts_pending_btn.get_meta("original_label", "🔊"))
+		_tts_pending_btn.disabled = false
+	_tts_pending_word = ""
+	_tts_pending_btn = null
 
 
 func _unhandled_input(event: InputEvent) -> void:
