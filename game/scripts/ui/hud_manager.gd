@@ -7,11 +7,11 @@ signal interaction_prompt_clicked()
 @onready var subtitle_panel: Control = $SubtitlePanel
 @onready var ptt_indicator: Control = $PTTIndicator
 @onready var inventory_notification: Label = $InventoryNotification
-@onready var anti_stall_hint: Label = $AntiStallHint
 
 var _npc_colors := {
 	"gajito": Color("#8BC34A"),
 	"papolicia": Color("#6B4423"),
+	"spud": Color("#6B4423"),
 	"moni": Color("#8B2332"),
 	"gerry": Color("#4A6B30"),
 	"lola": Color("#C4703A"),
@@ -36,10 +36,33 @@ func _ready() -> void:
 	_ptt_wave_timer.one_shot = false
 	_ptt_wave_timer.timeout.connect(_on_ptt_wave_tick)
 	add_child(_ptt_wave_timer)
+	GameManager.accessibility_font_size_changed.connect(_apply_font_size)
+	_apply_font_size(GameManager.accessibility_font_size)
+	GameManager.anti_stall_triggered.connect(_on_anti_stall_triggered)
+
+
+func _apply_font_size(size: int) -> void:
+	var npc_text: Label = subtitle_panel.get_node("NPCText")
+	var player_text: Label = subtitle_panel.get_node("PlayerText")
+	npc_text.add_theme_font_size_override("font_size", size)
+	player_text.add_theme_font_size_override("font_size", size)
 
 
 func _setup_subtitle_panel() -> void:
 	subtitle_panel.visible = false
+	if subtitle_panel.get_node_or_null("Background") == null:
+		var bg := ColorRect.new()
+		bg.name = "Background"
+		bg.color = Color(0, 0, 0, 0.6)
+		bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		bg.anchor_right = 1.0
+		bg.anchor_bottom = 1.0
+		bg.offset_left = -8.0
+		bg.offset_top = -4.0
+		bg.offset_right = 8.0
+		bg.offset_bottom = 4.0
+		subtitle_panel.add_child(bg)
+		subtitle_panel.move_child(bg, 0)
 
 
 # ── Interaction Prompt ────────────────────────────────────────────
@@ -165,22 +188,27 @@ func show_inventory_notification(clue_name: String) -> void:
 	inventory_notification.visible = false
 
 
-# ── Anti-Stall Hint ───────────────────────────────────────────────
+# ── Anti-Stall Hint (ADR-0011) ────────────────────────────────────
 
-var _hints := {
-	1: "Quizas deberias revisar el guardarropa...",
-	2: "El piso de arriba podria tener respuestas...",
-	3: "Barry Peel. Su reservado. El acuerdo."
+const _HINT_TEXTS := {
+	1: "Limonchero, ¿has revisado todos los rincones del local? Hay más pistas esperándote.",
+	2: "Quizás vale la pena hablar con alguien que aún no hayas interrogado del todo...",
+	3: "El cenicero junto a la barra tiene algo interesante. Y no olvides el guardarropa."
 }
+
+
+func _on_anti_stall_triggered(level_key: String) -> void:
+	# "L1"/"L2"/"L3" → 1/2/3
+	var n := int(level_key.substr(1))
+	show_anti_stall_hint(n)
 
 
 func show_anti_stall_hint(level: int) -> void:
 	if level < 1 or level > 3:
 		return
-	anti_stall_hint.text = _hints[level]
-	anti_stall_hint.visible = true
-	await get_tree().create_timer(4.0).timeout
-	anti_stall_hint.visible = false
+	if get_tree().paused:
+		return
+	GajitoPopup.show_message(_HINT_TEXTS[level], "high")
 
 
 # ── Global visibility toggle ──────────────────────────────────────
@@ -190,3 +218,5 @@ func set_hud_visible(visible: bool) -> void:
 	ptt_indicator.visible = visible
 	interaction_prompt.visible = visible
 	inventory_notification.visible = visible
+	if not visible:
+		GajitoPopup.dismiss()

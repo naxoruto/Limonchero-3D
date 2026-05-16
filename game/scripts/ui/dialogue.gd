@@ -17,6 +17,10 @@ signal text_confirmed(transcript: String)
 signal retry_from_text
 ## Emitido cuando el jugador cierra el panel de corrección de Gajito.
 signal gajito_correction_acknowledged
+## Emitido cuando el jugador selecciona una pista para presentar al NPC.
+signal clue_presentation_requested(clue_id: String)
+## Emitido cuando el jugador presiona X para capturar un testimonio.
+signal testimony_capture_requested(text: String, npc_id: String)
 
 @export var chars_per_second: float = 40.0
 ## Imagen del retrato de Gajito que aparece en el panel de corrección.
@@ -55,6 +59,14 @@ var _state: String = STATE_IDLE
 var _typewriter_active: bool = false
 var _typewriter_progress: float = 0.0
 var _pending_transcript: String = ""
+var _evidence_picker_open: bool = false
+var _evidence_panel: Control = null
+var _evidence_list: VBoxContainer = null
+
+var _capture_prompt: Label = null
+var _capture_timer: Timer = null
+var _last_npc_text: String = ""
+var _last_npc_id: String = ""
 
 
 func _ready() -> void:
@@ -67,6 +79,16 @@ func _ready() -> void:
 	_gajito_ack_btn.pressed.connect(_on_gajito_ack_pressed)
 	if gajito_portrait != null:
 		_gajito_portrait_rect.texture = gajito_portrait
+	GameManager.accessibility_font_size_changed.connect(_apply_font_size)
+	_apply_font_size(GameManager.accessibility_font_size)
+	_setup_evidence_picker()
+	_setup_capture_prompt()
+
+
+func _apply_font_size(size: int) -> void:
+	_chat_log.add_theme_font_size_override("normal_font_size", size)
+	_correction_label.add_theme_font_size_override("font_size", size)
+	_tip_label.add_theme_font_size_override("font_size", size - 2)
 
 
 func show_panel(npc: Node) -> void:
@@ -81,6 +103,7 @@ func show_panel(npc: Node) -> void:
 
 
 func hide_panel() -> void:
+	close_evidence_picker()
 	_panel.visible = false
 	_npc = null
 	_state = STATE_IDLE
@@ -183,6 +206,14 @@ func add_npc_message(text: String) -> void:
 	_typewriter_active = true
 	set_status("Pensando...")
 	set_process(true)
+	_show_capture_prompt(text)
+
+
+## Mensaje neutral del sistema (marcadores, stamps, capturas). No cambia estado.
+func add_system_message(text: String) -> void:
+	_finish_typewriter()
+	_chat_log.append_text("\n[color=#9E9E9E][i]%s[/i][/color]" % text)
+	_chat_log.visible_characters = -1
 
 
 func set_status(text: String) -> void:
@@ -207,6 +238,8 @@ func _finish_typewriter() -> void:
 		_chat_log.visible_characters = -1
 		_typewriter_active = false
 		set_process(false)
+		if _state == STATE_PROCESSING:
+			_enter_idle()
 
 
 func _process(delta: float) -> void:
@@ -263,6 +296,16 @@ func _unhandled_input(event: InputEvent) -> void:
 			close_requested.emit()
 			get_viewport().set_input_as_handled()
 			return
+		if event.keycode == KEY_TAB and event.pressed:
+			if _state == STATE_IDLE:
+				toggle_evidence_picker()
+			get_viewport().set_input_as_handled()
+			return
+		if event.keycode == KEY_X and event.pressed:
+			if _capture_prompt != null and _capture_prompt.visible:
+				_capture_text()
+			get_viewport().set_input_as_handled()
+			return
 		if event.keycode == KEY_V:
 			# V solo funciona en IDLE o durante RECORDING.
 			if _state == STATE_IDLE and event.pressed:
@@ -272,3 +315,205 @@ func _unhandled_input(event: InputEvent) -> void:
 			elif _state == STATE_RECORDING and not event.pressed:
 				# El backend mostrará el panel de revisión al recibir el audio.
 				recording_stopped.emit()
+
+
+# ── Evidence Picker (mini-notebook lateral durante diálogo) ────────
+
+
+func toggle_evidence_picker() -> void:
+	if _evidence_picker_open:
+		close_evidence_picker()
+	else:
+		open_evidence_picker()
+
+
+func open_evidence_picker() -> void:
+	_evidence_picker_open = true
+	_populate_evidence_picker()
+	_evidence_panel.visible = true
+	set_status("Selecciona una pista para mostrar — [TAB] para cerrar")
+
+
+func close_evidence_picker() -> void:
+	_evidence_picker_open = false
+	_evidence_panel.visible = false
+	if _state == STATE_IDLE:
+		_set_idle_status()
+
+
+func is_evidence_picker_open() -> bool:
+	return _evidence_picker_open
+
+
+const EVI_COLOR_PAPER := Color(0.961, 0.925, 0.784)
+const EVI_COLOR_INK := Color(0.165, 0.102, 0.031)
+const EVI_COLOR_GOOD := Color(0.165, 0.353, 0.125)
+const EVI_COLOR_BAD := Color(0.416, 0.082, 0.125)
+const EVI_COLOR_UNREVIEWED := Color(0.486, 0.4, 0.235)
+
+
+func _setup_evidence_picker() -> void:
+	_evidence_panel = Control.new()
+	_evidence_panel.name = "EvidencePicker"
+	_evidence_panel.visible = false
+	_evidence_panel.anchor_left = 0.68
+	_evidence_panel.anchor_right = 1.0
+	_evidence_panel.anchor_top = 0.05
+	_evidence_panel.anchor_bottom = 0.75
+	_evidence_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(_evidence_panel)
+
+	var bg := ColorRect.new()
+	bg.name = "PickerBG"
+	bg.color = Color(0.02, 0.02, 0.05, 0.92)
+	bg.anchor_right = 1.0
+	bg.anchor_bottom = 1.0
+	_evidence_panel.add_child(bg)
+
+	var title := Label.new()
+	title.name = "PickerTitle"
+	title.text = "EVIDENCIAS"
+	title.position = Vector2(12, 10)
+	title.add_theme_color_override("font_color", EVI_COLOR_PAPER)
+	title.add_theme_font_size_override("font_size", 15)
+	_evidence_panel.add_child(title)
+
+	var scroll := ScrollContainer.new()
+	scroll.name = "PickerScroll"
+	scroll.anchor_top = 0.08
+	scroll.anchor_right = 1.0
+	scroll.anchor_bottom = 1.0
+	scroll.anchor_left = 0.0
+	_evidence_panel.add_child(scroll)
+
+	_evidence_list = VBoxContainer.new()
+	_evidence_list.name = "PickerList"
+	_evidence_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_evidence_list.add_theme_constant_override("separation", 4)
+	scroll.add_child(_evidence_list)
+
+
+func _populate_evidence_picker() -> void:
+	for child in _evidence_list.get_children():
+		child.queue_free()
+
+	var clues := GameManager.get_all_clues()
+	if clues.is_empty():
+		var empty := Label.new()
+		empty.text = "(sin pistas)"
+		empty.add_theme_color_override("font_color", Color(1, 1, 1, 0.4))
+		empty.add_theme_font_size_override("font_size", 12)
+		_evidence_list.add_child(empty)
+		return
+
+	for clue_id in clues:
+		var clue: Dictionary = clues[clue_id]
+		var state: String = String(clue.get("state", ""))
+		var name: String = String(clue.get("name", clue_id))
+		var glyph := _evi_glyph(state)
+		var color := _evi_color(state)
+		var clue_type: String = String(clue.get("type", "physical"))
+
+		var btn := Button.new()
+		var type_tag := " 📷"
+		if clue_type == "testimony":
+			type_tag = " 💬"
+		btn.text = "[%s] %s — %s %s%s" % [clue_id, name, glyph, state, type_tag]
+		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		btn.flat = true
+		btn.add_theme_color_override("font_color", EVI_COLOR_PAPER)
+		btn.add_theme_color_override("font_hover_color", Color.WHITE)
+		btn.add_theme_color_override("font_focus_color", Color.WHITE)
+		btn.add_theme_font_size_override("font_size", 12)
+		btn.add_theme_stylebox_override("normal", _evi_btn_stylebox())
+		btn.add_theme_stylebox_override("hover", _evi_btn_hover_stylebox())
+		btn.add_theme_stylebox_override("focus", _evi_btn_hover_stylebox())
+
+		btn.pressed.connect(_on_evidence_selected.bind(String(clue_id)))
+		_evidence_list.add_child(btn)
+
+
+func _on_evidence_selected(clue_id: String) -> void:
+	clue_presentation_requested.emit(clue_id)
+	close_evidence_picker()
+
+
+func _evi_color(state: String) -> Color:
+	match state:
+		GameManager.STATE_GOOD:
+			return EVI_COLOR_GOOD
+		GameManager.STATE_BAD:
+			return EVI_COLOR_BAD
+		_:
+			return EVI_COLOR_UNREVIEWED
+
+
+func _evi_glyph(state: String) -> String:
+	match state:
+		GameManager.STATE_GOOD:
+			return "✓"
+		GameManager.STATE_BAD:
+			return "✗"
+		_:
+			return "○"
+
+
+func _evi_btn_stylebox() -> StyleBoxFlat:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(1, 1, 1, 0.05)
+	sb.content_margin_left = 8
+	sb.content_margin_top = 4
+	sb.content_margin_right = 8
+	sb.content_margin_bottom = 4
+	return sb
+
+
+func _evi_btn_hover_stylebox() -> StyleBoxFlat:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(1, 1, 1, 0.15)
+	sb.content_margin_left = 8
+	sb.content_margin_top = 4
+	sb.content_margin_right = 8
+	sb.content_margin_bottom = 4
+	return sb
+
+
+# ── Capture Testimony ─────────────────────────────────────────────
+
+
+func _setup_capture_prompt() -> void:
+	_capture_prompt = Label.new()
+	_capture_prompt.name = "CapturePrompt"
+	_capture_prompt.text = "[X] Agregar como evidencia"
+	_capture_prompt.visible = false
+	_capture_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_capture_prompt.anchor_left = 0.35
+	_capture_prompt.anchor_right = 0.65
+	_capture_prompt.anchor_bottom = 1.0
+	_capture_prompt.anchor_top = 0.92
+	_capture_prompt.add_theme_color_override("font_color", Color("#8BC34A"))
+	_capture_prompt.add_theme_font_size_override("font_size", 14)
+	add_child(_capture_prompt)
+
+	_capture_timer = Timer.new()
+	_capture_timer.name = "CaptureTimer"
+	_capture_timer.one_shot = true
+	_capture_timer.timeout.connect(_hide_capture_prompt)
+	add_child(_capture_timer)
+
+
+func _show_capture_prompt(text: String) -> void:
+	_last_npc_text = text
+	_last_npc_id = _npc.npc_id if _npc != null else ""
+	_capture_prompt.visible = true
+	_capture_timer.start(4.0)
+
+
+func _hide_capture_prompt() -> void:
+	_capture_prompt.visible = false
+
+
+func _capture_text() -> void:
+	_capture_prompt.visible = false
+	_capture_timer.stop()
+	testimony_capture_requested.emit(_last_npc_text, _last_npc_id)
