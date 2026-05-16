@@ -89,7 +89,9 @@ func _on_start_pressed() -> void:
 
 
 func _on_exit_pressed() -> void:
-	get_tree().quit()
+	# Delegar al BackendLauncher que muestra el diálogo de confirmación
+	# y maneja el shutdown del backend + cierre del juego.
+	BackendLauncher.request_quit_confirmation()
 
 
 func _on_retry_pressed() -> void:

@@ -15,6 +15,7 @@ Run:
 """
 
 import io
+import os
 import tempfile
 import time
 import logging
@@ -456,9 +457,19 @@ async def grammar_check(body: GrammarRequest):
 
 from typing import List
 
+# --- CONFIGURACIÓN DE NIVELES DE PRONUNCIACIÓN ---
+# Ajusta estos valores de 0 a 100 para ser más o menos estricto
+THRESHOLD_BAD_WORD = int(os.environ.get("THRESHOLD_BAD_WORD", 85))        # Si una palabra tiene menos de esto, se marca como mal dicha
+THRESHOLD_BAD_SENTENCE = int(os.environ.get("THRESHOLD_BAD_SENTENCE", 75))    # Si el promedio es menor a esto, la frase entera es inentendible
+# -------------------------------------------------
+
 class WordDetail(BaseModel):
     word: str
     probability: int
+
+class STTThresholds(BaseModel):
+    bad_word: int
+    bad_sentence: int
 
 class STTResponse(BaseModel):
     """Response body from /stt."""
@@ -467,6 +478,7 @@ class STTResponse(BaseModel):
     clarity_score: int = Field(default=0, description="Pronunciation clarity from 0 to 100")
     words: List[WordDetail] = Field(default_factory=list, description="Word by word pronunciation score")
     language: str = Field(default="en", description="Detected language")
+    thresholds: STTThresholds = Field(description="Configured evaluation thresholds")
 
 
 @app.post("/stt", response_model=STTResponse)
@@ -582,7 +594,11 @@ async def speech_to_text(file: UploadFile = File(...)):
             duration_ms=elapsed_ms, 
             clarity_score=clarity_score,
             words=word_details,
-            language=detected_lang
+            language=detected_lang,
+            thresholds=STTThresholds(
+                bad_word=THRESHOLD_BAD_WORD,
+                bad_sentence=THRESHOLD_BAD_SENTENCE,
+            )
         )
 
     except Exception as e:
@@ -591,6 +607,171 @@ async def speech_to_text(file: UploadFile = File(...)):
             status_code=500,
             detail=f"STT processing failed: {e}",
         )
+
+
+# ═══════════════════════════════════════════════════════
+#  STORY 005 — Pronunciation (TTS)
+# ═══════════════════════════════════════════════════════
+
+# Neural voice for edge-tts (natural sounding).
+# en-US-JennyNeural = female, clear American English.
+# Alternatives: en-US-GuyNeural (male), en-GB-SoniaNeural (British female).
+EDGE_TTS_VOICE = os.environ.get("EDGE_TTS_VOICE", "en-US-JennyNeural")
+
+class TTSRequest(BaseModel):
+    """Request body for /tts."""
+    text: str = Field(..., description="Text to synthesize into speech.")
+
+
+@app.post("/tts")
+async def text_to_speech(body: TTSRequest):
+    """
+    Synthesize speech for a given text using neural TTS (edge-tts).
+    Returns a WAV audio file that the game can play back to the user,
+    so they can hear the correct pronunciation of mispronounced words.
+    """
+    text = body.text.strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="Empty text.")
+
+    logger.info("🔊 TTS request: '%s'", text[:80])
+
+    try:
+        wav_bytes = await _synthesize_speech(text)
+        from fastapi.responses import Response
+        return Response(content=wav_bytes, media_type="audio/wav")
+    except Exception as e:
+        logger.error("TTS error: %s", e)
+        raise HTTPException(status_code=500, detail=f"TTS failed: {e}")
+
+
+async def _synthesize_speech(text: str) -> bytes:
+    """Synthesize speech with natural-sounding neural voices.
+
+    Priority:
+      1. edge-tts — Microsoft Edge neural TTS (very natural, free, requires internet).
+      2. pyttsx3 — offline fallback (robotic but always works).
+      3. espeak-ng/espeak — CLI fallback.
+    """
+    # 1. edge-tts (neural — natural sounding)
+    try:
+        import edge_tts
+        communicate = edge_tts.Communicate(text, EDGE_TTS_VOICE)
+        mp3_path = tempfile.mktemp(suffix=".mp3")
+        try:
+            await communicate.save(mp3_path)
+            wav_bytes = _mp3_to_wav(mp3_path)
+            logger.info("🔊 TTS via edge-tts (voice=%s, %d bytes)", EDGE_TTS_VOICE, len(wav_bytes))
+            return wav_bytes
+        finally:
+            try:
+                os.remove(mp3_path)
+            except OSError:
+                pass
+    except Exception as exc:
+        logger.warning("edge-tts failed: %s — trying pyttsx3 fallback", exc)
+
+    # 2. pyttsx3 (offline fallback)
+    try:
+        import pyttsx3
+        engine = pyttsx3.init()
+        # Find English voice
+        voices = engine.getProperty("voices")
+        en_voice = None
+        for voice in voices:
+            vid = voice.id.lower()
+            if "/en-" in vid or "/en_" in vid or vid.endswith("/en"):
+                en_voice = voice
+                break
+            if "english" in voice.name.lower() and "latin" not in voice.name.lower():
+                en_voice = voice
+                break
+        if en_voice:
+            engine.setProperty("voice", en_voice.id)
+        engine.setProperty("rate", 140)
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+            tmp_name = tmp.name
+        try:
+            engine.save_to_file(text, tmp_name)
+            engine.runAndWait()
+            with open(tmp_name, "rb") as f:
+                return f.read()
+        finally:
+            try:
+                os.remove(tmp_name)
+            except OSError:
+                pass
+    except Exception as exc:
+        logger.warning("pyttsx3 TTS failed: %s — trying espeak", exc)
+
+    # 3. espeak CLI (last resort)
+    import subprocess
+    import shutil
+
+    for espeak_cmd in ["espeak-ng", "espeak"]:
+        if shutil.which(espeak_cmd):
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+                tmp_name = tmp.name
+            try:
+                subprocess.run(
+                    [espeak_cmd, "-v", "en", "-s", "140", "-w", tmp_name, text],
+                    check=True,
+                    capture_output=True,
+                )
+                with open(tmp_name, "rb") as f:
+                    return f.read()
+            finally:
+                try:
+                    os.remove(tmp_name)
+                except OSError:
+                    pass
+
+    raise RuntimeError(
+        "No TTS engine available. Install edge-tts, pyttsx3, or espeak-ng."
+    )
+
+
+def _mp3_to_wav(mp3_path: str) -> bytes:
+    """Convert an MP3 file to WAV bytes using PyAV (already installed via faster-whisper)."""
+    import av
+
+    wav_buf = io.BytesIO()
+    with av.open(mp3_path) as inp:
+        with av.open(wav_buf, "w", format="wav") as out:
+            ostream = out.add_stream("pcm_s16le", rate=24000, layout="mono")
+            for frame in inp.decode(audio=0):
+                frame.pts = None
+                for packet in ostream.encode(frame):
+                    out.mux(packet)
+            for packet in ostream.encode(None):
+                out.mux(packet)
+    return wav_buf.getvalue()
+
+
+# ═══════════════════════════════════════════════════════
+#  Shutdown
+# ═══════════════════════════════════════════════════════
+
+@app.post("/shutdown")
+async def shutdown():
+    """
+    Gracefully shut down the backend server.
+    Called by the Godot game when the player exits.
+    """
+    import signal
+    logger.info("🛑 Shutdown requested by game client.")
+
+    # Schedule shutdown after response is sent
+    async def _delayed_shutdown():
+        import asyncio
+        await asyncio.sleep(0.5)
+        logger.info("🛑 Executing shutdown now.")
+        os.kill(os.getpid(), signal.SIGTERM)
+
+    import asyncio
+    asyncio.ensure_future(_delayed_shutdown())
+
+    return {"status": "shutting_down"}
 
 
 # ═══════════════════════════════════════════════════════

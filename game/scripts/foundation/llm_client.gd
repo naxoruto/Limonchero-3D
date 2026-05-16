@@ -10,6 +10,8 @@ signal npc_evidence_response_ready(npc_id: String, clue_id: String, raw_text: St
 signal gajito_evaluation_ready(passed: bool, score: float, correction: String, tip: String, translation_es: String)
 signal gajito_evaluation_failed(error: String)
 signal health_check_done(ok: bool)
+signal tts_audio_ready(wav_bytes: PackedByteArray)
+signal tts_failed(error: String)
 
 const DEFAULT_BASE_URL := "http://127.0.0.1:8000"
 const BACKEND_URL_ENV := "LIMONCHERO_BACKEND_URL"
@@ -27,14 +29,23 @@ var _stt_req: HTTPRequest = null
 var _npc_req: HTTPRequest = null
 var _gajito_req: HTTPRequest = null
 var _health_req: HTTPRequest = null
+var _tts_req: HTTPRequest = null
+var _tts_player: AudioStreamPlayer = null
 var _pending_npc_id: String = ""
 var _pending_evidence_clue_id: String = ""
 var _pending_gajito_transcript: String = ""
 
 # Guardamos el resultado del ultimo STT para usarlo en Gajito
 var _last_clarity_score: int = 0
+## Ultimas palabras con probabilidad
 var _last_words: Array = []
+## Ultimo idioma detectado (e.g. "en" o "es")
 var _last_language: String = "en"
+## Últimos thresholds de pronunciación devueltos por el backend
+var _last_thresholds: Dictionary = {
+	"bad_word": 80,
+	"bad_sentence": 70
+}
 
 
 func _ready() -> void:
@@ -43,18 +54,26 @@ func _ready() -> void:
 	_npc_req = HTTPRequest.new()
 	_gajito_req = HTTPRequest.new()
 	_health_req = HTTPRequest.new()
+	_tts_req = HTTPRequest.new()
 	add_child(_stt_req)
 	add_child(_npc_req)
 	add_child(_gajito_req)
 	add_child(_health_req)
+	add_child(_tts_req)
 	_stt_req.timeout = REQUEST_TIMEOUT_SEC
 	_npc_req.timeout = REQUEST_TIMEOUT_SEC
 	_gajito_req.timeout = REQUEST_TIMEOUT_SEC
 	_health_req.timeout = 3.0
+	_tts_req.timeout = 15.0
 	_stt_req.request_completed.connect(_on_stt_completed)
 	_npc_req.request_completed.connect(_on_npc_completed)
 	_gajito_req.request_completed.connect(_on_gajito_completed)
 	_health_req.request_completed.connect(_on_health_completed)
+	_tts_req.request_completed.connect(_on_tts_completed)
+	# Reproductor de audio para TTS.
+	_tts_player = AudioStreamPlayer.new()
+	_tts_player.bus = "Master"
+	add_child(_tts_player)
 
 
 func _resolve_base_url() -> String:
@@ -158,6 +177,52 @@ func check_health() -> void:
 		health_check_done.emit(false)
 
 
+## POST /tts — Solicita audio de pronunciación para texto dado.
+## El backend devuelve un WAV que se reproduce directamente.
+func request_tts(text: String) -> void:
+	if text.strip_edges().is_empty():
+		tts_failed.emit("Texto vacío")
+		return
+	var payload := JSON.stringify({"text": text})
+	var headers := ["Content-Type: application/json"]
+	var url := "%s/tts" % _base_url
+	var err := _tts_req.request(url, headers, HTTPClient.METHOD_POST, payload)
+	if err != OK:
+		tts_failed.emit("HTTPRequest error: %d" % err)
+
+
+## Reproduce el último audio TTS recibido.
+func play_tts_audio(wav_bytes: PackedByteArray) -> void:
+	if wav_bytes.is_empty() or _tts_player == null:
+		return
+	var stream := _build_tts_stream(wav_bytes)
+	if stream == null:
+		push_warning("LLMClient: no se pudo construir AudioStreamWAV para TTS.")
+		return
+	_tts_player.stop()
+	_tts_player.stream = stream
+	_tts_player.play()
+
+
+func _build_tts_stream(wav: PackedByteArray) -> AudioStreamWAV:
+	if wav.size() < 44:
+		return null
+	# Cabecera WAV estándar: sample_rate en offset 24, data desde offset 44.
+	var sample_rate: int = wav.decode_u32(24)
+	var num_channels: int = wav.decode_u16(22)
+	var bits_per_sample: int = wav.decode_u16(34)
+	var pcm := wav.slice(44)
+	var stream := AudioStreamWAV.new()
+	if bits_per_sample == 16:
+		stream.format = AudioStreamWAV.FORMAT_16_BITS
+	else:
+		stream.format = AudioStreamWAV.FORMAT_8_BITS
+	stream.mix_rate = sample_rate
+	stream.stereo = (num_channels > 1)
+	stream.data = pcm
+	return stream
+
+
 # ── Mock Gajito (integrado con STT clarity score) ─────────────────────
 
 func _run_mock_gajito_evaluation(transcript: String) -> void:
@@ -172,15 +237,16 @@ func _run_mock_gajito_evaluation(transcript: String) -> void:
 		passed = false
 		correction = "¡Hablaste en español! No se admiten trampas."
 		tip = "Recuerda que Gajito sólo revisa y te ayuda si intentas pensar en inglés."
-	elif _last_clarity_score > 0 and _last_clarity_score < 50:
+	elif _last_clarity_score > 0 and _last_clarity_score < int(_last_thresholds.get("bad_sentence", 70)):
 		passed = false
 		correction = "No se te entendió casi nada (Claridad total: %d%%)." % _last_clarity_score
 		tip = "Intenta hablar más claro y con mejor volumen."
 	else:
 		var bad_words := PackedStringArray()
+		var bad_word_threshold := int(_last_thresholds.get("bad_word", 80))
 		for w in _last_words:
 			if typeof(w) == TYPE_DICTIONARY and w.has("probability") and w.has("word"):
-				if int(w["probability"]) < 60:
+				if int(w["probability"]) < bad_word_threshold:
 					bad_words.append(w["word"])
 					
 		if bad_words.size() > 0:
@@ -206,6 +272,8 @@ func _on_stt_completed(result: int, code: int, _headers: PackedStringArray, body
 	_last_language = parsed.get("language", "en")
 	var words_data = parsed.get("words", [])
 	_last_words = words_data if typeof(words_data) == TYPE_ARRAY else []
+	if parsed.has("thresholds"):
+		_last_thresholds = parsed["thresholds"]
 		
 	stt_completed.emit(parsed["transcript"])
 
@@ -250,6 +318,16 @@ func _on_gajito_completed(result: int, code: int, _headers: PackedStringArray, b
 
 func _on_health_completed(result: int, code: int, _headers: PackedStringArray, _body: PackedByteArray) -> void:
 	health_check_done.emit(result == HTTPRequest.RESULT_SUCCESS and code == 200)
+
+
+func _on_tts_completed(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	if result != HTTPRequest.RESULT_SUCCESS or code != 200:
+		tts_failed.emit("TTS HTTP %d (result %d)" % [code, result])
+		return
+	if body.is_empty():
+		tts_failed.emit("TTS devolvió audio vacío")
+		return
+	tts_audio_ready.emit(body)
 
 
 # ── Multipart builder ─────────────────────────────────────────────────────
