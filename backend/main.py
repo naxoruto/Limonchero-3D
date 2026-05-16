@@ -443,13 +443,39 @@ async def speech_to_text(file: UploadFile = File(...)):
 
         transcript = " ".join(transcript_parts).strip()
         
+        transcript = transcript.replace("cisne y el árabe", "cisne y el agave")
+        transcript = transcript.replace("Cisne y el Árabe", "Cisne y el Agave")
+        transcript = transcript.replace("Cisne y el árabe", "Cisne y el Agave")
+        transcript = transcript.replace("pa policia", "papolicia")
+        transcript = transcript.replace("pa policía", "papolicia")
+        transcript = transcript.replace("pa' policia", "papolicia")
+        transcript = transcript.replace("pa' policía", "papolicia")
+        transcript = transcript.replace("pa' policia'", "papolicia")
+        
         # Whisper a veces confunde el español con árabe u otros idiomas (por la estática o acentos).
         # Para nuestro juego, si no evaluó claramente que es inglés ("en"), sumimos que trató de hablar español.
         detected_lang = "en" if info.language == "en" else "es"
         
         if detected_lang == "es":
-            logger.warning("El jugador NO habló en inglés (detectó %s). Asumiendo español.", info.language)
-            clarity_score = 0
+            import re
+            clean_transcript = transcript.lower()
+            tolerated_phrases = [
+                "limonchero", "gajito", "moni grana", 
+                "brocolini", "cisne y el agave", "papolicia",
+            ]
+            
+            for phrase in tolerated_phrases:
+                clean_transcript = clean_transcript.replace(phrase, "")
+                
+            # Verificar si después de remover las frases toleradas y símbolos queda alguna letra
+            remaining = re.sub(r'[^\w\s]', '', clean_transcript).strip()
+            
+            if not remaining and transcript.strip():
+                detected_lang = "en"
+                logger.info("El STT detectó español, pero son solo palabras/frases toleradas. Forzando a inglés.")
+            else:
+                logger.warning("El jugador NO habló en inglés (detectó %s). Asumiendo español.", info.language)
+                clarity_score = 0
             
         elapsed_ms = int((time.monotonic() - start_time) * 1000)
 

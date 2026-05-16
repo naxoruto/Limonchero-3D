@@ -6,7 +6,7 @@ Ver tambien GDD §3.3 (placeholder), ADR-0014 (NPC Dialogue Module).
 Reglas de idioma (cast-bible.md):
   - Todos los NPCs del club: SOLO INGLES
   - Gajito: SOLO ESPANOL (es companero, no NPC del club)
-  - Spud: SOLO INGLES
+  - papolicia: SOLO INGLES
 
 Barry Peel confession gate:
   Barry SOLO confiesa si las tres pruebas estan presentes:
@@ -33,8 +33,8 @@ _GLOBAL_RULES = (
 # ── NPC System Prompts ──────────────────────────────────
 
 NPC_PROMPTS: dict[str, str] = {
-    "spud": (
-        "You are Commissioner Wallace Spud. You speak ONLY IN ENGLISH. "
+    "papolicia": (
+        "You are Commissioner papolicia. You speak ONLY IN ENGLISH. "
         "You are impatient and condescending. "
         "You think Gerry Broccolini did it — he's the most obvious suspect and "
         "you want a quick arrest. "

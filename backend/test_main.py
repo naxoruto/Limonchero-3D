@@ -68,8 +68,8 @@ class TestNPCDialogue:
     def test_valid_npc_returns_response(self):
         """Valid NPC ID should return a 200 response with text."""
         with patch("main.ollama.chat", side_effect=self._mock_ollama_chat):
-            response = client.post("/npc/spud", json={
-                "npc_id": "spud",
+            response = client.post("/npc/papolicia", json={
+                "npc_id": "papolicia",
                 "history": [],
                 "message": "Hello Commissioner",
             })
@@ -90,7 +90,7 @@ class TestNPCDialogue:
 
     def test_all_valid_npcs(self):
         """All 6 NPCs from the GDD should be reachable."""
-        valid_npcs = ["spud", "moni", "gerry", "lola", "barry", "gajito"]
+        valid_npcs = ["papolicia", "moni", "gerry", "lola", "barry", "gajito"]
         with patch("main.ollama.chat", side_effect=self._mock_ollama_chat):
             for npc in valid_npcs:
                 response = client.post(f"/npc/{npc}", json={
@@ -156,8 +156,8 @@ class TestNPCDialogue:
     def test_ollama_down_returns_503(self):
         """If Ollama is unreachable, NPC endpoint should return 503."""
         with patch("main.ollama.chat", side_effect=Exception("Connection refused")):
-            response = client.post("/npc/spud", json={
-                "npc_id": "spud",
+            response = client.post("/npc/papolicia", json={
+                "npc_id": "papolicia",
                 "history": [],
                 "message": "Hello",
             })
@@ -280,7 +280,7 @@ class TestNPCPrompts:
     def test_all_npcs_have_prompts(self):
         """All 6 NPCs should have system prompts defined."""
         from npc_prompts import NPC_PROMPTS
-        expected = {"spud", "moni", "gerry", "lola", "barry", "gajito"}
+        expected = {"papolicia", "moni", "gerry", "lola", "barry", "gajito"}
         assert set(NPC_PROMPTS.keys()) == expected
 
     def test_all_npcs_english_only_except_gajito(self):
